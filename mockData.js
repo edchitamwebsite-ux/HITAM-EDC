@@ -1,4 +1,7 @@
-// Master Persistent Cache Seed Array Modules for Serverless Deployments
+// ==========================================================================
+// EDC HITAM Master Relational Store Emulator & Persistent Cache Seed Engine
+// ==========================================================================
+
 const initialBlogs = [
     { id: 11, title: "Welcoming the 2026 Academic Innovation Cohort", date: "2026-06-15", content: "Today marks the launch of our upgraded incubation tracks at the Hyderabad Institute of Technology and Management. The EDC welcomes incoming undergraduate engineering teams eager to tackle User Defined Problems (UDP) and establish scalable commercial paradigms.", author: "Blog Admin", tags: "Incubation, Cohort" },
     { id: 12, title: "National Innovation Week Launch Preparations", date: "2026-01-10", content: "Aligning with MoE Innovation Cell guidelines, our student coordinators are finalizing timelines for upcoming pitching rounds, expert validation sessions, and prototype matching tracks.", author: "Super Admin", tags: "IIC, MoE, Preparation" }
@@ -27,12 +30,12 @@ const initialVisitors = [
         date: "2021-09-18",
         topic: "Being Better as an Entrepreneur or Job Seeker",
         message: "HITAM's focus on 'Doing Engineering the Experiential Way' builds highly innovative mindsets. It was a pleasure interacting with their student ecosystem!",
-        img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80"
+        img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&].jpg"
     }
 ];
 
 const initialStartups = [
-    { id: 51, name: "Trendy Jutes", founder: "Manchu Deepa", industry: "Sustainable Materials", solution: "Eco-friendly retail alternatives built via local automated manufacturing channels.", metrics: "Scaled revenues to 50 Lakhs within early production runs.", url: "https://google.com" }
+    { id: 51, name: "Trendy Jutes", founder: "Manchu Deepa", industry: "Sustainable Materials", solution: "Eco-friendly jute bag distribution networks built via local automated manufacturing channels.", metrics: "Scaled commercial revenues to target threshold of 50 Lakhs.", url: "https://google.com" }
 ];
 
 const defaultStats = { initiatives: 26, mindsets: 1200, workshops: 45, experts: 32, funding: 15, awards: 12 };
@@ -49,11 +52,12 @@ const defaultProblemVideos = [
 ];
 
 function fetchTable(key, template) {
-    if (!localStorage.getItem(key)) {
+    const data = localStorage.getItem(key);
+    if (!data || data === "[]" || data === "{}") {
         localStorage.setItem(key, JSON.stringify(template));
         return template;
     }
-    return JSON.parse(localStorage.getItem(key));
+    return JSON.parse(data);
 }
 
 function commitTable(key, data) {

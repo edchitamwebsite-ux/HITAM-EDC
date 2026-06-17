@@ -3,45 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HITAM | Enterprise Development Center</title>
+    <title>HITAM | Entrepreneurship Development Cell</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease; }
         
-        /* Premium Transparent HITAM Background Watermark Design Layout */
         .watermarked-bg::before {
-            content: "";
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60vw;
-            height: 60vh;
-            background-image: url('hitam-logo.png'); /* Reads local transparent image file asset */
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            opacity: 0.15; /* Maintains a highly subtle, professional background opacity shadow footprint */
-            pointer-events: none;
-            z-index: -1;
+            content: ""; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75vw; height: 75vh; background-image: url('hitam-logo.png');
+            background-repeat: no-repeat; background-position: center; background-size: contain;
+            opacity: 0.05; pointer-events: none; z-index: -1;
+        }
+
+        /* Responsive Adaptive Media Prefers Color Scheme Styles Matrix (Req 1) */
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #020617 !important; color: #f8fafc !important; }
+            header { background-color: rgba(15, 23, 42, 0.95) !important; border-color: #1e293b !important; }
+            header nav a { color: #cbd5e1 !important; }
+            .glass-card { background: rgba(15, 23, 42, 0.85) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; }
+            h2, h3, h4, font, strong { color: #ffffff !important; }
+            p, span, li, label { color: #cbd5e1 !important; }
+            .bg-slate-100 { background-color: #0f172a !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .text-slate-500 { color: #94a3b8 !important; }
+            .bg-white { background-color: #0f172a !important; border-color: #1e293b !important; }
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen relative antialiased watermarked-bg">
 
     <div id="splash-welcome-screen" class="fixed inset-0 bg-slate-950 z-[9999] flex flex-col justify-center items-center transition-all duration-1000">
-        <div class="text-center space-y-8 px-4 max-w-xl">
+        <div class="text-center space-y-8 px-4 w-full max-w-md mx-auto">
             <div class="w-48 h-48 sm:w-56 sm:h-56 mx-auto flex items-center justify-center animate-pulse drop-shadow-2xl">
-    <img src="edc-logo.png" alt="EDC HITAM Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-36 h-36 rounded-3xl bg-gradient-to-tr from-emerald-600 to-emerald-400 mx-auto flex items-center justify-center text-white text-4xl font-extrabold\'>EDC</div>';">
-</div>
+                <img src="edc-logo.png" alt="EDC HITAM Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-36 h-36 rounded-3xl bg-gradient-to-tr from-emerald-600 to-emerald-400 mx-auto flex items-center justify-center text-white text-[11px] font-black uppercase tracking-wider text-center px-2\'>EDC Entrepreneurship</div>';">
+            </div>
             <div class="space-y-3">
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">HITAM Innovation Hub</h1>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">HITAM Innovation Hub</h1>
                 <p class="text-emerald-400 font-mono text-xs tracking-widest uppercase">Experiential Engineering & Incubation Ecosystem</p>
             </div>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button onclick="launchPortalEnvironment()" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300 transform hover:scale-105 shadow-xl shadow-emerald-700/30">
+            <div class="flex flex-col gap-4 justify-center items-center w-full px-4 sm:flex-row max-w-sm mx-auto">
+                <button onclick="launchPortalEnvironment()" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300 transform hover:scale-105 shadow-xl">
                     Explore Ecosystem
                 </button>
                 <button onclick="openRecruitmentModal()" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl text-sm tracking-wide transition-all duration-300">
@@ -51,178 +54,188 @@
         </div>
     </div>
 
-    <header class="bg-slate-950/95 backdrop-blur-md text-white sticky top-0 z-50 border-b border-slate-800/80 shadow-xl">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-white/95 text-slate-900 sticky top-0 z-50 border-b border-slate-200 shadow-xl transition-colors">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <span class="bg-emerald-600 px-3 py-1 rounded-lg font-black tracking-widest text-xs shadow-md shadow-emerald-700/20">HITAM</span>
-                <span class="font-bold tracking-tight text-slate-200 text-sm hidden sm:inline">Entrepreneurship Cell Portal</span>
+                <span class="bg-emerald-600 px-3 py-1 rounded-lg font-black tracking-widest text-xs text-white shadow-md">HITAM</span>
+                <span class="font-bold tracking-tight text-sm">Entrepreneurship Cell Portal</span>
             </div>
-            <nav class="flex space-x-6 text-xs md:text-sm font-semibold text-slate-300 items-center">
-                <a href="#blogs-section" class="hover:text-emerald-400 transition-colors">Daily Logs</a>
-                <a href="#team-section" class="hover:text-emerald-400 transition-colors">E-Cell Teams</a>
-                <a href="#events-section" class="hover:text-emerald-400 transition-colors">Initiatives</a>
-                <a href="#startup-showcase-section" class="hover:text-emerald-400 transition-colors">Startups</a>
-                <a href="#problem-videos-section" class="hover:text-emerald-400 transition-colors">Problem Pitches</a>
-                <a href="admin.html" class="bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-xl font-bold text-white transition-all text-xs shadow-lg shadow-emerald-900/30">Admin Dashboard</a>
+            <nav class="flex flex-wrap justify-center gap-4 text-xs md:text-sm font-semibold text-slate-600">
+                <a href="#blogs-section" class="hover:text-emerald-500 transition-colors">Daily Logs</a>
+                <a href="#team-section" class="hover:text-emerald-500 transition-colors">E-Cell Teams</a>
+                <a href="#events-section" class="hover:text-emerald-500 transition-colors">Initiatives</a>
+                <a href="#startup-showcase-section" class="hover:text-emerald-500 transition-colors">Startups</a>
+                <a href="#problem-videos-section" class="hover:text-emerald-500 transition-colors">Problem Pitches</a>
+                <a href="admin.html" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-white transition-all text-xs shadow-md">Admin Dashboard</a>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-12 space-y-24">
+    <main class="max-w-7xl mx-auto px-4 py-12 space-y-24 w-full overflow-x-hidden">
         
-        <section class="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Initiatives</span>
-                <h3 class="text-2xl font-extrabold text-emerald-800 mt-1" id="live-count-events">0+</h3>
+        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Initiatives</span><h3 class="text-2xl font-extrabold text-emerald-800 mt-1" id="live-count-events">0+</h3></div>
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Impacted</span><h3 class="text-2xl font-extrabold text-emerald-800 mt-1" id="live-count-members">0+</h3></div>
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Workshops</span><h3 class="text-2xl font-extrabold text-indigo-800 mt-1" id="live-count-workshops">0+</h3></div>
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Experts</span><h3 class="text-2xl font-extrabold text-indigo-800 mt-1" id="live-count-experts">0+</h3></div>
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Grants Shared</span><h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-funding">0+</h3></div>
+            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Awards Won</span><h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-awards">0+</h3></div>
+        </section>
+
+        <section class="space-y-12 w-full">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl shadow-xl border space-y-4">
+                <h2 class="text-xl font-black uppercase text-slate-900 tracking-tight flex items-center gap-2"><span>🏢</span> About EDC HITAM</h2>
+                <div class="text-xs text-slate-600 font-medium space-y-3 leading-relaxed">
+                    <p class="border-l-2 border-emerald-500 pl-3 font-semibold text-slate-800 dark:text-white">The Entrepreneurship Development Cell (EDC) was established at HITAM in 2018.</p>
+                    <p>EDC operates under the HITAM Innovation and Incubation Centre (HIIC), the official incubator of HITAM, located on the first floor of the Activity Block.</p>
+                    <p>EDC focuses on developing an entrepreneurial mindset among students and encourages them to think beyond traditional career paths.</p>
+                    <p>EDC helps students convert their ideas into startups by providing proper guidance, mentorship, and support.</p>
+                </div>
             </div>
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Impacted</span>
-                <h3 class="text-2xl font-extrabold text-emerald-800 mt-1" id="live-count-members">0+</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                <div class="glass-card p-6 rounded-2xl border space-y-3">
+                    <span class="bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase px-2 py-0.5 rounded dark:bg-emerald-950 dark:text-emerald-300">Vision Blueprint</span>
+                    <h3 class="text-lg font-black uppercase text-slate-900">Vision</h3>
+                    <p class="text-xs text-slate-600 font-medium leading-relaxed">To build an inclusive entrepreneurial ecosystem that empowers students to innovate fearlessly, develop sustainable ventures and emerge as socially responsible leaders driving global impact.</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border space-y-3">
+                    <span class="bg-indigo-100 text-indigo-800 text-[9px] font-black uppercase px-2 py-0.5 rounded dark:bg-indigo-950 dark:text-indigo-300">Action Vectors</span>
+                    <h3 class="text-lg font-black uppercase text-slate-900">Mission</h3>
+                    <ul class="text-xs text-slate-600 font-medium space-y-2 leading-relaxed">
+                        <li><strong>• Skill Development:</strong> Provide opportunities for learning through workshops, seminars and competitions.</li>
+                        <li><strong>• Incubation & Venture Creation:</strong> Facilitate creation of at least 5 student startups annually.</li>
+                        <li><strong>• Industry Partnerships:</strong> Build partnerships with industrial and regional ecosystems.</li>
+                        <li><strong>• Sustainable Impact:</strong> Encourage students to build sustainable business metrics.</li>
+                    </ul>
+                </div>
             </div>
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Workshops</span>
-                <h3 class="text-2xl font-extrabold text-indigo-800 mt-1" id="live-count-workshops">0+</h3>
-            </div>
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Experts</span>
-                <h3 class="text-2xl font-extrabold text-indigo-800 mt-1" id="live-count-experts">0+</h3>
-            </div>
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Grants Shared</span>
-                <h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-funding">0+</h3>
-            </div>
-            <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border">
-                <span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Awards Won</span>
-                <h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-awards">0+</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl space-y-3 border border-slate-800 dark:bg-slate-900">
+                    <h3 class="text-sm font-black uppercase tracking-wider text-emerald-400">Core Values</h3>
+                    <ul class="text-[11px] text-slate-300 space-y-1.5 leading-relaxed">
+                        <li><strong>• Innovation & Creativity:</strong> Think differently to resolve everyday issues.</li>
+                        <li><strong>• Integrity & Ethics:</strong> Ensure honesty, fairness, and responsibility in actions.</li>
+                        <li><strong>• Collaboration & Inclusivity:</strong> Welcome diverse engineering ideas from all paths.</li>
+                        <li><strong>• Resilience & Learning:</strong> Adapt to macro market shifts and never halt study loops.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 rounded-2xl border space-y-3">
+                    <h3 class="text-sm font-black uppercase tracking-wider text-slate-900">Expected Outcomes</h3>
+                    <ul class="text-[11px] text-slate-600 space-y-1.5 leading-relaxed">
+                        <li><strong>• Skill Expansion:</strong> Students enhance creativity, leadership, and milestone execution fields.</li>
+                        <li><strong>• Job Creators:</strong> Graduating engineers transition from job seekers to sustainable employment providers.</li>
+                        <li><strong>• Ecosystem Engagement:</strong> Build verifiable operational networks with mentors and venture syndicates.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
-        <section id="blogs-section" class="space-y-6">
+        <section id="blogs-section" class="space-y-6 w-full">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 pb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 tracking-tight">Daily Activity Logs & Announcements</h2>
                     <p class="text-xs text-slate-500 font-medium">Search compiled micro-incubation statements chronologically</p>
                 </div>
                 <div class="flex items-center space-x-2 w-full md:w-auto">
-                    <input type="date" id="blog-query-date" class="bg-white border text-sm rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 font-semibold" />
-                    <button onclick="executeBlogSearch()" class="bg-slate-900 text-white text-xs font-bold px-5 py-3 rounded-xl hover:bg-slate-800 transition-colors shadow">Search</button>
+                    <input type="date" id="blog-query-date" class="bg-white border text-sm rounded-xl p-2 outline-none text-slate-700 font-semibold" />
+                    <button onclick="executeBlogSearch()" class="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-colors">Search</button>
                     <button onclick="resetBlogView()" class="text-xs text-slate-400 font-bold underline">Reset</button>
                 </div>
             </div>
-            
-            <div id="latest-announcement-card" class="glass-card p-8 rounded-2xl shadow-xl shadow-slate-100/40 space-y-4 border">
-                </div>
-
-            <div class="bg-slate-100 p-6 rounded-2xl">
+            <div id="latest-announcement-card" class="glass-card p-6 sm:p-8 rounded-2xl shadow-xl border"></div>
+            <div class="bg-slate-100 p-6 rounded-2xl w-full">
                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Historical Archives Directory</h4>
-                <div id="previous-blogs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="previous-blogs-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full"></div>
             </div>
         </section>
 
-        <section id="team-section" class="space-y-6 bg-slate-950 text-white p-8 rounded-3xl shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <section id="team-section" class="space-y-6 bg-slate-950 text-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-black tracking-tight">E-Cell Board Registry</h2>
                     <p class="text-xs text-slate-400 font-medium">Year-by-year management iteration cycles</p>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="slideTeamYear(-1)" class="bg-slate-900 hover:bg-slate-800 p-2.5 rounded-xl text-xs font-black border border-slate-800 transition-all">&larr;</button>
-                    <span id="current-carousel-year" class="bg-emerald-600 px-5 py-1.5 rounded-xl text-xs font-black flex items-center shadow-lg">2026</span>
-                    <button onclick="slideTeamYear(1)" class="bg-slate-900 hover:bg-slate-800 p-2.5 rounded-xl text-xs font-black border border-slate-800 transition-all">&rarr;</button>
+                <div class="flex space-x-2 self-end sm:self-auto">
+                    <button onclick="slideTeamYear(-1)" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-xs font-black border border-slate-800">&larr;</button>
+                    <span id="current-carousel-year" class="bg-emerald-600 px-4 py-1.5 rounded-xl text-xs font-black flex items-center shadow-lg">2026</span>
+                    <button onclick="slideTeamYear(1)" class="bg-slate-900 hover:bg-slate-800 p-2 rounded-xl text-xs font-black border border-slate-800">&rarr;</button>
                 </div>
             </div>
-            <div id="team-cards-viewport" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                </div>
+            <div id="team-cards-viewport" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 w-full"></div>
         </section>
 
-        <section id="events-section" class="space-y-16">
+        <section id="events-section" class="space-y-16 w-full">
             <div>
                 <h2 class="text-3xl font-black tracking-tight text-slate-900">Functional Deployment Pillars</h2>
                 <p class="text-xs text-slate-500 font-medium">Live field actions pulled dynamically from memory storage systems</p>
             </div>
-
-            <div class="space-y-6">
-                <h3 class="text-xs font-black text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-lg w-fit border border-emerald-200">Exposure Tours & Site Visits</h3>
-                <div id="grid-tours" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            <div class="space-y-6 w-full">
+                <h3 class="text-xs font-black text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-lg w-fit border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">Exposure Tours & Site Visits</h3>
+                <div id="grid-tours" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full"></div>
             </div>
-
-            <div class="space-y-6">
-                <h3 class="text-xs font-black text-indigo-800 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg w-fit border border-indigo-200">Skills Enhancement Workshops</h3>
-                <div id="grid-workshops" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-xs font-black text-amber-800 uppercase tracking-widest bg-amber-50 px-3 py-1.5 rounded-lg w-fit border border-amber-200">Pitching Competitions & Ideation Finals</h3>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 rounded-2xl overflow-hidden bg-slate-900 aspect-video relative group border shadow-xl">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-70" style="background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80')"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 flex flex-col justify-end p-6 text-white">
-                            <span class="text-[10px] font-mono tracking-widest uppercase text-emerald-400 mb-1">Project Expo Showcase Hub</span>
-                            <h4 class="text-lg font-bold">Experiential Engineering Project Exhibition Finals</h4>
-                        </div>
-                    </div>
-                    <div id="grid-pitching" class="space-y-4 flex flex-col justify-between"></div>
-                </div>
+            <div class="space-y-6 w-full">
+                <h3 class="text-xs font-black text-indigo-800 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg w-fit border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800">Skills Enhancement Workshops</h3>
+                <div id="grid-workshops" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full"></div>
             </div>
         </section>
 
-        <section id="startup-showcase-section" class="space-y-6 bg-slate-100 p-8 rounded-2xl shadow-inner">
+        <section id="startup-showcase-section" class="space-y-6 bg-slate-100 p-6 sm:p-8 rounded-2xl shadow-inner w-full">
             <div class="border-b pb-4">
                 <h2 class="text-2xl font-black text-slate-900">EDC Supported Startups Portfolio</h2>
                 <p class="text-xs text-slate-500 font-medium">Tracking enterprise transformations launched across institutional bounds</p>
             </div>
-            <div id="grid-startups" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            <div id="grid-startups" class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"></div>
         </section>
 
-        <section id="problem-videos-section" class="space-y-6">
+        <section id="problem-videos-section" class="space-y-6 w-full">
             <div class="border-b border-slate-200 pb-4">
                 <h2 class="text-2xl font-black tracking-tight text-slate-900">EDC Active Problem Statements & Video Pitches</h2>
                 <p class="text-xs text-slate-500 font-medium">Explore active industry-defined and user-defined problem statement matrices</p>
             </div>
-            <div id="grid-problem-videos" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                </div>
+            <div id="grid-problem-videos" class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"></div>
         </section>
 
-        <section id="visitors-section" class="space-y-6">
+        <section id="visitors-section" class="space-y-6 w-full">
             <div class="border-b border-slate-200 pb-4">
                 <h2 class="text-2xl font-black tracking-tight text-slate-900">Visitors & Industry Leaders at EDC HITAM</h2>
                 <p class="text-xs text-slate-500 font-medium">Click a professional photo frame to read their validation testimonial statement</p>
             </div>
-            <div id="visitor-frames-matrix" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                </div>
+            <div id="visitor-frames-matrix" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full"></div>
         </section>
     </main>
 
     <div id="recruitment-modal" class="fixed inset-0 bg-slate-950/80 hidden z-[10000] flex justify-center items-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 text-slate-700">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 text-slate-700 dark:bg-slate-900">
             <button onclick="closeRecruitmentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-black text-xl">&times;</button>
             <div class="text-center">
                 <span class="text-3xl">🚀</span>
-                <h3 class="font-black text-slate-900 text-xl tracking-tight mt-1">Join the EDC Cohort</h3>
+                <h3 class="font-black text-slate-900 dark:text-white text-xl tracking-tight mt-1">Join the EDC Cohort</h3>
                 <p class="text-xs text-slate-500 font-medium">Submit your profile directly to the administrative panel</p>
             </div>
             <form onsubmit="submitEcellApplication(event)" class="space-y-3 text-xs font-semibold">
                 <div>
                     <label class="block mb-1">Full Name</label>
-                    <input type="text" id="app_name" class="w-full p-2.5 bg-slate-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" required placeholder="e.g., Shaik Rehan" />
+                    <input type="text" id="app_name" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl outline-none text-slate-900 dark:text-white" required placeholder="e.g., Shaik Rehan" />
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                         <label class="block mb-1">Roll Number</label>
-                        <input type="text" id="app_roll" class="w-full p-2.5 bg-slate-50 border rounded-xl outline-none" required placeholder="e.g., 21E51A..." />
+                        <input type="text" id="app_roll" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl outline-none text-slate-900 dark:text-white" required placeholder="e.g., 21E51A..." />
                     </div>
                     <div>
                         <label class="block mb-1">Department</label>
-                        <input type="text" id="app_dept" class="w-full p-2.5 bg-slate-50 border rounded-xl outline-none" required placeholder="e.g., CSD-C" />
+                        <input type="text" id="app_dept" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl outline-none text-slate-900 dark:text-white" required placeholder="e.g., CSD-C" />
                     </div>
                     <div>
                         <label class="block mb-1">Mobile Number</label>
-                        <input type="tel" id="app_phone" class="w-full p-2.5 bg-slate-50 border rounded-xl outline-none" required placeholder="e.g., 98490XXXXX" />
+                        <input type="tel" id="app_phone" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl outline-none text-slate-900 dark:text-white" required placeholder="e.g., 98490XXXXX" />
                     </div>
                 </div>
                 <div>
                     <label class="block mb-1">Core Innovation Focus / Technical Skills</label>
-                    <textarea id="app_skills" rows="3" class="w-full p-2.5 bg-slate-50 border rounded-xl outline-none" required placeholder="e.g., App Prototyping, Web Dev, Public Speaking..."></textarea>
+                    <textarea id="app_skills" rows="3" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border rounded-xl outline-none text-slate-900 dark:text-white" required placeholder="e.g., Web Dev, Public Speaking..."></textarea>
                 </div>
                 <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold uppercase tracking-wider text-[10px] rounded-xl shadow-lg mt-2">Submit Application</button>
             </form>
@@ -230,21 +243,21 @@
     </div>
 
     <div id="visitor-deepdive-modal" class="fixed inset-0 bg-slate-950/80 hidden z-[10000] flex justify-center items-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 border border-slate-100">
-            <button onclick="hideVisitorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-black text-xl transition-colors">&times;</button>
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+            <button onclick="hideVisitorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-black text-xl">&times;</button>
             <div class="flex items-center space-x-4">
                 <img id="modal-visitor-img" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500 bg-slate-100 shadow" src="" alt="">
                 <div>
-                    <h3 id="modal-visitor-name" class="font-black text-slate-900 text-lg leading-tight"></h3>
+                    <h3 id="modal-visitor-name" class="font-black text-slate-900 dark:text-white text-lg leading-tight"></h3>
                     <p id="modal-visitor-title" class="text-xs text-slate-500 font-medium mt-0.5"></p>
                 </div>
             </div>
-            <div class="text-xs space-y-1.5 border-y py-3 text-slate-600 font-semibold bg-slate-50 p-3 rounded-xl">
+            <div class="text-xs space-y-1.5 border-y py-3 text-slate-600 font-semibold bg-slate-50 dark:bg-slate-800 p-3 rounded-xl">
                 <p><strong>Timeline Visit Date:</strong> <span id="modal-visitor-date"></span></p>
                 <p><strong>Key Session Matrix Topic:</strong> <span id="modal-visitor-topic"></span></p>
             </div>
-            <div class="bg-emerald-50/60 border border-emerald-100 p-4 rounded-xl">
-                <p id="modal-visitor-message" class="text-sm italic text-slate-800 font-medium"></p>
+            <div class="bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900 p-4 rounded-xl">
+                <p id="modal-visitor-message" class="text-sm italic text-slate-800 dark:text-slate-200 font-medium"></p>
             </div>
         </div>
     </div>
@@ -255,8 +268,7 @@
                 <h4 class="font-bold text-slate-200">HITAM Entrepreneurship Development Cell</h4>
                 <p class="text-xs text-slate-500 mt-1">Doing Engineering the Experiential Way.</p>
             </div>
-            <div class="flex space-x-6 text-sm font-bold text-emerald-400" id="public-footer-social-links">
-                </div>
+            <div class="flex space-x-6 text-sm font-bold text-emerald-400" id="public-footer-social-links"></div>
         </div>
     </footer>
 
@@ -264,6 +276,22 @@
     <script>
         let availableYears = [2023, 2024, 2025, 2026];
         let yearIndex = 3; 
+
+        function generateEcellAudioChime(frequencyHz, durationSec) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(frequencyHz, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + durationSec);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + durationSec);
+            } catch (error) {}
+        }
 
         function runDynamicTickerCountUp(elementId, upperTargetBoundValue) {
             let initialCount = 0;
@@ -281,6 +309,7 @@
         }
 
         function launchPortalEnvironment() {
+            generateEcellAudioChime(587.33, 0.4); 
             const splashLayer = document.getElementById('splash-welcome-screen');
             splashLayer.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
@@ -294,10 +323,58 @@
             }, 1000);
         }
 
-        function openRecruitmentModal() { document.getElementById('recruitment-modal').classList.remove('hidden'); }
+        function openRecruitmentModal() { 
+            generateEcellAudioChime(440.00, 0.15); 
+            document.getElementById('recruitment-modal').classList.remove('hidden'); 
+        }
         function closeRecruitmentModal() { document.getElementById('recruitment-modal').classList.add('hidden'); }
 
+        async function submitEcellApplication(e) {
+    e.preventDefault();
+    
+    const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
+
+    const payload = {
+        name: document.getElementById('app_name').value,
+        roll: document.getElementById('app_roll').value,
+        dept: document.getElementById('app_dept').value,
+        phone: document.getElementById('app_phone').value,
+        skills: document.getElementById('app_skills').value
+    };
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/edc_applications`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            generateEcellAudioChime(880.00, 0.5); 
+            alert("Application submitted globally to the Cloud Database! The Admin will review your profile shortly.");
+            closeRecruitmentModal();
+        } else {
+            alert("Database structural handshake rejected. Verify table columns match exactly.");
+        }
+    } catch (error) {
+        console.error("Cloud Node Network Error:", error);
+        alert("Connection timeout. Please check your network context.");
+    }
+}
         function synchronizePublicClientDashboardView() {
+            db_blogs = JSON.parse(localStorage.getItem('edc_blogs')) || [];
+            db_team = JSON.parse(localStorage.getItem('edc_team')) || [];
+            db_events = JSON.parse(localStorage.getItem('edc_events')) || [];
+            db_visitors = JSON.parse(localStorage.getItem('edc_visitors')) || [];
+            db_startups = JSON.parse(localStorage.getItem('edc_startups')) || [];
+            db_videos = JSON.parse(localStorage.getItem('edc_problem_videos')) || [];
+            db_socials = JSON.parse(localStorage.getItem('edc_site_socials')) || {};
+
             const blogs = db_blogs.sort((a,b) => new Date(b.date) - new Date(a.date));
             const activeCard = document.getElementById('latest-announcement-card');
             const historyFeed = document.getElementById('previous-blogs-grid');
@@ -306,20 +383,20 @@
                 const fresh = blogs[0];
                 activeCard.innerHTML = `
                     <div class="flex justify-between items-center text-xs font-bold text-emerald-700">
-                        <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[9px] font-black border border-emerald-200">Active Stream Announcement</span>
+                        <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[9px] font-black border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">Active Stream Announcement</span>
                         <span class="text-slate-400 font-mono">Date: ${fresh.date}</span>
                     </div>
-                    <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-2">${fresh.title}</h3>
-                    <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-4xl">${fresh.content}</p>
+                    <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-2 dark:text-white">${fresh.title}</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-4xl">${fresh.content}</p>
                 `;
                 
                 historyFeed.innerHTML = '';
                 blogs.slice(1).forEach(b => {
                     historyFeed.innerHTML += `
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200/60 hover:shadow-md transition-all duration-300">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/60 hover:shadow-md transition-all duration-300 dark:bg-slate-900 dark:border-slate-800">
                             <span class="text-[10px] text-slate-400 font-bold block mb-1 font-mono">${b.date}</span>
-                            <h5 class="font-extrabold text-slate-900 text-sm mb-1">${b.title}</h5>
-                            <p class="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">${b.content}</p>
+                            <h5 class="font-extrabold text-slate-900 dark:text-white text-sm mb-1">${b.title}</h5>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">${b.content}</p>
                         </div>
                     `;
                 });
@@ -335,72 +412,69 @@
 
                 metricsList.forEach(item => {
                     elementsContainer.innerHTML += `
-                        <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between">
-                            <img class="w-full h-44 object-cover bg-slate-100" src="${item.img}">
+                        <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl transition-all duration-500 flex flex-col justify-between w-full dark:bg-slate-900 dark:border-slate-800">
+                            <img class="w-full h-44 object-cover bg-slate-100 dark:bg-slate-800" src="${item.img}">
                             <div class="p-5 space-y-2 flex-grow flex flex-col justify-between">
                                 <div class="space-y-2">
                                     <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold font-mono">
                                         <span>${item.date}</span>
-                                        <span class="text-slate-600 truncate max-w-[130px]">${item.speaker || ''}</span>
+                                        <span class="text-slate-600 dark:text-slate-400 truncate max-w-[130px]">${item.speaker || ''}</span>
                                     </div>
-                                    <h4 class="font-extrabold text-slate-900 text-sm leading-snug hover:text-emerald-700 transition-colors">${item.title}</h4>
+                                    <h4 class="font-extrabold text-slate-900 dark:text-white text-sm leading-snug hover:text-emerald-700 transition-colors">${item.title}</h4>
                                 </div>
-                                <p class="text-xs text-slate-500 font-medium line-clamp-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mt-2"><strong>Outcomes:</strong> ${item.outcome}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-3 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 mt-2"><strong>Outcomes:</strong> ${item.outcome}</p>
                             </div>
                         </div>
                     `;
                 });
             });
 
-            // Render Dynamic Startups List
             const startupAnchorGrid = document.getElementById('grid-startups');
             startupAnchorGrid.innerHTML = '';
             db_startups.forEach(st => {
                 startupAnchorGrid.innerHTML += `
-                    <div class="bg-white border rounded-2xl p-5 shadow-sm space-y-3">
+                    <div class="bg-white border dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 dark:bg-slate-900">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="text-lg font-black text-slate-900">${st.name}</h4>
-                                <p class="text-xs text-emerald-600 font-mono font-semibold">Founder: ${st.founder} | ${st.industry}</p>
+                                <h4 class="text-lg font-black text-slate-900 dark:text-white">${st.name}</h4>
+                                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-mono font-semibold">Founder: ${st.founder} | ${st.industry}</p>
                             </div>
-                            <a href="${st.url}" target="_blank" class="text-xs font-bold text-emerald-600 hover:underline">Launch Site &rarr;</a>
+                            <a href="${st.url}" target="_blank" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Launch Site &rarr;</a>
                         </div>
-                        <p class="text-xs text-slate-600"><strong>Problem Statement:</strong> ${st.solution}</p>
-                        <p class="text-xs text-slate-500 font-medium bg-slate-50 p-2 rounded-lg"><strong>Metrics:</strong> ${st.metrics}</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300"><strong>Problem Statement:</strong> ${st.solution}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border dark:border-slate-800"><strong>Metrics:</strong> ${st.metrics}</p>
                     </div>
                 `;
             });
 
-            // Render Embedded Video Matrix Loops
             const videosContainerGrid = document.getElementById('grid-problem-videos');
             videosContainerGrid.innerHTML = '';
             db_videos.forEach(vid => {
                 videosContainerGrid.innerHTML += `
-                    <div class="bg-white rounded-2xl border overflow-hidden p-4 shadow-sm space-y-3">
+                    <div class="bg-white rounded-2xl border dark:border-slate-800 overflow-hidden p-4 shadow-sm space-y-3 dark:bg-slate-900">
                         <div class="aspect-video rounded-xl overflow-hidden bg-slate-900">
                             <iframe class="w-full h-full" src="${vid.url}" frameborder="0" allowfullscreen></iframe>
                         </div>
                         <div>
-                            <h4 class="font-extrabold text-slate-900 text-sm">${vid.title}</h4>
-                            <p class="text-xs text-slate-500 mt-1 font-medium">${vid.desc}</p>
+                            <h4 class="font-extrabold text-slate-900 dark:text-white text-sm">${vid.title}</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">${vid.desc}</p>
                         </div>
                     </div>
                 `;
             });
 
-            // Render Social Handles Links inside components
             document.getElementById('public-footer-social-links').innerHTML = `
-                <a href="${db_socials.linkedin}" target="_blank" class="hover:text-emerald-300">LinkedIn</a>
-                <a href="${db_socials.instagram}" target="_blank" class="hover:text-emerald-300">Instagram</a>
-                <a href="${db_socials.youtube}" target="_blank" class="hover:text-emerald-300">YouTube</a>
-                <a href="${db_socials.website}" target="_blank" class="hover:text-emerald-300">HITAM Main</a>
+                <a href="${db_socials.linkedin || 'https://linkedin.com'}" target="_blank" class="hover:text-emerald-300">LinkedIn</a>
+                <a href="${db_socials.instagram || 'https://instagram.com'}" target="_blank" class="hover:text-emerald-300">Instagram</a>
+                <a href="${db_socials.youtube || 'https://youtube.com'}" target="_blank" class="hover:text-emerald-300">YouTube</a>
+                <a href="${db_socials.website || 'https://hitam.org'}" target="_blank" class="hover:text-emerald-300">HITAM Main</a>
             `;
 
             const framesGrid = document.getElementById('visitor-frames-matrix');
             framesGrid.innerHTML = '';
             db_visitors.forEach(vis => {
                 framesGrid.innerHTML += `
-                    <div onclick="showVisitorDeepCheckModal(${vis.id})" class="aspect-square rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-500 hover:shadow-lg transition-all duration-500 cursor-pointer bg-slate-100 relative group">
+                    <div onclick="showVisitorDeepCheckModal(${vis.id})" class="aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:shadow-lg transition-all duration-500 cursor-pointer bg-slate-100 dark:bg-slate-800 relative group">
                         <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="${vis.img}">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-3">
                             <span class="text-[10px] text-white font-bold truncate w-full tracking-wide uppercase">${vis.name}</span>
@@ -408,30 +482,6 @@
                     </div>
                 `;
             });
-        }
-
-        function executeBlogSearch() {
-            const queryTargetDate = document.getElementById('blog-query-date').value;
-            if(!queryTargetDate) return alert("Select a date query execution target parameter.");
-            const matchedLogs = db_blogs.filter(blog => blog.date === queryTargetDate);
-            const activeCard = document.getElementById('latest-announcement-card');
-
-            if (matchedLogs.length === 0) {
-                activeCard.innerHTML = `<p class="text-red-500 text-xs font-bold text-center py-6">No historical records matched target parameters for ${queryTargetDate}.</p>`;
-            } else {
-                activeCard.innerHTML = matchedLogs.map(match => `
-                    <div class="border-b last:border-0 pb-4 mb-4 last:pb-0 last:mb-0 space-y-2 animate-fade-in">
-                        <span class="text-xs font-bold text-emerald-700 block">Query Target Located Successfully • ${match.date}</span>
-                        <h3 class="text-lg font-black text-slate-900">${match.title}</h3>
-                        <p class="text-sm text-slate-600 mt-1 font-medium leading-relaxed">${match.content}</p>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function resetBlogView() {
-            document.getElementById('blog-query-date').value = '';
-            synchronizePublicClientDashboardView();
         }
 
         function slideTeamYear(vectorDirection) {
@@ -450,7 +500,7 @@
 
             contextScopeMembers.forEach(mem => {
                 cardsViewportGrid.innerHTML += `
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col items-center text-center space-y-4 hover:border-emerald-400/40 transition-all duration-300 shadow-xl">
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col items-center text-center space-y-4 hover:border-emerald-400/40 transition-all duration-300 shadow-xl w-full">
                         <img class="w-20 h-20 rounded-full object-cover border-2 border-emerald-400 bg-slate-800 shadow-md" src="${mem.img}">
                         <div>
                             <h4 class="font-extrabold text-white text-base leading-tight">${mem.name}</h4>
