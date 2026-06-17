@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HITAM | Entrepreneurship Development Cell</title>
+    <link rel="icon" type="image/png" href="edc-logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -272,6 +273,26 @@
         </div>
     </footer>
 
+    <div id="success-celebration-popup" class="fixed inset-0 bg-slate-950/80 hidden z-[20000] flex justify-center items-center p-4 transition-all duration-500">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl transform scale-95 transition-all duration-500" id="success-popup-box">
+            <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-emerald-100 dark:border-emerald-800 animate-bounce">
+                🎉
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Congratulations!</h3>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono tracking-widest font-bold uppercase">Application Logged Successfully</p>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                Your profile has been received. Your submission will be carefully verified by the core execution management team shortly. Welcome to the loop!
+            </p>
+            <button onclick="closeSuccessCelebrationPopup()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 font-extrabold uppercase tracking-wider text-[10px] rounded-xl shadow-md transition-colors mt-2">
+                Acknowledge & Continue
+            </button>
+        </div>
+    </div>
+
+    <div id="recruitment-modal" class="fixed inset-0 bg-slate-950/80 hidden z-[10000] ...">
+
     <script src="mockData.js"></script>
     <script>
         let availableYears = [2023, 2024, 2025, 2026];
@@ -329,7 +350,7 @@
         }
         function closeRecruitmentModal() { document.getElementById('recruitment-modal').classList.add('hidden'); }
 
-        async function submitEcellApplication(e) {
+async function submitEcellApplication(e) {
     e.preventDefault();
     
     const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
@@ -355,9 +376,21 @@
         });
 
         if (response.ok) {
+            closeRecruitmentModal(); // Shuts down input form screen
+            
+            // Fires success audio chime and displays our custom verification layout
             generateEcellAudioChime(880.00, 0.5); 
-            alert("Application submitted globally to the Cloud Database! The Admin will review your profile shortly.");
-            closeRecruitmentModal();
+            
+            const popupOverlay = document.getElementById('success-celebration-popup');
+            const popupBox = document.getElementById('success-popup-box');
+            
+            popupOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                popupBox.classList.remove('scale-95');
+                popupBox.classList.add('scale-100');
+            }, 50);
+            
+            document.getElementById('unified-console-form').reset();
         } else {
             alert("Database structural handshake rejected. Verify table columns match exactly.");
         }
@@ -365,6 +398,12 @@
         console.error("Cloud Node Network Error:", error);
         alert("Connection timeout. Please check your network context.");
     }
+}
+
+// PASTE THIS NEW CLOSING FUNCTION RIGHT BELOW IT
+function closeSuccessCelebrationPopup() {
+    const popupOverlay = document.getElementById('success-celebration-popup');
+    popupOverlay.classList.add('hidden');
 }
         function synchronizePublicClientDashboardView() {
             db_blogs = JSON.parse(localStorage.getItem('edc_blogs')) || [];
@@ -527,6 +566,8 @@
         function hideVisitorModal() { document.getElementById('visitor-deepdive-modal').classList.add('hidden'); }
 
         window.onload = synchronizePublicClientDashboardView;
+
     </script>
+    
 </body>
 </html>
