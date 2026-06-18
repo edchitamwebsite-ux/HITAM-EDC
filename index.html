@@ -386,35 +386,38 @@
         }
 
         function renderAnnouncementsLayoutGrid(blogsCollection) {
-            const sortedBlogs = blogsCollection.sort((a,b) => new Date(b.date) - new Date(a.date));
             const activeCard = document.getElementById('latest-announcement-card');
             const historyFeed = document.getElementById('previous-blogs-grid');
             
-            if (sortedBlogs.length === 0) {
+            if (!blogsCollection || blogsCollection.length === 0) {
                 activeCard.innerHTML = `<p class="text-slate-400 text-xs font-mono p-4">No announcement channels registered in cloud arrays yet.</p>`;
-                historyFeed.innerHTML = ''; return;
+                historyFeed.innerHTML = ''; 
+                return;
             }
 
-            const fresh = sortedBlogs[0];
+            // Safely show the absolute newest announcement at the top slot
+            const fresh = blogsCollection[0];
             activeCard.innerHTML = `
                 <div class="flex justify-between items-center text-xs font-bold text-emerald-700">
                     <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg uppercase tracking-wider text-[9px] font-black border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">Active Stream Announcement</span>
-                    <span class="text-slate-400 font-mono">Date: ${fresh.date}</span>
+                    <span class="text-slate-400 font-mono">Date: ${fresh.date || ''}</span>
                 </div>
-                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-2 dark:text-white">${fresh.title}</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-4xl mt-1">${fresh.content}</p>
+                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-2 dark:text-white">${fresh.title || ''}</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-4xl mt-1">${fresh.content || ''}</p>
             `;
             
+            // Render the rest in the historical archive directory list lower rows
             historyFeed.innerHTML = '';
-            sortedBlogs.slice(1).forEach(b => {
+            blogsCollection.slice(1).forEach(b => {
                 historyFeed.innerHTML += `
                     <div class="bg-white p-5 rounded-2xl border border-slate-200/60 hover:shadow-md transition-all duration-300 dark:bg-slate-900 dark:border-slate-800">
-                        <span class="text-[10px] text-slate-400 font-bold block mb-1 font-mono">${b.date}</span>
-                        <h5 class="font-extrabold text-slate-900 dark:text-white text-sm mb-1">${b.title}</h5>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">${b.content}</p>
+                        <span class="text-[10px] text-slate-400 font-bold block mb-1 font-mono">${b.date || ''}</span>
+                        <h5 class="font-extrabold text-slate-900 dark:text-white text-sm mb-1">${b.title || ''}</h5>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">${b.content || ''}</p>
                     </div>
                 `;
             });
+        
         }
 
         function executeBlogSearch() {
