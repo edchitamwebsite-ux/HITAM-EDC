@@ -12,69 +12,59 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen">
 
     <div id="security-authentication-lockout-gate" class="fixed inset-0 bg-slate-950 z-[20000] flex justify-center items-center p-4">
-        <div class="bg-slate-900 border border-slate-800/80 p-8 rounded-2xl max-w-md w-full space-y-6 shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full space-y-6 shadow-2xl">
             <div class="text-center space-y-2">
                 <span class="text-4xl block">🔒</span>
-                <h2 class="text-lg font-extrabold tracking-tight text-white">System Configuration Handshake</h2>
+                <h2 class="text-lg font-extrabold text-white">System Configuration Handshake</h2>
                 <p class="text-xs text-slate-400 font-medium">Provide verified access profile signatures to launch console</p>
             </div>
             <form onsubmit="verifySystemCredentialsGate(event)" class="space-y-4 text-xs font-bold text-slate-400">
-                <div>
-                    <label class="block mb-1">Administrative Role Account Email</label>
-                    <input type="email" id="input-gate-user" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none font-medium focus:border-emerald-500" required placeholder="youremail@gmail.com">
-                </div>
-                <div>
-                    <label class="block mb-1">Pass Access Key Signature</label>
-                    <input type="password" id="input-gate-pass" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none font-medium focus:border-emerald-500" required placeholder="••••••••">
-                </div>
+                <div><label class="block mb-1">Administrative Account Email</label><input type="email" id="input-gate-user" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:border-emerald-500 outline-none" required value="edc.hitam.website@gmail.com"></div>
+                <div><label class="block mb-1">Pass Key Access Signature</label><input type="password" id="input-gate-pass" class="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white focus:border-emerald-500 outline-none" required placeholder="••••••••"></div>
                 <button type="submit" class="w-full py-3.5 rounded-xl font-extrabold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors uppercase tracking-widest text-[10px]">Verify Signature</button>
             </form>
         </div>
     </div>
 
-    <header class="bg-slate-900 border-b border-slate-800/60 px-6 py-4 flex justify-between items-center shadow-xl">
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-xl">
         <div>
-            <h1 class="text-xs font-black tracking-widest text-slate-200 uppercase flex items-center space-x-2">
-                <span class="text-emerald-500">&#9881;</span> <span>EDC HITAM Entrepreneurship Control Terminal</span>
-            </h1>
-            <p class="text-[10px] text-slate-400 font-semibold mt-0.5" id="active-role-badge">Authenticated As: Checking Role Context...</p>
+            <h1 class="text-xs font-black tracking-widest text-slate-200 uppercase flex items-center space-x-2"><span class="text-emerald-500">&#9881;</span> <span>EDC HITAM Cloud Control Terminal</span></h1>
+            <p class="text-[10px] text-slate-400 font-semibold mt-0.5" id="active-role-badge">Authenticating Account Profile...</p>
         </div>
         <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl border border-slate-700 transition-all">Close Terminal</a>
     </header>
 
-    <nav class="max-w-7xl mx-auto px-4 mt-8">
-        <div class="bg-slate-900 p-2 rounded-2xl border border-slate-800/80 flex flex-wrap gap-1 text-xs font-bold text-slate-400" id="admin-tabs-nav">
-            <button id="tab-edc_blogs" onclick="switchAdminRoutingTable('edc_blogs', this)" class="flex-1 py-3 px-4 rounded-xl transition-all text-white bg-emerald-600">Daily Announcements</button>
-            <button id="tab-edc_team" onclick="switchAdminRoutingTable('edc_team', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">Board Members</button>
-            <button id="tab-edc_events" onclick="switchAdminRoutingTable('edc_events', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">Action Pillars</button>
-            <button id="tab-edc_visitors" onclick="switchAdminRoutingTable('edc_visitors', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">Dignitary Testimonials</button>
-            <button id="tab-edc_startups" onclick="switchAdminRoutingTable('edc_startups', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">🚀 Incubated Startups</button>
-            <button id="tab-edc_stats_config" onclick="switchAdminRoutingTable('edc_stats_config', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">📊 Live Stats</button>
-            <button id="tab-edc_socials_config" onclick="switchAdminRoutingTable('edc_socials_config', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">🌐 Social Links</button>
-            <button id="tab-edc_problem_videos" onclick="switchAdminRoutingTable('edc_problem_videos', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">🎬 Problem Videos</button>
-            <button id="tab-edc_applications_view" onclick="switchAdminRoutingTable('edc_applications_view', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">✉ Recruitment Log</button>
-            <button id="tab-edc_audit_logs" onclick="switchAdminRoutingTable('edc_audit_logs', this)" class="flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200">📜 System Audit Logs</button>
+    <nav class="max-w-7xl mx-auto px-4 mt-6">
+        <div class="bg-slate-900 p-2 rounded-2xl border border-slate-800 flex flex-wrap gap-1 text-xs font-bold text-slate-400" id="admin-tabs-nav">
+            <button id="tab-edc_blogs" onclick="switchAdminRoutingTable('edc_blogs', this)" class="flex-1 py-3 px-4 rounded-xl text-white bg-emerald-600">Daily Announcements</button>
+            <button id="tab-edc_team" onclick="switchAdminRoutingTable('edc_team', this)" class="flex-1 py-3 px-4 rounded-xl hover:text-slate-200">Board Members</button>
+            <button id="tab-edc_events" onclick="switchAdminRoutingTable('edc_events', this)" class="flex-1 py-3 px-4 rounded-xl hover:text-slate-200">🎪 Cell Initiatives</button>
+            <button id="tab-edc_startups" onclick="switchAdminRoutingTable('edc_startups', this)" class="flex-1 py-3 px-4 rounded-xl hover:text-slate-200">🚀 Incubated Startups</button>
+            <button id="tab-edc_visitors" onclick="switchAdminRoutingTable('edc_visitors', this)" class="flex-1 py-3 px-4 rounded-xl hover:text-slate-200">✨ Guest Testimonials</button>
+            <button id="tab-edc_applications_view" onclick="switchAdminRoutingTable('edc_applications_view', this)" class="w-full sm:flex-1 py-3 px-4 rounded-xl hover:text-slate-200">✉ Recruitment Log</button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section class="bg-slate-900 border border-slate-800/80 p-6 rounded-2xl h-fit lg:col-span-1 shadow-2xl">
-            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Transaction Entry Input Panel</h3>
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl h-fit lg:col-span-1 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="form-action-title-label" class="text-xs font-black text-slate-400 uppercase tracking-widest">New Entry Transaction Panel</h3>
+                <button onclick="abortEditModeResetState()" id="abort-edit-mode-btn" class="hidden text-[10px] bg-slate-800 border text-amber-500 rounded-lg px-2 py-1 font-bold">Clear / Cancel</button>
+            </div>
             <form id="unified-console-form" onsubmit="executeStorageWriteCycle(event)" class="space-y-4 text-xs font-bold text-slate-400">
                 <div id="dynamic-inputs-frame-wrapper" class="space-y-4"></div>
-                <button type="submit" id="form-submit-action-btn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase tracking-wider text-[10px] rounded-xl transition-colors shadow-lg">Commit To Live Matrix</button>
+                <button type="submit" id="form-submit-action-btn" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase text-[10px] rounded-xl transition-colors tracking-wider">Commit To Live Matrix</button>
             </form>
         </section>
 
-        <section class="lg:col-span-2 bg-slate-900 border border-slate-800/80 p-6 rounded-2xl shadow-2xl">
-            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Active Registry Node Register Monitor</h3>
+        <section class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Active Registry Node Monitor Matrix</h3>
             <div class="overflow-x-auto rounded-xl border border-slate-800">
                 <table class="w-full text-left text-xs text-slate-300">
                     <thead>
                         <tr class="bg-slate-950 text-slate-400 font-extrabold uppercase tracking-wider border-b border-slate-800">
-                            <th class="p-3.5" id="th-name-label">Asset Reference Identifier Name</th>
-                            <th class="p-3.5" id="th-date-label">Temporal Key</th>
-                            <th class="p-3.5 text-center">Simultaneous Action Handles</th>
+                            <th class="p-3.5">Component Profile Element Details</th>
+                            <th class="p-3.5 text-center">Cloud Operation Metrics Action Switches</th>
                         </tr>
                     </thead>
                     <tbody id="live-registry-rows-feed" class="divide-y divide-slate-800/40 font-semibold bg-slate-900/40"></tbody>
@@ -83,334 +73,243 @@
         </section>
     </main>
 
-    <script src="mockData.js"></script>
     <script>
+        const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
         let currentActiveSubsystemRoute = "edc_blogs";
-        let activeAdminRole = "";
-        let activeAdminEmail = "";
-
-        const roleAccountsDatabase = {
-            "edc.hitam.website@gmail.com": { pass: "edc.hitam@2026", role: "Super Admin", modules: ["edc_blogs", "edc_team", "edc_events", "edc_visitors", "edc_startups", "edc_stats_config", "edc_socials_config", "edc_problem_videos", "edc_applications_view", "edc_audit_logs"] },
-            "blog.admin@hitam.org": { pass: "blog@2026", role: "Blog Administrator", modules: ["edc_blogs"] },
-            "team.admin@hitam.org": { pass: "team@2026", role: "Team Administrator", modules: ["edc_team"] },
-            "events.admin@hitam.org": { pass: "events@2026", role: "Events Administrator", modules: ["edc_events"] },
-            "speaker.admin@hitam.org": { pass: "speaker@2026", role: "Guest Speaker Administrator", modules: ["edc_visitors"] },
-            "startup.admin@hitam.org": { pass: "startup@2026", role: "Startup Showcase Administrator", modules: ["edc_startups"] }
-        };
+        
+        // Tracking context variables for runtime memory editing scopes
+        let activeEditEntityIdReference = null; 
+        let cachedLoadedRowDataCollection = []; 
 
         function verifySystemCredentialsGate(event) {
             event.preventDefault();
-            const email = document.getElementById('input-gate-user').value;
-            const pass = document.getElementById('input-gate-pass').value;
-
-            if (roleAccountsDatabase[email] && roleAccountsDatabase[email].pass === pass) {
-                activeAdminEmail = email;
-                activeAdminRole = roleAccountsDatabase[email].role;
+            if (document.getElementById('input-gate-pass').value === "edc.hitam@2026") {
                 document.getElementById('security-authentication-lockout-gate').remove();
-                document.getElementById('active-role-badge').innerText = `Authenticated As: ${activeAdminRole} (${email})`;
-                logAuditAction("Authentication Handshake", "Authorized configuration access token generated successfully.");
-                enforceTabVisibilityMatrix();
-            } else { alert("Security handshake validation failed."); }
+                document.getElementById('active-role-badge').innerText = "Authenticated As: Super Admin (edc.hitam.website@gmail.com)";
+                switchAdminRoutingTable('edc_blogs', document.getElementById('tab-edc_blogs'));
+            } else { alert("Verification loop sequence credentials mismatch error."); }
         }
 
-        function logAuditAction(actionType, message) {
-            const auditLogs = fetchTable('edc_admin_audit_logs', []);
-            auditLogs.push({ id: Date.now(), user: activeAdminEmail, role: activeAdminRole, date: new Date().toLocaleString(), action: actionType, details: message });
-            commitTable('edc_admin_audit_logs', auditLogs);
-        }
-
-        function enforceTabVisibilityMatrix() {
-            const permittedModules = roleAccountsDatabase[activeAdminEmail].modules;
-            const allTabs = document.querySelectorAll('#admin-tabs-nav button');
-            let initialValidRouteSet = false;
-            allTabs.forEach(tab => {
-                const targetKey = tab.id.replace('tab-', '');
-                if (permittedModules.includes(targetKey)) {
-                    tab.classList.remove('hidden');
-                    if (!initialValidRouteSet) { switchAdminRoutingTable(targetKey, tab); initialValidRouteSet = true; }
-                } else { tab.classList.add('hidden'); }
-            });
-        }
-
-        function switchAdminRoutingTable(targetArrayKey, buttonElement) {
-            currentActiveSubsystemRoute = targetArrayKey;
-            const tabButtons = document.querySelectorAll('#admin-tabs-nav button');
-            tabButtons.forEach(btn => btn.className = "flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200");
-            if (buttonElement) buttonElement.className = "flex-1 py-3 px-4 rounded-xl transition-all text-white bg-emerald-600 shadow-lg";
+        function switchAdminRoutingTable(routeKey, btn) {
+            currentActiveSubsystemRoute = routeKey;
+            abortEditModeResetState();
+            document.querySelectorAll('#admin-tabs-nav button').forEach(b => b.className = "flex-1 py-3 px-4 rounded-xl transition-all hover:text-slate-200");
+            if (btn) btn.className = "flex-1 py-3 px-4 rounded-xl transition-all text-white bg-emerald-600 shadow-lg";
             generateTailoredFieldsLayout(); refreshAdminRegistryTableMonitor();
         }
 
         function generateTailoredFieldsLayout() {
-            const inputAnchor = document.getElementById('dynamic-inputs-frame-wrapper');
+            const wrapper = document.getElementById('dynamic-inputs-frame-wrapper');
             const submitBtn = document.getElementById('form-submit-action-btn');
-            inputAnchor.innerHTML = ''; submitBtn.style.display = 'block';
+            wrapper.innerHTML = ''; submitBtn.style.display = 'block';
 
-            if(currentActiveSubsystemRoute === 'edc_stats_config') {
-                inputAnchor.innerHTML = `
-                    <div><label class="block mb-1">Active Initiatives Total Count</label><input type='number' id='stat_init' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.initiatives || 26}'></div>
-                    <div><label class="block mb-1">Total Impacted Members Target</label><input type='number' id='stat_mind' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.mindsets || 1200}'></div>
-                    <div><label class="block mb-1">Workshops Managed</label><input type='number' id='stat_work' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.workshops || 45}'></div>
-                    <div><label class="block mb-1">Industry Experts Hosted</label><input type='number' id='stat_exp' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.experts || 32}'></div>
-                    <div><label class="block mb-1">Funding Grants Processed</label><input type='number' id='stat_fund' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.funding || 15}'></div>
-                    <div><label class="block mb-1">Awards Won Count</label><input type='number' id='stat_aw' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' value='${db_stats.awards || 12}'></div>
-                `; return;
+            let reorderingBlueprintHTML = `<div><label class="block mb-1 text-emerald-400">Display Order Index Sequence Number (Sort Order) *</label><input type='number' id='val_sort_order' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' required value='1' placeholder='e.g., 1 for top card, 2, 3...'></div>`;
+
+            if (currentActiveSubsystemRoute === 'edc_blogs') {
+                wrapper.innerHTML = `<div><label class="block mb-1">Announcement Title Log *</label><input type='text' id='val_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Stamp Date *</label><input type='date' id='val_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
+                <div><label class="block mb-1">Announcement Content *</label><textarea id='val_content' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>` + reorderingBlueprintHTML;
+            } else if (currentActiveSubsystemRoute === 'edc_team') {
+                wrapper.innerHTML = `<div><label class="block mb-1">Full Member Name *</label><input type='text' id='val_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Operational Designation Role *</label><input type='text' id='val_role' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. Co-ordinator"></div>
+                <div><label class="block mb-1">Year Cohort *</label><input type='text' id='val_year' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' required value='2026'></div>
+                <div><label class="block mb-1">Core Achievement Milestone Summary *</label><input type='text' id='val_achievement' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Photo Filename Asset Key URL *</label><input type='text' id='val_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. abhijeet.png"></div>` + reorderingBlueprintHTML;
+            } else if (currentActiveSubsystemRoute === 'edc_events') {
+                wrapper.innerHTML = `<div><label class="block mb-1">Initiative Event Title *</label><input type='text' id='ev_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Pillar Classification Type *</label>
+                    <select id='ev_type' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold outline-none'>
+                        <option value="tours">Exposure Tours & Site Visits</option>
+                        <option value="workshops">Skills Enhancement Workshops</option>
+                        <option value="pitching">Venture Pitching Events</option>
+                    </select>
+                </div>
+                <div><label class="block mb-1">Execution Calendar Date *</label><input type='date' id='ev_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
+                <div><label class="block mb-1">Guest Expert / Host / Speaker *</label><input type='text' id='ev_speaker' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Key Outcomes Summary *</label><textarea id='ev_outcome' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
+                <div><label class="block mb-1">Cover Image Filename Key *</label><input type='text' id='ev_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g., hitam-logo.png"></div>` + reorderingBlueprintHTML;
+            } else if (currentActiveSubsystemRoute === 'edc_startups') {
+                wrapper.innerHTML = `<div><label class="block mb-1">Venture Startup Corporate Name *</label><input type='text' id='st_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Founder Executive Full Name *</label><input type='text' id='st_founder' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Sector Domain Classification *</label><input type='text' id='st_ind' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Venture Solution Context *</label><textarea id='st_sol' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
+                <div><label class="block mb-1">Growth Metrics Validation Log Summary *</label><input type='text' id='st_met' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Portfolio Website Link URL Target *</label><input type='url' id='st_url' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://google.com'></div>` + reorderingBlueprintHTML;
+            } else if (currentActiveSubsystemRoute === 'edc_visitors') {
+                wrapper.innerHTML = `<div><label class="block mb-1">Dignitary Full Name *</label><input type='text' id='vis_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Professional Designation / Title *</label><input type='text' id='vis_des' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Organization / Corporate Identity *</label><input type='text' id='vis_org' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Visit Date *</label><input type='date' id='vis_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
+                <div><label class="block mb-1">Key Session Matrix Topic *</label><input type='text' id='vis_top' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+                <div><label class="block mb-1">Validation Testimonial Message *</label><textarea id='vis_msg' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
+                <div><label class="block mb-1">Photo Filename Asset Key *</label><input type='text' id='vis_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. sheela-singh.png"></div>` + reorderingBlueprintHTML;
+            } else if (currentActiveSubsystemRoute === 'edc_applications_view') {
+                wrapper.innerHTML = `<p class="p-4 bg-slate-950/50 border border-slate-800 rounded-xl font-medium text-slate-400">Read-only live tracking audit log panel monitoring incoming student applications over encrypted channels.</p>`;
+                submitBtn.style.display = 'none';
             }
-            if(currentActiveSubsystemRoute === 'edc_socials_config') {
-                inputAnchor.innerHTML = `
-                    <div><label class="block mb-1">LinkedIn URL Link (or web reference string)</label><input type='text' id='soc_li' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' value='${db_socials.linkedin || ''}'></div>
-                    <div><label class="block mb-1">Instagram URL Link (or web reference string)</label><input type='text' id='soc_in' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' value='${db_socials.instagram || ''}'></div>
-                    <div><label class="block mb-1">YouTube URL Link (or web reference string)</label><input type='text' id='soc_yt' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' value='${db_socials.youtube || ''}'></div>
-                    <div><label class="block mb-1">Main Website URL Link</label><input type='text' id='soc_web' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' value='${db_socials.website || ''}'></div>
-                `; return;
-            }
-            if (currentActiveSubsystemRoute === 'edc_applications_view') {
-    const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
-
-    fetch(`${SUPABASE_URL}/rest/v1/edc_applications`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    })
-    .then(res => res.json())
-    .then(cloudApplicationsMatrix => {
-        const tbodyAnchor = document.getElementById('live-registry-rows-feed');
-        tbodyAnchor.innerHTML = '';
-        
-        if (cloudApplicationsMatrix.length === 0) {
-            tbodyAnchor.innerHTML = `<tr><td colspan='3' class='p-5 text-center text-slate-500 font-mono'>No live student applications logged inside cloud storage channels yet.</td></tr>`;
-            return;
-        }
-
-        cloudApplicationsMatrix.forEach(studentNode => {
-            tbodyAnchor.innerHTML += `
-                <tr class='hover:bg-slate-900 border-b border-slate-800 text-slate-200'>
-                    <td class='p-3.5 font-bold'>${studentNode.name} (${studentNode.roll})</td>
-                    <td class='p-3.5 text-slate-400 font-mono'>${studentNode.dept} | Ph: ${studentNode.phone} <br><span class="text-xs text-slate-500 font-semibold font-sans">Skills Focus: ${studentNode.skills}</span></td>
-                    <td class='p-3.5 text-center'>
-                        <button onclick='purgeCloudApplicationItem("${studentNode.roll}")' class='bg-red-950/40 border border-red-900 text-red-400 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold tracking-wider'>Scrub</button>
-                    </td>
-                </tr>`;
-        });
-    });
-    return;
-}
-
-            const templates = {
-                edc_blogs: `
-                    <div><label class="block mb-1">Announcement Title Log *</label><input type='text' id='val_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div><label class="block mb-1">Publication Stamp Date *</label><input type='date' id='val_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-17'></div>
-                    <div><label class="block mb-1">Narrative Reporting Text Content</label><textarea id='val_content' rows='4' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
-                `,
-                edc_team: `
-                    <div><label class="block mb-1">Board Member Profile Legal Name *</label><input type='text' id='val_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div><label class="block mb-1">Operational Role Designation *</label><input type='text' id='val_role' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                        <div><label class="block mb-1">Timeline Year Cohort *</label><input type='number' id='val_year' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-black' required value='2026'></div>
-                    </div>
-                    <div><label class="block mb-1">Ecosystem Milestone Achievement Log Summary</label><input type='text' id='val_achievement' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></div>
-                    <div><label class="block mb-1">Photo Link (Paste ANY website link URL or use local path format) *</label><input type='text' id='val_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'></div>
-                `,
-                edc_events: `
-                    <div><label class="block mb-1">Strategic Initiative Title *</label><input type='text' id='val_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div><label class="block mb-1">Pillar Modality Classification</label><select id='val_type' class='w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white'><option value='tours'>Exposure Tour</option><option value='workshops'>Workshop</option><option value='pitching'>Pitching Day</option></select></div>
-                        <div><label class="block mb-1">Execution Date</label><input type='date' id='val_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-17'></div>
-                    </div>
-                    <div><label class="block mb-1">Resource Expert Speaker In-Charge</label><input type='text' id='val_speaker' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></div>
-                    <div><label class="block mb-1">Outcome Evaluation Summaries</label><textarea id='val_outcome' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></textarea></div>
-                    <div><label class="block mb-1">Asset Cover Media Image URL (Paste ANY web link or local path) *</label><input type='text' id='val_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=400&q=80'></div>
-                `,
-                edc_startups: `
-                    <div><label class="block mb-1">Startup Corporate Entity Name *</label><input type='text' id='st_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div><label class="block mb-1">Founder Details Name *</label><input type='text' id='st_founder' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div><label class="block mb-1">Industry Classification Sector *</label><input type='text' id='st_ind' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div><label class="block mb-1">Problem-Solution Fit Framework</label><textarea id='st_sol' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></textarea></div>
-                    <div><label class="block mb-1">Validated Growth Metrics & Achievements</label><input type='text' id='st_met' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></div>
-                    <div><label class="block mb-1">Venture Website Address URL Target</label><input type='text' id='st_url' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' value='https://google.com'></div>
-                `,
-                edc_problem_videos: `
-                    <div><label class="block mb-1">Problem Pitch Title Name *</label><input type='text' id='vid_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div><label class="block mb-1">YouTube Embed Link URL *</label><input type='url' id='vid_url' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder='https://www.youtube.com/embed/...'></div>
-                    <div><label class="block mb-1">Brief Context Summary Parameters</label><textarea id='vid_desc' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></textarea></div>
-                `,
-                edc_visitors: `
-                    <div><label class="block mb-1">Dignitary Full Executive Name *</label><input type='text' id='val_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div><label class="block mb-1">Designation Role</label><input type='text' id='val_designation' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></input></div>
-                        <div><label class="block mb-1">Corporate Parent Company</label><input type='text' id='val_org' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></input></div>
-                    </div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div><label class="block mb-1">Timeline Visit Date</label><input type='date' id='val_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' value='2026-06-17'></div>
-                        <div><label class="block mb-1">Delivered Presentation Theme Topic</label><input type='text' id='val_topic' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></input></div>
-                    </div>
-                    <div><label class="block mb-1">E-Cell Testimonial Statement Summary</label><textarea id='val_message' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white'></textarea></div>
-                    <div><label class="block mb-1">Photo Reference URL Target (Paste ANY web link or local path) *</label><input type='text' id='val_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80'></div>
-                `
-            };
-            inputAnchor.innerHTML = templates[currentActiveSubsystemRoute] || '';
         }
 
         function executeStorageWriteCycle(event) {
             event.preventDefault();
-            if(currentActiveSubsystemRoute === 'edc_stats_config') {
-                db_stats.initiatives = Number(document.getElementById('stat_init').value) || 0;
-                db_stats.mindsets = Number(document.getElementById('stat_mind').value) || 0;
-                db_stats.workshops = Number(document.getElementById('stat_work').value) || 0;
-                db_stats.experts = Number(document.getElementById('stat_exp').value) || 0;
-                db_stats.funding = Number(document.getElementById('stat_fund').value) || 0;
-                db_stats.awards = Number(document.getElementById('stat_aw').value) || 0;
-                commitTable('edc_site_stats', db_stats); logAuditAction("Modify Site Stats", "Custom values shifted.");
-                alert("Site statistics committed successfully!"); return;
-            }
-            if (currentActiveSubsystemRoute === 'edc_socials_config') {
-                db_socials.linkedin = document.getElementById('soc_li').value;
-                db_socials.instagram = document.getElementById('soc_in').value;
-                db_socials.youtube = document.getElementById('soc_yt').value;
-                db_socials.website = document.getElementById('soc_web').value;
-                commitTable('edc_site_socials', db_socials); logAuditAction("Modify Social Outlets", "Custom links parsed.");
-                alert("Social platform links updated successfully!"); return;
-            }
+            let tableTarget = currentActiveSubsystemRoute;
+            let payload = {};
 
-            let currentCachedDataset = fetchTable(currentActiveSubsystemRoute, []);
-            let structuredPayload = { id: Date.now() };
-
+            // Dynamic layout mapping assignment allocations
             if (currentActiveSubsystemRoute === 'edc_blogs') {
-                structuredPayload.title = document.getElementById('val_title').value;
-                structuredPayload.date = document.getElementById('val_date').value;
-                structuredPayload.content = document.getElementById('val_content').value;
-                db_blogs.push(structuredPayload);
+                payload = { title: document.getElementById('val_title').value, date: document.getElementById('val_date').value, content: document.getElementById('val_content').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
             } else if (currentActiveSubsystemRoute === 'edc_team') {
-                structuredPayload.name = document.getElementById('val_name').value;
-                structuredPayload.role = document.getElementById('val_role').value;
-                structuredPayload.year = Number(document.getElementById('val_year').value) || 2026;
-                structuredPayload.achievement = document.getElementById('val_achievement').value;
-                structuredPayload.img = document.getElementById('val_img').value;
-                db_team.push(structuredPayload);
+                payload = { name: document.getElementById('val_name').value, role: document.getElementById('val_role').value, year: document.getElementById('val_year').value, achievement: document.getElementById('val_achievement').value, img: document.getElementById('val_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
             } else if (currentActiveSubsystemRoute === 'edc_events') {
-                structuredPayload.title = document.getElementById('val_title').value;
-                structuredPayload.type = document.getElementById('val_type').value;
-                structuredPayload.date = document.getElementById('val_date').value;
-                structuredPayload.speaker = document.getElementById('val_speaker').value;
-                structuredPayload.outcome = document.getElementById('val_outcome').value;
-                structuredPayload.img = document.getElementById('val_img').value;
-                db_events.push(structuredPayload);
+                payload = { title: document.getElementById('ev_title').value, type: document.getElementById('ev_type').value, date: document.getElementById('ev_date').value, speaker: document.getElementById('ev_speaker').value, outcome: document.getElementById('ev_outcome').value, img: document.getElementById('ev_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
             } else if (currentActiveSubsystemRoute === 'edc_startups') {
-                structuredPayload.name = document.getElementById('st_name').value;
-                structuredPayload.founder = document.getElementById('st_founder').value;
-                structuredPayload.industry = document.getElementById('st_ind').value;
-                structuredPayload.solution = document.getElementById('st_sol').value;
-                structuredPayload.metrics = document.getElementById('st_met').value;
-                structuredPayload.url = document.getElementById('st_url').value;
-                db_startups.push(structuredPayload);
-            } else if (currentActiveSubsystemRoute === 'edc_problem_videos') {
-                structuredPayload.title = document.getElementById('vid_title').value;
-                structuredPayload.url = document.getElementById('vid_url').value;
-                structuredPayload.desc = document.getElementById('vid_desc').value;
-                db_videos.push(structuredPayload);
+                payload = { name: document.getElementById('st_name').value, founder: document.getElementById('st_founder').value, industry: document.getElementById('st_ind').value, solution: document.getElementById('st_sol').value, metrics: document.getElementById('st_met').value, url: document.getElementById('st_url').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
             } else if (currentActiveSubsystemRoute === 'edc_visitors') {
-                structuredPayload.name = document.getElementById('val_name').value;
-                structuredPayload.designation = document.getElementById('val_designation').value;
-                structuredPayload.org = document.getElementById('val_org').value;
-                structuredPayload.date = document.getElementById('val_date').value;
-                structuredPayload.topic = document.getElementById('val_topic').value;
-                structuredPayload.message = document.getElementById('val_message').value;
-                structuredPayload.img = document.getElementById('val_img').value;
-                db_visitors.push(structuredPayload);
+                payload = { name: document.getElementById('vis_name').value, designation: document.getElementById('vis_des').value, org: document.getElementById('vis_org').value, date: document.getElementById('vis_date').value, topic: document.getElementById('vis_top').value, message: document.getElementById('vis_msg').value, img: document.getElementById('vis_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
             }
 
-            currentCachedDataset.push(structuredPayload);
-            commitTable(currentActiveSubsystemRoute, currentCachedDataset);
-            logAuditAction("Write Transaction", `Added new entity row entry into path context table: ${currentActiveSubsystemRoute}`);
-            document.getElementById('unified-console-form').reset();
-            generateTailoredFieldsLayout(); refreshAdminRegistryTableMonitor();
-            alert("Venture element committed successfully!");
-        }
+            let endpointTargetURL = `${SUPABASE_URL}/rest/v1/${tableTarget}`;
+            let systemHTTPMethodType = "POST";
 
-        function refreshAdminRegistryTableMonitor() {
-            const tbodyAnchor = document.getElementById('live-registry-rows-feed');
-            tbodyAnchor.innerHTML = '';
-            document.getElementById('th-name-label').innerText = "Asset Reference Identifier Name";
-            document.getElementById('th-date-label').innerText = "Temporal Key";
-
-            if (currentActiveSubsystemRoute === 'edc_stats_config' || currentActiveSubsystemRoute === 'edc_socials_config') {
-                tbodyAnchor.innerHTML = `<tr><td colspan='3' class='p-4 text-slate-400 font-medium'>System configurations adjusted directly inside left parameters panel context.</td></tr>`; return;
+            // If an active ID signature is verified, rewrite standard POST pipeline to look up specific row update target bounds via query strings
+            if (activeEditEntityIdReference !== null) {
+                systemHTTPMethodType = "PATCH";
+                endpointTargetURL += `?id=eq.${activeEditEntityIdReference}`;
             }
 
-            let targetArrayCollection = [];
-            if(currentActiveSubsystemRoute === 'edc_applications_view') {
-                targetArrayCollection = fetchTable('edc_applications', []);
-                document.getElementById('th-name-label').innerText = "Applicant Name / Roll";
-                document.getElementById('th-date-label').innerText = "Dept/Class";
-            } else if (currentActiveSubsystemRoute === 'edc_problem_videos') {
-                targetArrayCollection = fetchTable('edc_problem_videos', []);
-            } else if (currentActiveSubsystemRoute === 'edc_audit_logs') {
-                targetArrayCollection = fetchTable('edc_admin_audit_logs', []);
-                document.getElementById('th-name-label').innerText = "Action Performed (User Context)";
-                document.getElementById('th-date-label').innerText = "Timestamp Log";
-            } else { targetArrayCollection = fetchTable(currentActiveSubsystemRoute, []); }
-
-            if (targetArrayCollection.length === 0) {
-                tbodyAnchor.innerHTML = `<tr><td colspan='3' class='p-5 text-center text-slate-500 font-mono'>Registry collection vector currently unallocated.</td></tr>`; return;
-            }
-
-            targetArrayCollection.forEach(rowItem => {
-                const titleReferenceHandle = rowItem.title || rowItem.name || rowItem.action || "Unnamed Component Element";
-                let dateReferenceHandle = rowItem.date || rowItem.year || rowItem.roll || "N/A";
-                if(rowItem.phone) { dateReferenceHandle += ` [Ph: ${rowItem.phone}]`; }
-                
-                tbodyAnchor.innerHTML += `
-                    <tr class='hover:bg-slate-900 transition-colors border-b border-slate-800/40 text-slate-200'>
-                        <td class='p-3.5 font-bold max-w-xs truncate'>${titleReferenceHandle}</td>
-                        <td class='p-3.5 text-slate-400 font-mono font-bold'>${dateReferenceHandle}</td>
-                        <td class='p-3.5 text-center'>
-                            <button onclick='purgeRegisterElementItem(${rowItem.id})' class='bg-red-950/40 border border-red-900 text-red-400 font-bold px-3 py-1.5 rounded-xl hover:bg-red-900 transition-colors text-[10px] uppercase tracking-wider'>Scrub Allocation</button>
-                        </td>
-                    </tr>
-                `;
+            fetch(endpointTargetURL, {
+                method: systemHTTPMethodType,
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+                body: JSON.stringify(payload)
+            }).then(res => {
+                if (res.ok) {
+                    alert(activeEditEntityIdReference !== null ? "Database record updated successfully!" : "New entity entry successfully tracked across cloud channels!");
+                    abortEditModeResetState();
+                    refreshAdminRegistryTableMonitor();
+                } else { alert("Handshake failure. Verify table columns are present."); }
             });
         }
 
-        function purgeRegisterElementItem(targetId) {
-            if(!confirm("Are you sure you want to scrub this strategic memory allocation entity?")) return;
-            let useRouteKey = currentActiveSubsystemRoute === 'edc_applications_view' ? 'edc_applications' : (currentActiveSubsystemRoute === 'edc_audit_logs' ? 'edc_admin_audit_logs' : currentActiveSubsystemRoute);
-            let currentCachedDataset = fetchTable(useRouteKey, []);
-            const postPurgeDataset = currentCachedDataset.filter(item => item.id !== targetId);
-            commitTable(useRouteKey, postPurgeDataset);
+        function refreshAdminRegistryTableMonitor() {
+            const feed = document.getElementById('live-registry-rows-feed');
+            feed.innerHTML = '';
+            let targetEndpoint = currentActiveSubsystemRoute === 'edc_applications_view' ? 'edc_applications' : currentActiveSubsystemRoute;
 
-            if(currentActiveSubsystemRoute === 'edc_blogs') db_blogs = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_team') db_team = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_events') db_events = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_startups') db_startups = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_visitors') db_visitors = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_problem_videos') db_videos = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_applications_view') db_applications = postPurgeDataset;
-            if(currentActiveSubsystemRoute === 'edc_audit_logs') db_logs = postPurgeDataset;
+            // Order dashboard rows tracking tables by order number values so you see reordering live inside table view columns grid layout
+            let reorderingParameterHook = currentActiveSubsystemRoute !== 'edc_applications_view' ? '?order=sort_order.asc,id.desc' : '';
 
-            logAuditAction("Delete Operation", `Purged object reference matching ID parameter context: ${targetId} from ${useRouteKey}`);
-            refreshAdminRegistryTableMonitor();
+            fetch(`${SUPABASE_URL}/rest/v1/${targetEndpoint}${reorderingParameterHook}`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            })
+            .then(res => res.json()).then(data => {
+                cachedLoadedRowDataCollection = data; // Cache array data frames inside memory buffer references
+                if (data.length === 0) {
+                    feed.innerHTML = `<tr><td class='p-4 text-slate-500 font-mono text-center'>Registry matrix unallocated.</td></tr>`; return;
+                }
+                data.forEach(row => {
+                    let text = row.title || row.name || "Unnamed Entry Element";
+                    let matchKeyId = row.id;
+                    let displayMeta = row.roll ? `Roll Number: ${row.roll}` : (row.role ? `Role Context: ${row.role}` : (row.type ? `Pillar: ${row.type}` : (row.designation ? `Title: ${row.designation}` : `Cloud Transaction Log`)));
+                    
+                    let priorityBadgeLayoutHTML = row.sort_order !== undefined ? `<span class='ml-2 bg-slate-800 text-emerald-400 border border-slate-700 px-1.5 py-0.5 rounded font-mono font-bold text-[10px]'>Slot: ${row.sort_order}</span>` : '';
+
+                    let functionalButtonsBarLayoutHTML = ``;
+                    if (currentActiveSubsystemRoute !== 'edc_applications_view') {
+                        functionalButtonsBarLayoutHTML = `
+                            <button onclick='initiateFormEditorMode(${matchKeyId})' class='bg-amber-950/40 border border-amber-900 text-amber-400 font-bold tracking-wider rounded-xl py-1.5 px-3 uppercase text-[10px] hover:bg-amber-900 transition-colors mr-1'>✏️ Edit</button>
+                            <button onclick='purgeCloudElementRowItem("${targetEndpoint}", ${matchKeyId})' class='bg-red-950/40 border border-red-900 text-red-400 font-bold tracking-wider rounded-xl py-1.5 px-3 uppercase text-[10px] hover:bg-red-900 transition-colors'>🗑️ Delete</button>
+                        `;
+                    } else {
+                        // Recruitment logs can only be scrubbed, not modified via edits
+                        functionalButtonsBarLayoutHTML = `<button onclick='purgeCloudElementRowItem("${targetEndpoint}", ${matchKeyId}, "roll=eq.${row.roll}")' class='bg-red-950/40 border border-red-900 text-red-400 font-bold tracking-wider rounded-xl py-1.5 px-3 uppercase text-[10px] hover:bg-red-900 transition-colors'>Scrub Record</button>`;
+                    }
+
+                    feed.innerHTML += `
+                        <tr class='border-b border-slate-800/60 text-slate-200 hover:bg-slate-900/40 transition-colors'>
+                            <td class='p-3.5'>
+                                <div class='font-bold flex items-center'>${text} ${priorityBadgeLayoutHTML}</div>
+                                <div class='text-[10px] text-slate-500 font-mono font-bold uppercase mt-0.5'>${displayMeta}</div>
+                            </td>
+                            <td class='p-3.5 text-center whitespace-nowrap'>${functionalButtonsBarLayoutHTML}</td>
+                        </tr>`;
+                });
+            });
         }
-        function purgeCloudApplicationItem(studentRoll) {
-    if(!confirm("Are you sure you want to delete this student's application from the cloud?")) return;
 
-    const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
+        function initiateFormEditorMode(targetRowId) {
+            const structuralMatchRowTarget = cachedLoadedRowDataCollection.find(r => r.id === targetRowId);
+            if (!structuralMatchRowTarget) return;
 
-    fetch(`${SUPABASE_URL}/rest/v1/edc_applications?roll=eq.${studentRoll}`, {
-        method: 'DELETE',
-        headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
+            activeEditEntityIdReference = targetRowId;
+            document.getElementById('form-action-title-label').innerText = "⚡ UPDATE / EDIT RECORD LOOP PANEL";
+            document.getElementById('form-submit-action-btn').innerText = "Save and Update Matrix Changes";
+            document.getElementById('form-submit-action-btn').className = "w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-extrabold uppercase text-[10px] rounded-xl transition-colors tracking-wider";
+            document.getElementById('abort-edit-mode-btn').classList.remove('hidden');
+
+            generateTailoredFieldsLayout();
+
+            // Auto populate input frames safely based on context routes paths definitions parameters
+            if (currentActiveSubsystemRoute === 'edc_blogs') {
+                document.getElementById('val_title').value = structuralMatchRowTarget.title || '';
+                document.getElementById('val_date').value = structuralMatchRowTarget.date || '';
+                document.getElementById('val_content').value = structuralMatchRowTarget.content || '';
+            } else if (currentActiveSubsystemRoute === 'edc_team') {
+                document.getElementById('val_name').value = structuralMatchRowTarget.name || '';
+                document.getElementById('val_role').value = structuralMatchRowTarget.role || '';
+                document.getElementById('val_year').value = structuralMatchRowTarget.year || '2026';
+                document.getElementById('val_achievement').value = structuralMatchRowTarget.achievement || '';
+                document.getElementById('val_img').value = structuralMatchRowTarget.img || '';
+            } else if (currentActiveSubsystemRoute === 'edc_events') {
+                document.getElementById('ev_title').value = structuralMatchRowTarget.title || '';
+                document.getElementById('ev_type').value = structuralMatchRowTarget.type || 'tours';
+                document.getElementById('ev_date').value = structuralMatchRowTarget.date || '';
+                document.getElementById('ev_speaker').value = structuralMatchRowTarget.speaker || '';
+                document.getElementById('ev_outcome').value = structuralMatchRowTarget.outcome || '';
+                document.getElementById('ev_img').value = structuralMatchRowTarget.img || '';
+            } else if (currentActiveSubsystemRoute === 'edc_startups') {
+                document.getElementById('st_name').value = structuralMatchRowTarget.name || '';
+                document.getElementById('st_founder').value = structuralMatchRowTarget.founder || '';
+                document.getElementById('st_ind').value = structuralMatchRowTarget.industry || '';
+                document.getElementById('st_sol').value = structuralMatchRowTarget.solution || '';
+                document.getElementById('st_met').value = structuralMatchRowTarget.metrics || '';
+                document.getElementById('st_url').value = structuralMatchRowTarget.url || '';
+            } else if (currentActiveSubsystemRoute === 'edc_visitors') {
+                document.getElementById('vis_name').value = structuralMatchRowTarget.name || '';
+                document.getElementById('vis_des').value = structuralMatchRowTarget.designation || '';
+                document.getElementById('vis_org').value = structuralMatchRowTarget.org || '';
+                document.getElementById('vis_date').value = structuralMatchRowTarget.date || '';
+                document.getElementById('vis_top').value = structuralMatchRowTarget.topic || '';
+                document.getElementById('vis_msg').value = structuralMatchRowTarget.message || '';
+                document.getElementById('vis_img').value = structuralMatchRowTarget.img || '';
+            }
+            
+            if(document.getElementById('val_sort_order')) {
+                document.getElementById('val_sort_order').value = structuralMatchRowTarget.sort_order || 0;
+            }
         }
-    })
-    .then(response => {
-        if (response.ok) {
-            alert("Application successfully removed from cloud storage!");
-            refreshAdminRegistryTableMonitor();
-        } else {
-            alert("Failed to delete the entry.");
+
+        function abortEditModeResetState() {
+            activeEditEntityIdReference = null;
+            document.getElementById('form-action-title-label').innerText = "New Entry Transaction Panel";
+            document.getElementById('form-submit-action-btn').innerText = "Commit To Live Matrix";
+            document.getElementById('form-submit-action-btn').className = "w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold uppercase text-[10px] rounded-xl transition-colors tracking-wider";
+            document.getElementById('abort-edit-mode-btn').classList.add('hidden');
+            document.getElementById('unified-console-form').reset();
+            generateTailoredFieldsLayout();
         }
-    })
-    .catch(error => console.error("Cloud Delete Error:", error));
-}
+
+        function purgeCloudElementRowItem(table, targetRowId, defaultQueryOverrideString = null) {
+            if (!confirm("Are you sure you want to completely delete this entry block out of the cloud ecosystem?")) return;
+            
+            let queryMatchParameterString = defaultQueryOverrideString ? defaultQueryOverrideString : `id=eq.${targetRowId}`;
+            
+            fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryMatchParameterString}`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            }).then(res => {
+                if (res.ok) { alert("Record dropped cleanly out of active cloud databases."); abortEditModeResetState(); refreshAdminRegistryTableMonitor(); }
+            });
+        }
     </script>
 </body>
 </html>
