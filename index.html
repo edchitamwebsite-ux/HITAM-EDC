@@ -38,30 +38,46 @@
                 <img src="edc-logo.png" alt="EDC HITAM Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-36 h-36 rounded-3xl bg-gradient-to-tr from-emerald-600 to-emerald-400 mx-auto flex items-center justify-center text-white text-[11px] font-black uppercase tracking-wider text-center px-2\'>EDC Hub</div>';">
             </div>
             <div class="space-y-3">
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">HITAM Innovation Hub</h1>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">HITAM EDC</h1>
                 <p class="text-emerald-400 font-mono text-xs tracking-widest uppercase">Experiential Engineering & Incubation Ecosystem</p>
             </div>
             <div class="flex flex-col gap-4 justify-center items-center w-full px-4 sm:flex-row max-w-sm mx-auto">
                 <button onclick="launchPortalEnvironment()" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300 transform hover:scale-105 shadow-xl">Explore Ecosystem</button>
-                <button onclick="openRecruitmentModal()" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl text-sm tracking-wide transition-all duration-300">Join EDC Team ✨</button>
+                <button onclick="openRecruitmentModal()" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold rounded-xl text-sm tracking-wide transition-all duration-300">Join EDC ✨</button>
             </div>
         </div>
     </div>
 
     <header class="bg-white/95 text-slate-900 sticky top-0 z-50 border-b border-slate-200 shadow-xl transition-colors">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <span class="bg-emerald-600 px-3 py-1 rounded-lg font-black tracking-widest text-xs text-white shadow-md">HITAM</span>
-                <span class="font-bold tracking-tight text-sm">Entrepreneurship Cell Portal</span>
+                <span class="bg-emerald-600 px-3 py-1 rounded-lg font-black tracking-widest text-xs text-white shadow-md">EDC</span>
+                <span class="font-bold tracking-tight text-sm hidden sm:inline"> HITAM Innovation and Incubation Centre (HIIC)</span>
             </div>
-            <nav class="flex flex-wrap justify-center gap-4 text-xs md:text-sm font-semibold text-slate-600">
+            
+            <nav class="hidden lg:flex items-center gap-4 text-sm font-semibold text-slate-600">
                 <a href="#blogs-section" class="hover:text-emerald-500 transition-colors">Daily Logs</a>
-                <a href="#team-section" class="hover:text-emerald-500 transition-colors">E-Cell Teams</a>
+                <a href="#team-section" class="hover:text-emerald-500 transition-colors">EDC Team</a>
                 <a href="#events-section" class="hover:text-emerald-500 transition-colors">Initiatives</a>
                 <a href="#startup-showcase-section" class="hover:text-emerald-500 transition-colors">Startups</a>
                 <a href="#problem-videos-section" class="hover:text-emerald-500 transition-colors">Problem Pitches</a>
                 <a href="admin.html" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-white transition-all text-xs shadow-md">Admin Dashboard</a>
             </nav>
+
+            <button onclick="toggleMobileControlDrawer()" class="lg:hidden flex flex-col justify-between items-center w-6 h-5 p-0.5 outline-none group" aria-label="Toggle Navigation Menu">
+                <span class="w-1.5 h-1.5 bg-slate-800 dark:bg-white rounded-full transition-transform"></span>
+                <span class="w-1.5 h-1.5 bg-slate-800 dark:bg-white rounded-full"></span>
+                <span class="w-1.5 h-1.5 bg-slate-800 dark:bg-white rounded-full"></span>
+            </button>
+        </div>
+
+        <div id="mobile-navigation-drawer" class="hidden lg:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 absolute top-full left-0 w-full shadow-2xl p-4 flex flex-col gap-3 text-xs font-bold transition-all animate-fadeIn">
+            <a onclick="toggleMobileControlDrawer()" href="#blogs-section" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">Daily Logs</a>
+            <a onclick="toggleMobileControlDrawer()" href="#team-section" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">EDC Team</a>
+            <a onclick="toggleMobileControlDrawer()" href="#events-section" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">Initiatives</a>
+            <a onclick="toggleMobileControlDrawer()" href="#startup-showcase-section" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">Startups</a>
+            <a onclick="toggleMobileControlDrawer()" href="#problem-videos-section" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">Problem Pitches</a>
+            <a href="admin.html" class="bg-emerald-700 text-center py-2.5 rounded-xl font-bold text-white transition-all shadow-md mt-2">Admin Dashboard</a>
         </div>
     </header>
 
@@ -73,6 +89,79 @@
             <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Experts</span><h3 class="text-2xl font-extrabold text-indigo-800 mt-1" id="live-count-experts">0+</h3></div>
             <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Grants Shared</span><h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-funding">0+</h3></div>
             <div class="glass-card p-4 rounded-xl shadow-xl flex flex-col justify-between border"><span class="text-slate-400 uppercase font-bold text-[9px] tracking-widest">Awards Won</span><h3 class="text-2xl font-extrabold text-amber-800 mt-1" id="live-count-awards">0+</h3></div>
+        </section>
+        <section id="about-edc-foundation" class="glass-card p-6 sm:p-8 rounded-3xl shadow-xl border space-y-12 w-full">
+            <div class="border-b border-slate-200/60 dark:border-slate-800 pb-6">
+                <span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-3 py-1 rounded-lg uppercase tracking-wider text-[10px] font-black border border-emerald-200 dark:border-emerald-800">Established 2018</span>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight mt-2 dark:text-white">About EDC HITAM</h2>
+                <div class="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                    <p>The Entrepreneurship Development Cell (EDC) was established at HITAM in 2018. It operates under the <strong>HITAM Innovation and Incubation Centre (HIIC)</strong>, the official incubator of HITAM, located on the first floor of the Activity Block.</p>
+                    <p>EDC focuses on developing an entrepreneurial mindset among students, encouraging them to think beyond traditional career paths, and helping them convert their ideas into viable startups by providing proper guidance, mentorship, and support.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 p-6 rounded-2xl dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2">👁️ Vision</h3>
+                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed italic">
+                        "To build an inclusive entrepreneurial ecosystem that empowers students to innovate fearlessly, develop sustainable ventures and emerge as socially responsible leaders driving global impact."
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 p-6 rounded-2xl dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">🎯 Mission</h3>
+                    <ul class="text-xs space-y-2 font-medium text-slate-600 dark:text-slate-300">
+                        <li><strong>• Skill Development:</strong> Provide opportunities for learning through workshops, seminars and competitions.</li>
+                        <li><strong>• Incubation & Venture Creation:</strong> Facilitate the creation of at least 5 student-led startups annually. Offer platforms for ideation, collaboration and startup incubation.</li>
+                        <li><strong>• Industry Partnerships:</strong> Build partnerships with industry and startup communities.</li>
+                        <li><strong>• Sustainable Impact:</strong> Encourage students to develop sustainable and impactful ventures.</li>
+                        <li><strong>• Mentorship:</strong> Provide mentorship and resources to transform ideas into practical innovations.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Core Values</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">💡 Innovation & Creativity</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Inspire students to think differently and create fresh solutions to everyday problems.</p>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">🛡️ Integrity & Ethics</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Ensure honesty, fairness and responsibility in all business and learning activities.</p>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">🤝 Collaboration & Inclusivity</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Promote teamwork and welcome diverse ideas from students of all backgrounds.</p>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">⛰️ Resilience & Learning</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Encourage students to stay strong through challenges, adapt to changes and never stop learning.</p>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">🌍 Sustainability & Social Impact</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Focus on supporting businesses that do good for the community and protect the environment.</p>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-xl space-y-1">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white">🚀 Entrepreneurial Mindset</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Build the courage to take smart risks, solve real problems, and lead others.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 bg-slate-100 dark:bg-slate-950 p-6 rounded-2xl border dark:border-slate-900">
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Expected Outcomes</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium text-slate-600 dark:text-slate-300">
+                    <p><strong>🛠️ Skill Development:</strong> Students will enhance creativity, problem-solving, leadership, and teamwork skills.</p>
+                    <p><strong>🎯 Entrepreneurial Execution:</strong> Students will conceptualize, validate, and launch viable business ventures.</p>
+                    <p><strong>📈 Business Knowledge & Awareness:</strong> Students will gain knowledge of market opportunities, funding, financial planning, and legal compliance.</p>
+                    <p><strong>🌐 Networking & Ecosystem Engagement:</strong> Students will build professional connections with mentors, industry experts, and investors through events.</p>
+                    <p><strong>💼 Economic Contribution:</strong> Students will transition from job seekers to job creators, generating employment and supporting economic growth.</p>
+                    <p><strong>🏛️ Institutional Advancement:</strong> The institution will foster a culture of innovation, strengthen its reputation, and attract industry collaborations.</p>
+                    <p class="md:col-span-2"><strong>🌾 Societal & Rural Impact:</strong> Students will develop socially responsible and rural enterprises addressing community challenges.</p>
+                </div>
+            </div>
         </section>
 
         <section id="blogs-section" class="space-y-6 w-full">
@@ -97,7 +186,7 @@
         <section id="team-section" class="space-y-6 bg-slate-950 text-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 gap-4">
                 <div>
-                    <h2 class="text-2xl font-black tracking-tight">E-Cell Board Registry</h2>
+                    <h2 class="text-2xl font-black tracking-tight">EDC TEAM</h2>
                     <p class="text-xs text-slate-400 font-medium">Year-by-year management iteration cycles</p>
                 </div>
                 <div class="flex space-x-2 self-end sm:self-auto">
@@ -337,9 +426,9 @@
 
             document.getElementById('public-footer-social-links').innerHTML = `
                 <a href="https://linkedin.com" target="_blank" class="hover:text-emerald-300">LinkedIn</a>
-                <a href="https://instagram.com" target="_blank" class="hover:text-emerald-300">Instagram</a>
-                <a href="https://youtube.com" target="_blank" class="hover:text-emerald-300">YouTube</a>
-                <a href="https://hitam.org" target="_blank" class="hover:text-emerald-300">HITAM Main</a>
+                <a href="https://www.instagram.com/edc_hitam/" target="_blank" class="hover:text-emerald-300">Instagram</a>
+                <a href="https://chat.whatsapp.com/LN0aAxHI5p5IJ4CXzrfUAX" target="_blank" class="hover:text-emerald-300">WhatsApp</a>
+                <a href="https://hitam.org" target="_blank" class="hover:text-emerald-300">HITAM OFFICIAL PAGE</a>
             `;
         }
 
@@ -483,6 +572,15 @@
         }
         function hideVisitorModal() { document.getElementById('visitor-deepdive-modal').classList.add('hidden'); }
         window.onload = synchronizePublicClientDashboardView;
+
+        function toggleMobileControlDrawer() {
+            const drawer = document.getElementById('mobile-navigation-drawer');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+            } else {
+                drawer.classList.add('hidden');
+            }
+        }
     </script>
 </body>
 </html>
