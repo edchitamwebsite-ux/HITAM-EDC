@@ -451,7 +451,7 @@
             contextScopeMembers.forEach(mem => {
                 cardsViewportGrid.innerHTML += `
                     <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col items-center text-center space-y-4 hover:border-emerald-400/40 transition-all duration-300 shadow-xl w-full">
-                        <img class="w-20 h-20 rounded-full object-cover border-2 border-emerald-400 bg-slate-800 shadow-md" src="${mem.img}" onerror="this.src='edc-logo.png'">
+                        <img class="w-20 h-20 rounded-full object-cover border-2 border-emerald-400 bg-slate-800 shadow-md" src="${mem.img.startsWith('http') ? mem.img : 'https://raw.githubusercontent.com/edchitamwebsite-ux/HITAM-EDC/main/' + mem.img}" onerror="this.src='edc-logo.png'">
                         <div>
                             <h4 class="font-extrabold text-white text-base leading-tight">${mem.name}</h4>
                             <p class="text-xs text-emerald-400 font-mono mt-1 font-semibold">${mem.role}</p>
