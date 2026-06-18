@@ -50,10 +50,12 @@
 
     <header class="bg-white/95 text-slate-900 sticky top-0 z-50 border-b border-slate-200 shadow-xl transition-colors">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <span class="bg-emerald-600 px-3 py-1 rounded-lg font-black tracking-widest text-xs text-white shadow-md">EDC</span>
-                <span class="font-bold tracking-tight text-sm hidden sm:inline"> HITAM Innovation and Incubation Centre (HIIC)</span>
-            </div>
+            <a href="index.html" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-md border border-slate-200/60 dark:border-slate-800 transition-transform group-hover:scale-105 flex items-center justify-center overflow-hidden">
+                    <img src="edc-logo.png" alt="EDC Logo" class="w-full h-full object-contain" onerror="this.src='https://raw.githubusercontent.com/edchitamwebsite-ux/HITAM-EDC/main/edc-logo.png'">
+                </div>
+                <span class="font-extrabold tracking-tight text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors hidden sm:inline">EDC | Hyderabad Institute of Technology and Management</span>
+            </a>
             
             <nav class="hidden lg:flex items-center gap-4 text-sm font-semibold text-slate-600">
                 <a href="#blogs-section" class="hover:text-emerald-500 transition-colors">Daily Logs</a>
@@ -102,14 +104,14 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 p-6 rounded-2xl dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 shadow-sm space-y-3">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2">👁️ Vision</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2"> Vision</h3>
                     <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed italic">
                         "To build an inclusive entrepreneurial ecosystem that empowers students to innovate fearlessly, develop sustainable ventures and emerge as socially responsible leaders driving global impact."
                     </p>
                 </div>
 
                 <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 p-6 rounded-2xl dark:from-slate-900 dark:to-slate-950 dark:border-slate-800 shadow-sm space-y-3">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2">🎯 Mission</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2"> Mission</h3>
                     <ul class="text-xs space-y-2 font-medium text-slate-600 dark:text-slate-300">
                         <li><strong>• Skill Development:</strong> Provide opportunities for learning through workshops, seminars and competitions.</li>
                         <li><strong>• Incubation & Venture Creation:</strong> Facilitate the creation of at least 5 student-led startups annually. Offer platforms for ideation, collaboration and startup incubation.</li>
@@ -119,7 +121,34 @@
                     </ul>
                 </div>
             </div>
-
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-6 rounded-2xl shadow-sm space-y-6">
+                    <div>
+                        <h4 class="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">The EDC Startup Execution Pipeline</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">The structured blueprint shifting student innovators from raw concepts to market-ready validation</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-900 space-y-1">
+                            <span class="text-[10px] uppercase font-black tracking-widest text-emerald-600 dark:text-emerald-400 block mb-1">Phase 1</span>
+                            <h5 class="font-bold text-xs text-slate-900 dark:text-white">Ideation</h5>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">Problem identification, field user research, and lean canvas mapping.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-900 space-y-1">
+                            <span class="text-[10px] uppercase font-black tracking-widest text-emerald-600 dark:text-emerald-400 block mb-1">Phase 2</span>
+                            <h5 class="font-bold text-xs text-slate-900 dark:text-white">Validation</h5>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">Wireframing, customer solution interviews, and market validation testing.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-900 space-y-1">
+                            <span class="text-[10px] uppercase font-black tracking-widest text-indigo-600 dark:text-indigo-400 block mb-1">Phase 3</span>
+                            <h5 class="font-bold text-xs text-slate-900 dark:text-white">MVP Build</h5>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">Rapid architectural prototyping, core feature deployment, and live hosting.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-900 space-y-1">
+                            <span class="text-[10px] uppercase font-black tracking-widest text-indigo-600 dark:text-indigo-400 block mb-1">Phase 4</span>
+                            <h5 class="font-bold text-xs text-slate-900 dark:text-white"> Launch</h5>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1">Campus pilot deployment, runtime metrics tracking, and incubator seed pitching.</p>
+                        </div>
+                    </div>
+                </div>
             <div class="space-y-4">
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Core Values</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
