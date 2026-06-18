@@ -442,7 +442,7 @@
         function renderActiveTeamSliderCohort() {
             const selectedTargetYear = availableYears[yearIndex];
             document.getElementById('current-carousel-year').innerText = selectedTargetYear;
-            const contextScopeMembers = liveCloudTeam.filter(m => Number(m.year) === selectedTargetYear);
+            const contextScopeMembers = liveCloudTeam.filter(m => String(m.year) === String(selectedTargetYear));
             const cardsViewportGrid = document.getElementById('team-cards-viewport');
             cardsViewportGrid.innerHTML = '';
 
