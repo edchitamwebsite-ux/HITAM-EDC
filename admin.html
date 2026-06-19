@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDC Master Administrative Terminal</title>
-    <link rel="icon" type="image/png" href="edc-logo.png">
+    <link class="js-meta-tag" icon="image/png" href="edc-logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
@@ -103,12 +103,16 @@
             const submitBtn = document.getElementById('form-submit-action-btn');
             wrapper.innerHTML = ''; submitBtn.style.display = 'block';
 
-            let reorderingBlueprintHTML = `<div><label class="block mb-1 text-emerald-400">Display Order Index Sequence Number (Sort Order) *</label><input type='number' id='val_sort_order' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' required value='1' placeholder='e.g., 1 for top card, 2, 3...'></div>`;
+            // Conditional rendering for sort_order element
+            let reorderingBlueprintHTML = '';
+            if (currentActiveSubsystemRoute === 'edc_team' || currentActiveSubsystemRoute === 'edc_events') {
+                reorderingBlueprintHTML = `<div><label class="block mb-1 text-emerald-400">Display Order Index Sequence Number (Sort Order) *</label><input type='number' id='val_sort_order' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold' required value='1' placeholder='e.g., 1 for top card, 2, 3...'></div>`;
+            }
 
             if (currentActiveSubsystemRoute === 'edc_blogs') {
                 wrapper.innerHTML = `<div><label class="block mb-1">Announcement Title Log *</label><input type='text' id='val_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Stamp Date *</label><input type='date' id='val_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
-                <div><label class="block mb-1">Announcement Content *</label><textarea id='val_content' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>` + reorderingBlueprintHTML;
+                <div><label class="block mb-1">Announcement Content *</label><textarea id='val_content' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>`;
             } else if (currentActiveSubsystemRoute === 'edc_team') {
                 wrapper.innerHTML = `<div><label class="block mb-1">Full Member Name *</label><input type='text' id='val_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Operational Designation Role *</label><input type='text' id='val_role' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. Co-ordinator"></div>
@@ -134,7 +138,7 @@
                 <div><label class="block mb-1">Sector Domain Classification *</label><input type='text' id='st_ind' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Venture Solution Context *</label><textarea id='st_sol' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
                 <div><label class="block mb-1">Growth Metrics Validation Log Summary *</label><input type='text' id='st_met' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                <div><label class="block mb-1">Portfolio Website Link URL Target *</label><input type='url' id='st_url' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://google.com'></div>` + reorderingBlueprintHTML;
+                <div><label class="block mb-1">Portfolio Website Link URL Target *</label><input type='url' id='st_url' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required value='https://google.com'></div>`;
             } else if (currentActiveSubsystemRoute === 'edc_visitors') {
                 wrapper.innerHTML = `<div><label class="block mb-1">Dignitary Full Name *</label><input type='text' id='vis_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Professional Designation / Title *</label><input type='text' id='vis_des' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
@@ -142,7 +146,7 @@
                 <div><label class="block mb-1">Visit Date *</label><input type='date' id='vis_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
                 <div><label class="block mb-1">Key Session Matrix Topic *</label><input type='text' id='vis_top' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Validation Testimonial Message *</label><textarea id='vis_msg' rows='3' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
-                <div><label class="block mb-1">Photo Filename Asset Key *</label><input type='text' id='vis_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. sheela-singh.png"></div>` + reorderingBlueprintHTML;
+                <div><label class="block mb-1">Photo Filename Asset Key *</label><input type='text' id='vis_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. sheela-singh.png"></div>`;
             } else if (currentActiveSubsystemRoute === 'edc_applications_view') {
                 wrapper.innerHTML = `<p class="p-4 bg-slate-950/50 border border-slate-800 rounded-xl font-medium text-slate-400">Read-only live tracking audit log panel monitoring incoming student applications over encrypted channels.</p>`;
                 submitBtn.style.display = 'none';
@@ -154,50 +158,18 @@
             let tableTarget = currentActiveSubsystemRoute;
             let payload = {};
 
-           // Dynamic layout mapping assignment allocations
-if (currentActiveSubsystemRoute === 'edc_blogs') {
-    payload = { 
-        title: document.getElementById('val_title').value, 
-        date: document.getElementById('val_date').value, 
-        content: document.getElementById('val_content').value 
-    }; // Removed sort_order parameter
-} else if (currentActiveSubsystemRoute === 'edc_team') {
-    payload = { 
-        name: document.getElementById('val_name').value, 
-        role: document.getElementById('val_role').value, 
-        year: document.getElementById('val_year').value, 
-        achievement: document.getElementById('val_achievement').value, 
-        img: document.getElementById('val_img').value 
-    }; // Removed sort_order parameter
-} else if (currentActiveSubsystemRoute === 'edc_events') {
-    payload = { 
-        title: document.getElementById('ev_title').value, 
-        type: document.getElementById('ev_type').value, 
-        date: document.getElementById('ev_date').value, 
-        speaker: document.getElementById('ev_speaker').value, 
-        outcome: document.getElementById('ev_outcome').value, 
-        img: document.getElementById('ev_img').value 
-    }; // Removed sort_order parameter
-} else if (currentActiveSubsystemRoute === 'edc_startups') {
-    payload = { 
-        name: document.getElementById('st_name').value, 
-        founder: document.getElementById('st_founder').value, 
-        industry: document.getElementById('st_ind').value, 
-        solution: document.getElementById('st_sol').value, 
-        metrics: document.getElementById('st_met').value, 
-        url: document.getElementById('st_url').value 
-    }; // Removed sort_order parameter
-} else if (currentActiveSubsystemRoute === 'edc_visitors') {
-    payload = { 
-        name: document.getElementById('vis_name').value, 
-        designation: document.getElementById('vis_des').value, 
-        org: document.getElementById('vis_org').value, 
-        date: document.getElementById('vis_date').value, 
-        topic: document.getElementById('vis_top').value, 
-        message: document.getElementById('vis_msg').value, 
-        img: document.getElementById('vis_img').value 
-    }; // Removed sort_order parameter
-}
+            if (currentActiveSubsystemRoute === 'edc_blogs') {
+                payload = { title: document.getElementById('val_title').value, date: document.getElementById('val_date').value, content: document.getElementById('val_content').value };
+            } else if (currentActiveSubsystemRoute === 'edc_team') {
+                payload = { name: document.getElementById('val_name').value, role: document.getElementById('val_role').value, year: document.getElementById('val_year').value, achievement: document.getElementById('val_achievement').value, img: document.getElementById('val_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
+            } else if (currentActiveSubsystemRoute === 'edc_events') {
+                payload = { title: document.getElementById('ev_title').value, type: document.getElementById('ev_type').value, date: document.getElementById('ev_date').value, speaker: document.getElementById('ev_speaker').value, outcome: document.getElementById('ev_outcome').value, img: document.getElementById('ev_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
+            } else if (currentActiveSubsystemRoute === 'edc_startups') {
+                payload = { name: document.getElementById('st_name').value, founder: document.getElementById('st_founder').value, industry: document.getElementById('st_ind').value, solution: document.getElementById('st_sol').value, metrics: document.getElementById('st_met').value, url: document.getElementById('st_url').value };
+            } else if (currentActiveSubsystemRoute === 'edc_visitors') {
+                payload = { name: document.getElementById('vis_name').value, designation: document.getElementById('vis_des').value, org: document.getElementById('vis_org').value, date: document.getElementById('vis_date').value, topic: document.getElementById('vis_top').value, message: document.getElementById('vis_msg').value, img: document.getElementById('vis_img').value };
+            }
+
             let endpointTargetURL = `${SUPABASE_URL}/rest/v1/${tableTarget}`;
             let systemHTTPMethodType = "POST";
 
@@ -215,7 +187,7 @@ if (currentActiveSubsystemRoute === 'edc_blogs') {
                     alert(activeEditEntityIdReference !== null ? "Database record updated successfully!" : "New entity entry successfully tracked across cloud channels!");
                     abortEditModeResetState();
                     refreshAdminRegistryTableMonitor();
-                } else { alert("Handshake failure. Verify table columns are present."); }
+                } else { alert("Handshake failure. Verify database configuration connection."); }
             });
         }
 
@@ -224,7 +196,11 @@ if (currentActiveSubsystemRoute === 'edc_blogs') {
             feed.innerHTML = '';
             let targetEndpoint = currentActiveSubsystemRoute === 'edc_applications_view' ? 'edc_applications' : currentActiveSubsystemRoute;
 
-            let reorderingParameterHook = currentActiveSubsystemRoute !== 'edc_applications_view' ? '?order=id.desc' : '';
+            // Only order by sort_order parameter for team and events targets
+            let reorderingParameterHook = '?order=id.desc';
+            if (currentActiveSubsystemRoute === 'edc_team' || currentActiveSubsystemRoute === 'edc_events') {
+                reorderingParameterHook = '?order=sort_order.asc,id.desc';
+            }
 
             fetch(`${SUPABASE_URL}/rest/v1/${targetEndpoint}${reorderingParameterHook}`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -240,7 +216,7 @@ if (currentActiveSubsystemRoute === 'edc_blogs') {
                     let matchKeyId = row.id;
                     let displayMeta = row.roll ? `Roll Number: ${row.roll}` : (row.role ? `Role Context: ${row.role}` : (row.type ? `Pillar: ${row.type}` : (row.designation ? `Title: ${row.designation}` : `Cloud Transaction Log`)));
                     
-                    let priorityBadgeLayoutHTML = row.sort_order !== undefined ? `<span class='ml-2 bg-slate-800 text-emerald-400 border border-slate-700 px-1.5 py-0.5 rounded font-mono font-bold text-[10px]'>Slot: ${row.sort_order}</span>` : '';
+                    let priorityBadgeLayoutHTML = (row.sort_order !== undefined && (currentActiveSubsystemRoute === 'edc_team' || currentActiveSubsystemRoute === 'edc_events')) ? `<span class='ml-2 bg-slate-800 text-emerald-400 border border-slate-700 px-1.5 py-0.5 rounded font-mono font-bold text-[10px]'>Slot: ${row.sort_order}</span>` : '';
 
                     let functionalButtonsBarLayoutHTML = ``;
                     if (currentActiveSubsystemRoute !== 'edc_applications_view') {
@@ -309,9 +285,9 @@ if (currentActiveSubsystemRoute === 'edc_blogs') {
                 document.getElementById('vis_msg').value = structuralMatchRowTarget.message || '';
                 document.getElementById('vis_img').value = structuralMatchRowTarget.img || '';
             }
-            
-            if(document.getElementById('val_sort_order')) {
-                document.getElementById('val_sort_order').value = structuralMatchRowTarget.sort_order || 0;
+
+            if(document.getElementById('val_sort_order') && (currentActiveSubsystemRoute === 'edc_team' || currentActiveSubsystemRoute === 'edc_events')) {
+                document.getElementById('val_sort_order').value = structuralMatchRowTarget.sort_order || 1;
             }
         }
 
