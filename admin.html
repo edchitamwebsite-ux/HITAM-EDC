@@ -154,18 +154,50 @@
             let tableTarget = currentActiveSubsystemRoute;
             let payload = {};
 
-            if (currentActiveSubsystemRoute === 'edc_blogs') {
-                payload = { title: document.getElementById('val_title').value, date: document.getElementById('val_date').value, content: document.getElementById('val_content').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
-            } else if (currentActiveSubsystemRoute === 'edc_team') {
-                payload = { name: document.getElementById('val_name').value, role: document.getElementById('val_role').value, year: document.getElementById('val_year').value, achievement: document.getElementById('val_achievement').value, img: document.getElementById('val_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
-            } else if (currentActiveSubsystemRoute === 'edc_events') {
-                payload = { title: document.getElementById('ev_title').value, type: document.getElementById('ev_type').value, date: document.getElementById('ev_date').value, speaker: document.getElementById('ev_speaker').value, outcome: document.getElementById('ev_outcome').value, img: document.getElementById('ev_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
-            } else if (currentActiveSubsystemRoute === 'edc_startups') {
-                payload = { name: document.getElementById('st_name').value, founder: document.getElementById('st_founder').value, industry: document.getElementById('st_ind').value, solution: document.getElementById('st_sol').value, metrics: document.getElementById('st_met').value, url: document.getElementById('st_url').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
-            } else if (currentActiveSubsystemRoute === 'edc_visitors') {
-                payload = { name: document.getElementById('vis_name').value, designation: document.getElementById('vis_des').value, org: document.getElementById('vis_org').value, date: document.getElementById('vis_date').value, topic: document.getElementById('vis_top').value, message: document.getElementById('vis_msg').value, img: document.getElementById('vis_img').value, sort_order: parseInt(document.getElementById('val_sort_order').value) || 0 };
-            }
-
+           // Dynamic layout mapping assignment allocations
+if (currentActiveSubsystemRoute === 'edc_blogs') {
+    payload = { 
+        title: document.getElementById('val_title').value, 
+        date: document.getElementById('val_date').value, 
+        content: document.getElementById('val_content').value 
+    }; // Removed sort_order parameter
+} else if (currentActiveSubsystemRoute === 'edc_team') {
+    payload = { 
+        name: document.getElementById('val_name').value, 
+        role: document.getElementById('val_role').value, 
+        year: document.getElementById('val_year').value, 
+        achievement: document.getElementById('val_achievement').value, 
+        img: document.getElementById('val_img').value 
+    }; // Removed sort_order parameter
+} else if (currentActiveSubsystemRoute === 'edc_events') {
+    payload = { 
+        title: document.getElementById('ev_title').value, 
+        type: document.getElementById('ev_type').value, 
+        date: document.getElementById('ev_date').value, 
+        speaker: document.getElementById('ev_speaker').value, 
+        outcome: document.getElementById('ev_outcome').value, 
+        img: document.getElementById('ev_img').value 
+    }; // Removed sort_order parameter
+} else if (currentActiveSubsystemRoute === 'edc_startups') {
+    payload = { 
+        name: document.getElementById('st_name').value, 
+        founder: document.getElementById('st_founder').value, 
+        industry: document.getElementById('st_ind').value, 
+        solution: document.getElementById('st_sol').value, 
+        metrics: document.getElementById('st_met').value, 
+        url: document.getElementById('st_url').value 
+    }; // Removed sort_order parameter
+} else if (currentActiveSubsystemRoute === 'edc_visitors') {
+    payload = { 
+        name: document.getElementById('vis_name').value, 
+        designation: document.getElementById('vis_des').value, 
+        org: document.getElementById('vis_org').value, 
+        date: document.getElementById('vis_date').value, 
+        topic: document.getElementById('vis_top').value, 
+        message: document.getElementById('vis_msg').value, 
+        img: document.getElementById('vis_img').value 
+    }; // Removed sort_order parameter
+}
             let endpointTargetURL = `${SUPABASE_URL}/rest/v1/${tableTarget}`;
             let systemHTTPMethodType = "POST";
 
@@ -192,7 +224,7 @@
             feed.innerHTML = '';
             let targetEndpoint = currentActiveSubsystemRoute === 'edc_applications_view' ? 'edc_applications' : currentActiveSubsystemRoute;
 
-            let reorderingParameterHook = currentActiveSubsystemRoute !== 'edc_applications_view' ? '?order=sort_order.asc,id.desc' : '';
+            let reorderingParameterHook = currentActiveSubsystemRoute !== 'edc_applications_view' ? '?order=id.desc' : '';
 
             fetch(`${SUPABASE_URL}/rest/v1/${targetEndpoint}${reorderingParameterHook}`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
