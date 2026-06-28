@@ -28,7 +28,6 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-
         /* Snappy Green Easing Tab Fade In */
         @keyframes snappyFadeIn {
             from { opacity: 0; transform: translateY(12px); }
@@ -690,31 +689,38 @@
         }
 
         function renderAnnouncementsLayoutGrid(arr) {
-            const activeCard = document.getElementById('latest-announcement-card');
-            const historyFeed = document.getElementById('previous-blogs-grid');
-            if (!Array.isArray(arr) || arr.length === 0) {
-                activeCard.innerHTML = `<p class="text-slate-400 text-xs font-mono p-4">No active notices.</p>`;
-                historyFeed.innerHTML = ''; return;
-            }
-            const fresh = arr[0];
-            activeCard.innerHTML = `
-                <div class="flex justify-between items-center text-xs font-bold text-emerald-700">
-                    <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-xl uppercase tracking-wider text-[9px] font-black border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">Active Stream Notice</span>
-                    <span class="text-slate-400 font-mono">Date: ${fresh.date || ''}</span>
-                </div>
-                <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-3 dark:text-white">${fresh.title || ''}</h3>
-                <p class="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-4xl mt-2">${fresh.content || ''}</p>
-            `;
-            historyFeed.innerHTML = '';
-            arr.slice(1).forEach(function(b) {
-                historyFeed.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200/60 hover:shadow-md transition-all duration-300 dark:bg-slate-900 dark:border-slate-800 transform hover:-translate-y-1">
-                        <span class="text-[10px] text-slate-400 font-bold block mb-1 font-mono">${b.date || ''}</span>
-                        <h5 class="font-extrabold text-slate-900 dark:text-white text-sm mb-1">${b.title || ''}</h5>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">${b.content || ''}</p>
-                    </div>`;
-            });
-        }
+    const activeCard = document.getElementById('latest-announcement-card');
+    const historyFeed = document.getElementById('previous-blogs-grid');
+    if (!Array.isArray(arr) || arr.length === 0) {
+        activeCard.innerHTML = `<p class="text-slate-400 text-xs font-mono p-4">No active notices.</p>`;
+        historyFeed.innerHTML = ''; return;
+    }
+    const fresh = arr[0];
+    
+    // Using a template literal injection to cleanly display numbers, symbols, and formatting
+    activeCard.innerHTML = `
+        <div class="flex justify-between items-center text-xs font-bold text-emerald-700">
+            <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-xl uppercase tracking-wider text-[9px] font-black border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">Active Stream Notice</span>
+            <span class="text-slate-400 font-mono">Date: ${fresh.date || ''}</span>
+        </div>
+        <h3 class="text-2xl font-extrabold text-slate-900 tracking-tight mt-3 dark:text-white">${fresh.title || ''}</h3>
+        
+        <!-- FIX: Kept whitespace-pre-line to respect entering raw lines, spacing, emojis, and styling characters -->
+        <p class="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-4xl mt-2 whitespace-pre-line">${fresh.content || ''}</p>
+    `;
+    
+    historyFeed.innerHTML = '';
+    arr.slice(1).forEach(function(b) {
+        historyFeed.innerHTML += `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/60 hover:shadow-md transition-all duration-300 dark:bg-slate-900 dark:border-slate-800 transform hover:-translate-y-1">
+                <span class="text-[10px] text-slate-400 font-bold block mb-1 font-mono">${b.date || ''}</span>
+                <h5 class="font-extrabold text-slate-900 dark:text-white text-sm mb-1">${b.title || ''}</h5>
+                
+                <!-- FIX: Allowing full preservation of specific numbers, bullets, and structural text adjustments -->
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-6 leading-relaxed whitespace-pre-line">${b.content || ''}</p>
+            </div>`;
+    });
+}
 
         function executeBlogSearch() {
             if(!Array.isArray(liveCloudBlogs)) return;
