@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITAM | Entrepreneurship Development Cell</title>
+    <link rel="icon" type="image/png" href="edc-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #071011;
+            --panel: #0d1718;
+            --panel-soft: #121f21;
+            --line: rgba(226, 232, 240, 0.12);
+            --line-strong: rgba(226, 232, 240, 0.2);
+            --text: #f5f7f4;
+            --muted: #a9b7b0;
+            --green: #45d483;
+            --teal: #2dc8b8;
+            --blue: #4f8df7;
+            --gold: #f2c15f;
+            --danger: #ff6b6b;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+            --radius: 8px;
+            --ease: 220ms ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                linear-gradient(120deg, rgba(69, 212, 131, 0.13), transparent 32%),
+                linear-gradient(235deg, rgba(79, 141, 247, 0.12), transparent 36%),
+                linear-gradient(180deg, #081312 0%, #0b1115 42%, #071011 100%);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.25) 70%, rgba(0, 0, 0, 0.06));
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                linear-gradient(90deg, rgba(7, 16, 17, 0.85), rgba(7, 16, 17, 0.22) 48%, rgba(7, 16, 17, 0.92)),
+                repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 18px);
+            pointer-events: none;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            height: 3px;
+            width: 0;
+            background: linear-gradient(90deg, var(--green), var(--teal), var(--gold));
+        }
+
+        .starfall {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .starfall span {
+            position: absolute;
+            top: -12vh;
+            left: var(--x);
+            width: var(--size);
+            height: var(--size);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 0 12px rgba(69, 212, 131, 0.65), 0 0 24px rgba(79, 141, 247, 0.28);
+            opacity: var(--opacity);
+            animation: starFall var(--duration) linear infinite;
+            animation-delay: var(--delay);
+        }
+
+        .starfall span::after {
+            content: "";
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.7), transparent);
+            transform: translateX(-50%);
+        }
+
+        @keyframes starFall {
+            from { transform: translate3d(0, -12vh, 0); }
+            to { transform: translate3d(var(--drift), 116vh, 0); }
+        }
+
+        .intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at 50% 52%, rgba(69, 212, 131, 0.18), transparent 28%),
+                linear-gradient(180deg, #050b0c, #071011 52%, #020505);
+            transition: opacity 760ms ease, visibility 760ms ease;
+        }
+
+        .intro-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-mark {
+            position: relative;
+            width: min(260px, 54vw);
+            aspect-ratio: 1;
+            display: grid;
+            place-items: center;
+            animation: introScale 2600ms cubic-bezier(0.18, 0.9, 0.2, 1) forwards;
+        }
+
+        .intro-mark::before,
+        .intro-mark::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(69, 212, 131, 0.32);
+            border-radius: 28px;
+            transform: rotate(45deg) scale(0.82);
+            animation: introFrame 2600ms ease forwards;
+        }
+
+        .intro-mark::after {
+            inset: 18px;
+            border-color: rgba(79, 141, 247, 0.28);
+            animation-delay: 160ms;
+        }
+
+        .intro-mark img {
+            width: 132px;
+            padding: 14px;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 0 70px rgba(69, 212, 131, 0.28);
+            animation: introLogo 2600ms ease forwards;
+        }
+
+        .intro-title {
+            position: absolute;
+            bottom: -54px;
+            color: var(--green);
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: introText 2600ms ease forwards;
+        }
+
+        @keyframes introScale {
+            0% { transform: scale(0.74); filter: blur(10px); opacity: 0; }
+            18% { transform: scale(1); filter: blur(0); opacity: 1; }
+            72% { transform: scale(1.06); opacity: 1; }
+            100% { transform: scale(5.6); opacity: 0; }
+        }
+
+        @keyframes introFrame {
+            0% { transform: rotate(45deg) scale(0.5); opacity: 0; }
+            34% { transform: rotate(45deg) scale(1); opacity: 1; }
+            100% { transform: rotate(45deg) scale(1.28); opacity: 0; }
+        }
+
+        @keyframes introLogo {
+            0%, 12% { opacity: 0; transform: scale(0.7); }
+            26%, 70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.92); }
+        }
+
+        @keyframes introText {
+            0%, 20% { opacity: 0; transform: translateY(10px); }
+            36%, 70% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-8px); }
+        }
+
+        .social-sidebar {
+            position: fixed;
+            right: 18px;
+            top: 50%;
+            z-index: 850;
+            display: grid;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(7, 16, 17, 0.76);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+            transform: translateY(-50%);
+        }
+
+        .social-sidebar a {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+            transition: transform var(--ease), border-color var(--ease), color var(--ease);
+        }
+
+        .social-sidebar a:hover {
+            color: var(--green);
+            border-color: rgba(69, 212, 131, 0.52);
+            transform: translateX(-2px) scale(1.06);
+        }
+
+        .ambient-toggle {
+            position: fixed;
+            left: 18px;
+            bottom: 18px;
+            z-index: 900;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0 15px;
+            border: 1px solid rgba(79, 141, 247, 0.28);
+            border-radius: 999px;
+            color: var(--text);
+            background: rgba(7, 16, 17, 0.78);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            font-size: 0.76rem;
+            font-weight: 900;
+            transition: transform var(--ease), border-color var(--ease), color var(--ease);
+        }
+
+        .ambient-toggle:hover,
+        .ambient-toggle.active {
+            color: #9bc8ff;
+            border-color: rgba(126, 187, 255, 0.62);
+            transform: translateY(-2px);
+        }
+
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+            border-bottom: 1px solid transparent;
+            transition: background var(--ease), border-color var(--ease), transform var(--ease);
+        }
+
+        .site-header.scrolled {
+            background: rgba(7, 16, 17, 0.84);
+            border-color: var(--line);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .nav-shell {
+            width: min(1180px, calc(100% - 36px));
+            min-height: 78px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 210px;
+        }
+
+        .brand-mark {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            background: #fff;
+            padding: 5px;
+            box-shadow: 0 10px 34px rgba(69, 212, 131, 0.13);
+        }
+
+        .brand-title {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+        }
+
+        .brand-subtitle {
+            display: block;
+            margin-top: 2px;
+            color: var(--green);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .nav-links a {
+            padding: 10px 13px;
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 800;
+            transition: color var(--ease), background var(--ease);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-btn,
+        .ghost-btn,
+        .primary-btn {
+            min-height: 42px;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+            transition: transform var(--ease), border-color var(--ease), background var(--ease);
+        }
+
+        .icon-btn {
+            width: 42px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ghost-btn,
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 17px;
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .primary-btn {
+            border-color: rgba(69, 212, 131, 0.42);
+            background: linear-gradient(135deg, var(--green), var(--teal));
+            color: #05100c;
+            box-shadow: 0 18px 42px rgba(45, 200, 184, 0.18);
+        }
+
+        .icon-btn:hover,
+        .ghost-btn:hover,
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(69, 212, 131, 0.6);
+        }
+
+        .mobile-menu {
+            display: none;
+            width: min(1180px, calc(100% - 36px));
+            margin: 0 auto 14px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(7, 16, 17, 0.96);
+        }
+
+        .mobile-menu.open {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mobile-menu a {
+            padding: 12px;
+            color: var(--muted);
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .mobile-menu a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+        }
+
+        .section {
+            width: min(1180px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 92px 0;
+            scroll-margin-top: 92px;
+        }
+
+        .hero {
+            width: min(1180px, calc(100% - 36px));
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 126px 0 48px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.82fr);
+            align-items: center;
+            gap: 56px;
+        }
+
+        .hero-copy {
+            max-width: 720px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--green);
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 34px;
+            height: 2px;
+            background: var(--green);
+        }
+
+        h1 {
+            max-width: 800px;
+            font-size: clamp(3.2rem, 8vw, 6.7rem);
+            line-height: 0.92;
+            letter-spacing: -0.055em;
+            font-weight: 900;
+        }
+
+        h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(245, 247, 244, 0.55);
+        }
+
+        .hero-lede {
+            max-width: 640px;
+            margin-top: 28px;
+            color: var(--muted);
+            font-size: clamp(1rem, 1.8vw, 1.17rem);
+            line-height: 1.75;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .hero-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 44px;
+        }
+
+        .mini-stat {
+            min-height: 96px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .mini-stat strong {
+            display: block;
+            font-size: 1.7rem;
+            font-weight: 900;
+        }
+
+        .mini-stat span {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .hero-visual {
+            position: relative;
+            min-height: 520px;
+            isolation: isolate;
+        }
+
+        .hero-visual::before {
+            content: "";
+            position: absolute;
+            inset: 7% 1% 7% 8%;
+            z-index: -1;
+            border: 1px solid rgba(69, 212, 131, 0.2);
+            background:
+                linear-gradient(135deg, rgba(69, 212, 131, 0.08), rgba(79, 141, 247, 0.08)),
+                rgba(255, 255, 255, 0.025);
+            clip-path: polygon(15% 0, 100% 8%, 88% 100%, 0 92%);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-logo-stage {
+            position: absolute;
+            inset: 64px 18px 42px 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background:
+                radial-gradient(circle at 50% 45%, rgba(69, 212, 131, 0.2), transparent 30%),
+                linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+            box-shadow: var(--shadow);
+        }
+
+        .hero-logo-stage::before {
+            content: "";
+            position: absolute;
+            width: 82%;
+            aspect-ratio: 1;
+            border: 1px solid rgba(69, 212, 131, 0.22);
+            border-radius: 28px;
+            transform: rotate(45deg);
+            animation: slowSpin 18s linear infinite;
+        }
+
+        .hero-logo-stage::after {
+            content: "";
+            position: absolute;
+            inset: 22%;
+            border: 1px solid rgba(79, 141, 247, 0.22);
+            border-radius: var(--radius);
+            transform: rotate(-12deg);
+            animation: pulsePanel 4s ease-in-out infinite;
+        }
+
+        .hero-logo-stage img {
+            position: relative;
+            z-index: 2;
+            width: min(230px, 52%);
+            padding: 24px;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 22px 82px rgba(69, 212, 131, 0.24);
+            animation: logoFloat 5.5s ease-in-out infinite;
+        }
+
+        .orbit-label {
+            position: absolute;
+            z-index: 3;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(7, 16, 17, 0.78);
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .orbit-label.one { top: 18%; left: 8%; }
+        .orbit-label.two { top: 28%; right: 7%; }
+        .orbit-label.three { bottom: 20%; left: 11%; }
+
+        @keyframes slowSpin {
+            from { transform: rotate(45deg); }
+            to { transform: rotate(405deg); }
+        }
+
+        @keyframes pulsePanel {
+            0%, 100% { transform: rotate(-12deg) scale(1); opacity: 0.55; }
+            50% { transform: rotate(-8deg) scale(1.08); opacity: 1; }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .signal-card {
+            position: absolute;
+            left: 24px;
+            bottom: 4px;
+            width: min(330px, 80%);
+            padding: 18px;
+            border: 1px solid rgba(69, 212, 131, 0.28);
+            border-radius: var(--radius);
+            background: rgba(9, 18, 19, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+        }
+
+        .signal-card b {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--green);
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .signal-card p {
+            color: var(--text);
+            line-height: 1.5;
+            font-weight: 700;
+        }
+
+        .section-head {
+            display: grid;
+            grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.45fr);
+            gap: 34px;
+            align-items: end;
+            margin-bottom: 34px;
+        }
+
+        .section-label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--green);
+            font-size: 0.74rem;
+            font-weight: 900;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4.4vw, 4rem);
+            line-height: 1;
+            letter-spacing: -0.04em;
+            font-weight: 900;
+        }
+
+        .section-note {
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 0.98rem;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 18px;
+        }
+
+        .panel,
+        .card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 18px 54px rgba(0, 0, 0, 0.16);
+        }
+
+        .panel {
+            padding: 28px;
+        }
+
+        .panel p {
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .panel p + p {
+            margin-top: 15px;
+        }
+
+        .about-more {
+            margin-top: 18px;
+            overflow: hidden;
+        }
+
+        .about-more summary {
+            min-height: 52px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 20px;
+            border: 1px solid rgba(69, 212, 131, 0.42);
+            border-radius: 999px;
+            color: #06120d;
+            background: linear-gradient(135deg, var(--green), var(--teal));
+            box-shadow: 0 18px 42px rgba(45, 200, 184, 0.16);
+            font-size: 0.78rem;
+            font-weight: 900;
+            list-style: none;
+            cursor: pointer;
+            transition: transform var(--ease), box-shadow var(--ease);
+        }
+
+        .about-more summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .about-more summary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 52px rgba(45, 200, 184, 0.22);
+        }
+
+        .about-more[open] summary {
+            margin-bottom: 18px;
+        }
+
+        .about-more-panel {
+            display: grid;
+            gap: 18px;
+            padding: 24px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.04);
+            animation: revealMore 260ms ease both;
+        }
+
+        .about-more-panel h3,
+        .about-more-panel h4 {
+            color: var(--text);
+            line-height: 1.2;
+            font-weight: 900;
+        }
+
+        .about-more-panel h3 {
+            font-size: clamp(1.45rem, 2.8vw, 2.2rem);
+        }
+
+        .about-more-panel h4 {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .about-more-panel p,
+        .about-more-panel li {
+            color: var(--muted);
+            line-height: 1.72;
+        }
+
+        .about-more-panel blockquote {
+            margin: 0;
+            padding: 18px;
+            border-left: 3px solid var(--green);
+            background: rgba(69, 212, 131, 0.08);
+            color: var(--text);
+            line-height: 1.7;
+            font-weight: 800;
+        }
+
+        .about-more-grid,
+        .values-grid,
+        .outcomes-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .about-more-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .values-grid,
+        .outcomes-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .info-tile {
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .info-tile b {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--text);
+            line-height: 1.35;
+            font-size: 0.92rem;
+        }
+
+        .mission-list {
+            display: grid;
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .mission-list li {
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        @keyframes revealMore {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .metric {
+            min-height: 136px;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: linear-gradient(145deg, rgba(69, 212, 131, 0.1), rgba(255, 255, 255, 0.035));
+        }
+
+        .metric strong {
+            display: block;
+            margin-bottom: 12px;
+            font-size: clamp(1.7rem, 4vw, 2.8rem);
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+
+        .program-grid,
+        .timeline-grid,
+        .announcement-grid,
+        .testimonial-grid,
+        .startup-grid,
+        .contact-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .announcement-grid {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+
+        .announcement-feature {
+            padding: 26px;
+            min-height: 310px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background:
+                linear-gradient(135deg, rgba(69, 212, 131, 0.13), rgba(79, 141, 247, 0.07)),
+                rgba(255,255,255,0.04);
+        }
+
+        .announcement-feature h3 {
+            margin: 18px 0 12px;
+            font-size: clamp(1.5rem, 3vw, 2.6rem);
+            line-height: 1.04;
+            letter-spacing: -0.035em;
+        }
+
+        .announcement-feature p,
+        .announcement-list p {
+            color: var(--muted);
+            line-height: 1.68;
+        }
+
+        .announcement-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .announcement-item {
+            padding: 18px;
+        }
+
+        .program-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .program-card {
+            min-height: 260px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .program-card::after {
+            content: "";
+            position: absolute;
+            left: 22px;
+            right: 22px;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--green), var(--blue), var(--gold));
+        }
+
+        .program-card .icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--green);
+            background: rgba(255, 255, 255, 0.045);
+        }
+
+        .program-card h3 {
+            margin-top: 22px;
+            font-size: 1.05rem;
+            line-height: 1.25;
+        }
+
+        .program-card p {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.62;
+        }
+
+        .timeline-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .event-card {
+            display: grid;
+            grid-template-columns: 155px 1fr;
+            min-height: 190px;
+            overflow: hidden;
+        }
+
+        .event-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-body {
+            padding: 20px;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--green);
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .event-body h3 {
+            font-size: 1.02rem;
+            line-height: 1.3;
+        }
+
+        .event-body p {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .team-carousel {
+            position: relative;
+            min-height: 600px;
+            overflow: hidden;
+            border: 1px solid rgba(79, 141, 247, 0.18);
+            border-radius: 8px;
+            background:
+                linear-gradient(90deg, rgba(7, 16, 17, 0.9), rgba(7, 16, 17, 0.25) 50%, rgba(7, 16, 17, 0.9)),
+                radial-gradient(circle at 50% 20%, rgba(79, 141, 247, 0.12), transparent 48%);
+        }
+
+        .team-carousel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.55) 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(79, 141, 247, 0.34) 1px, transparent 1.5px);
+            background-position: 0 0, 36px 42px;
+            background-size: 96px 96px, 132px 132px;
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .team-track {
+            position: relative;
+            z-index: 1;
+            min-height: 600px;
+        }
+
+        .team-slide {
+            position: absolute;
+            top: 42px;
+            left: 50%;
+            width: min(360px, 74vw);
+            min-height: 500px;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.72);
+            filter: blur(1.5px);
+            transition:
+                transform 780ms cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 560ms ease,
+                filter 560ms ease,
+                z-index 560ms ease;
+        }
+
+        .team-slide.active,
+        .team-slide.prev,
+        .team-slide.next {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .team-slide.active {
+            z-index: 4;
+            transform: translateX(-50%) scale(1.08);
+            filter: blur(0);
+        }
+
+        .team-slide.prev {
+            z-index: 2;
+            transform: translateX(calc(-50% - min(34vw, 390px))) scale(0.9);
+            filter: blur(0.3px);
+        }
+
+        .team-slide.next {
+            z-index: 2;
+            transform: translateX(calc(-50% + min(34vw, 390px))) scale(0.9);
+            filter: blur(0.3px);
+        }
+
+        .team-card {
+            width: 100%;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 42px 32px;
+            border: 1px solid rgba(79, 141, 247, 0.22);
+            border-radius: 8px;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.9) 48%, rgba(24, 74, 132, 0.76) 100%);
+            box-shadow:
+                0 28px 80px rgba(0, 0, 0, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04),
+                inset 0 -80px 90px rgba(79, 141, 247, 0.18);
+            text-align: center;
+        }
+
+        .team-photo {
+            width: 132px;
+            height: 132px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 34px;
+            overflow: hidden;
+            border: 2px solid rgba(126, 187, 255, 0.72);
+            border-radius: 999px;
+            background: rgba(79, 141, 247, 0.08);
+            box-shadow: 0 0 34px rgba(79, 141, 247, 0.28);
+        }
+
+        .team-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-card h3 {
+            margin: 0 0 12px;
+            color: #fff;
+            font-size: clamp(2rem, 4.6vw, 3.25rem);
+            line-height: 1.02;
+            letter-spacing: 0;
+            font-weight: 900;
+        }
+
+        .team-card span {
+            display: block;
+            margin: 0 0 18px;
+            color: #9bc8ff;
+            font-size: 0.9rem;
+            font-weight: 900;
+            line-height: 1.45;
+            text-transform: none;
+        }
+
+        .team-card p {
+            max-width: 285px;
+            margin: 0 0 24px;
+            color: #9bc8ff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.62;
+        }
+
+        .team-slide:not(.active) .team-card {
+            opacity: 0.66;
+        }
+
+        .carousel-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .carousel-controls button {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .team-count {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .testimonial-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .testimonial-card {
+            padding: 24px;
+        }
+
+        .testimonial-card p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .testimonial-person {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .testimonial-person img {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(69, 212, 131, 0.34);
+        }
+
+        .testimonial-person b,
+        .testimonial-person span {
+            display: block;
+        }
+
+        .testimonial-person span {
+            margin-top: 2px;
+            color: var(--green);
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .startup-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .startup-card {
+            padding: 22px;
+        }
+
+        .startup-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+
+        .startup-card p {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .contact-grid {
+            grid-template-columns: 0.85fr 1.15fr;
+            align-items: stretch;
+        }
+
+        .contact-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .contact-item {
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .contact-item b {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.78rem;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .contact-item span {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 14px 15px;
+            outline: none;
+            transition: border-color var(--ease), background var(--ease);
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: rgba(69, 212, 131, 0.58);
+            background: rgba(255, 255, 255, 0.065);
+        }
+
+        .footer {
+            border-top: 1px solid var(--line);
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        .footer-inner {
+            width: min(1180px, calc(100% - 36px));
+            margin: 0 auto;
+            padding: 34px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .footer p {
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .socials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .socials a {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 900;
+            transition: color var(--ease), border-color var(--ease), transform var(--ease);
+        }
+
+        .socials a:hover {
+            color: var(--green);
+            border-color: rgba(69, 212, 131, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-panel {
+            width: min(520px, 100%);
+            padding: 26px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            background: #0b1415;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .modal-head h2 {
+            font-size: 1.65rem;
+        }
+
+        .success-modal .modal-panel {
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            border-color: rgba(69, 212, 131, 0.42);
+        }
+
+        .success-modal .modal-panel::before {
+            content: "";
+            position: absolute;
+            inset: -40% 18% auto;
+            height: 160px;
+            background: radial-gradient(circle, rgba(69, 212, 131, 0.26), transparent 68%);
+            pointer-events: none;
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 16px;
+            border: 1px solid rgba(69, 212, 131, 0.42);
+            border-radius: 999px;
+            background: rgba(69, 212, 131, 0.12);
+            color: var(--green);
+            font-size: 2rem;
+        }
+
+        .success-modal h2 {
+            margin-bottom: 10px;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+        }
+
+        .success-modal p {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .success-modal .primary-btn {
+            margin-top: 22px;
+        }
+
+        .close-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+        }
+
+        .toast {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1300;
+            width: min(360px, calc(100% - 36px));
+            padding: 16px;
+            border: 1px solid rgba(69, 212, 131, 0.36);
+            border-radius: var(--radius);
+            background: rgba(8, 20, 18, 0.95);
+            box-shadow: var(--shadow);
+            color: var(--text);
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--ease), transform var(--ease);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 560ms ease, transform 560ms ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1040px) {
+            .hero,
+            .about-grid,
+            .contact-grid,
+            .section-head {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                min-height: auto;
+                padding-top: 118px;
+            }
+
+            .hero-visual {
+                min-height: 520px;
+            }
+
+            .program-grid,
+            .testimonial-grid,
+            .startup-grid,
+            .values-grid,
+            .outcomes-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline-grid,
+            .announcement-grid,
+            .about-more-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .icon-btn {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .nav-shell {
+                min-height: 70px;
+                width: min(100% - 28px, 1180px);
+            }
+
+            .brand {
+                min-width: 0;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .nav-actions .ghost-btn {
+                display: none;
+            }
+
+            .section,
+            .hero,
+            .footer-inner,
+            .mobile-menu {
+                width: min(100% - 28px, 1180px);
+            }
+
+            h1 {
+                font-size: clamp(3rem, 18vw, 4.6rem);
+            }
+
+            .hero-strip,
+            .metrics,
+            .program-grid,
+            .values-grid,
+            .outcomes-grid,
+            .field-row {
+                grid-template-columns: 1fr;
+            }
+
+            .about-more-panel {
+                padding: 18px;
+            }
+
+            .hero-visual {
+                min-height: 460px;
+            }
+
+            .hero-logo-stage {
+                inset: 72px 0 54px;
+            }
+
+            .social-sidebar {
+                right: 10px;
+                padding: 7px;
+            }
+
+            .social-sidebar a {
+                width: 34px;
+                height: 34px;
+            }
+
+            .event-card {
+                grid-template-columns: 1fr;
+            }
+
+            .team-carousel,
+            .team-track {
+                min-height: 540px;
+            }
+
+            .team-slide {
+                top: 34px;
+                width: min(340px, 78vw);
+                min-height: 460px;
+            }
+
+            .team-card {
+                min-height: 460px;
+                padding: 34px 24px;
+            }
+
+            .team-slide.prev {
+                transform: translateX(calc(-50% - 42vw)) scale(0.82);
+            }
+
+            .team-slide.next {
+                transform: translateX(calc(-50% + 42vw)) scale(0.82);
+            }
+
+            .testimonial-grid,
+            .startup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card img {
+                height: 190px;
+            }
+
+            .footer-inner {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="starfall" aria-hidden="true">
+        <span style="--x: 4%; --size: 2px; --opacity: .62; --duration: 9s; --delay: -2s; --drift: 18px;"></span>
+        <span style="--x: 9%; --size: 3px; --opacity: .5; --duration: 12s; --delay: -7s; --drift: -22px;"></span>
+        <span style="--x: 15%; --size: 2px; --opacity: .7; --duration: 10s; --delay: -4s; --drift: 26px;"></span>
+        <span style="--x: 21%; --size: 1px; --opacity: .72; --duration: 8s; --delay: -1s; --drift: -14px;"></span>
+        <span style="--x: 27%; --size: 3px; --opacity: .54; --duration: 13s; --delay: -10s; --drift: 28px;"></span>
+        <span style="--x: 34%; --size: 2px; --opacity: .75; --duration: 9s; --delay: -6s; --drift: -18px;"></span>
+        <span style="--x: 39%; --size: 1px; --opacity: .58; --duration: 11s; --delay: -3s; --drift: 24px;"></span>
+        <span style="--x: 44%; --size: 3px; --opacity: .66; --duration: 14s; --delay: -8s; --drift: -30px;"></span>
+        <span style="--x: 50%; --size: 2px; --opacity: .78; --duration: 10s; --delay: -5s; --drift: 18px;"></span>
+        <span style="--x: 56%; --size: 2px; --opacity: .48; --duration: 12s; --delay: -9s; --drift: -24px;"></span>
+        <span style="--x: 62%; --size: 3px; --opacity: .62; --duration: 9s; --delay: -2s; --drift: 20px;"></span>
+        <span style="--x: 68%; --size: 1px; --opacity: .7; --duration: 8s; --delay: -4s; --drift: -16px;"></span>
+        <span style="--x: 73%; --size: 2px; --opacity: .56; --duration: 13s; --delay: -11s; --drift: 30px;"></span>
+        <span style="--x: 79%; --size: 3px; --opacity: .72; --duration: 10s; --delay: -6s; --drift: -22px;"></span>
+        <span style="--x: 84%; --size: 2px; --opacity: .52; --duration: 12s; --delay: -3s; --drift: 16px;"></span>
+        <span style="--x: 90%; --size: 1px; --opacity: .68; --duration: 9s; --delay: -7s; --drift: -20px;"></span>
+        <span style="--x: 96%; --size: 3px; --opacity: .6; --duration: 14s; --delay: -5s; --drift: 24px;"></span>
+    </div>
+
+    <div class="intro-screen" id="introScreen" aria-label="EDC intro animation">
+        <div class="intro-mark">
+            <img src="edc-logo.png" alt="EDC logo">
+            <div class="intro-title">EDC HITAM</div>
+        </div>
+    </div>
+
+    <div class="progress" id="progress"></div>
+
+    <aside class="social-sidebar" id="sideSocialLinks" aria-label="Quick social links"></aside>
+    <button class="ambient-toggle" type="button" id="ambientToggle" aria-pressed="false">Calm sound</button>
+
+    <header class="site-header" id="siteHeader">
+        <div class="nav-shell">
+            <a href="#home" class="brand" aria-label="HITAM EDC home">
+                <img class="brand-mark" src="edc-logo.png" alt="EDC logo">
+                <span>
+                    <span class="brand-title">EDC HITAM</span>
+                    <span class="brand-subtitle">Entrepreneurship Development Cell</span>
+                </span>
+
+            </a>
+
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="#announcements">News</a>
+                <a href="#about">About</a>
+                <a href="#programs">Programs</a>
+                <a href="#events">Events</a>
+                <a href="#team">Team</a>
+                <a href="#testimonials">Guests</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a class="ghost-btn" href="admin-site-settings.html">Admin</a>
+                <button class="primary-btn" type="button" data-open-join>Join EDC</button>
+                <button class="icon-btn" type="button" id="menuToggle" aria-label="Open menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+            <a href="#announcements">News</a>
+            <a href="#about">About</a>
+            <a href="#programs">Programs</a>
+            <a href="#events">Events</a>
+            <a href="#team">Team</a>
+            <a href="#testimonials">Guests</a>
+            <a href="#contact">Contact</a>
+            <a href="admin-site-settings.html">Admin</a>
+        </nav>
+    </header>
+
+    <main id="home">
+        <section class="hero">
+            <div class="hero-copy reveal">
+                <span class="eyebrow">HITAM Entrepreneurship Development Cell</span>
+                <h1>Build ideas. <span>Launch futures.</span></h1>
+                <p class="hero-lede">A student-led innovation ecosystem where builders learn entrepreneurship by doing: validating problems, prototyping solutions, meeting mentors, and turning campus energy into real ventures.</p>
+                <div class="hero-actions">
+                    <a class="primary-btn" href="#programs">Explore Programs</a>
+                    <button class="ghost-btn" type="button" data-open-join>Apply to Join</button>
+                </div>
+                <div class="hero-strip" aria-label="EDC quick stats">
+                    <div class="mini-stat"><strong data-stat="initiatives">26+</strong><span>initiatives across innovation and venture building</span></div>
+                    <div class="mini-stat"><strong data-stat="mindsets">1,200+</strong><span>students reached through EDC activity</span></div>
+                    <div class="mini-stat"><strong data-stat="workshops">45+</strong><span>workshops, talks, tours, and pitch tracks</span></div>
+                </div>
+            </div>
+
+            <div class="hero-visual reveal" aria-label="EDC student community visuals">
+                <div class="hero-logo-stage">
+                    <span class="orbit-label one">Ideas</span>
+                    <span class="orbit-label two">Mentors</span>
+                    <span class="orbit-label three">Ventures</span>
+                    <img src="edc-logo.png" alt="EDC logo">
+                </div>
+                <div class="signal-card">
+                    <b>Live Campus Ecosystem</b>
+                    <p>Mentorship, startup exposure, industry visits, and founder mindset programs under one student-first platform.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="announcements">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Announcements</span>
+                    <h2>Latest updates from the EDC desk.</h2>
+                </div>
+                <p class="section-note">These updates are pulled from the same Daily Announcements area in your admin panel.</p>
+            </div>
+            <div class="announcement-grid reveal">
+                <article class="card announcement-feature" id="featuredAnnouncement"></article>
+                <div class="announcement-list" id="announcementList"></div>
+            </div>
+        </section>
+
+        <section class="section" id="about">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">About EDC</span>
+                    <h2>Where engineering curiosity becomes entrepreneurial action.</h2>
+                </div>
+                <p class="section-note">EDC HITAM helps students move from classroom ideas to practical, confident experimentation through mentorship, events, exposure visits, and a community that takes initiative seriously.</p>
+            </div>
+
+            <div class="about-grid">
+                <article class="panel reveal">
+                    <p>We nurture the startup mindset at the grassroots level, helping students identify problems, shape solutions, understand customers, and build the confidence to present their ideas.</p>
+                    <p>The cell acts as a bridge between innovators, mentors, alumni, industry guests, and institutional support so that every student has a clearer path from spark to prototype.</p>
+                </article>
+                <div class="metrics reveal" id="metricsGrid"></div>
+            </div>
+
+            <details class="about-more reveal" id="aboutMore">
+                <summary>Know More About Us</summary>
+                <div class="about-more-panel">
+                    <div>
+                        <span class="section-label">Established 2018</span>
+                        <h3>About EDC HITAM</h3>
+                        <p>The Entrepreneurship Development Cell (EDC) was established at HITAM in 2018. It operates under the HITAM Innovation and Incubation Centre (HIIC), the official incubator of HITAM, located on the first floor of the Activity Block.</p>
+                        <p>EDC focuses on developing an entrepreneurial mindset among student bodies, encouraging them to design outside bounds, and validating raw engineering prototypes into viable commercial startups through customized mentorship models.</p>
+                    </div>
+
+                    <div>
+                        <h4>🎯 Vision</h4>
+                        <blockquote>To build an inclusive entrepreneurial ecosystem that empowers students to innovate fearlessly, develop sustainable ventures and emerge as socially responsible leaders driving global impact.</blockquote>
+                    </div>
+
+                    <div>
+                        <h4>🚀 Mission & Strategic Goals</h4>
+                        <ul class="mission-list">
+                            <li><strong>Skill Development:</strong> Provide opportunities for experiential learning through industry hackathons.</li>
+                            <li><strong>Incubation Pipelines:</strong> Facilitate the creation of at least 5 student-led startups annually inside HIIC boundaries.</li>
+                            <li><strong>Corporate Synergy:</strong> Build active joint venture relationships with tech networks and startup accelerators.</li>
+                            <li><strong>Sustainable Impact:</strong> Encourage students to deploy eco-responsible methodologies inside campus frameworks.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4>Core Values</h4>
+                        <div class="values-grid">
+                            <div class="info-tile"><b>💡 Innovation & Creativity</b><p>Inspire students to think differently and create fresh solutions to everyday problems.</p></div>
+                            <div class="info-tile"><b>🛡️ Integrity & Ethics</b><p>Ensure honesty, fairness and responsibility in all business and learning activities.</p></div>
+                            <div class="info-tile"><b>🤝 Collaboration & Inclusivity</b><p>Promote teamwork and welcome diverse ideas from students of all backgrounds.</p></div>
+                            <div class="info-tile"><b>⛰️ Resilience & Learning</b><p>Encourage students to stay strong through challenges, adapt to changes and never stop learning.</p></div>
+                            <div class="info-tile"><b>🌍 Sustainability & Social Impact</b><p>Focus on supporting businesses that do good for the community and protect the environment.</p></div>
+                            <div class="info-tile"><b>🚀 Entrepreneurial Mindset</b><p>Build the courage to take smart risks, solve real problems, and lead others.</p></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4>Expected Outcomes</h4>
+                        <div class="outcomes-grid">
+                            <div class="info-tile"><b>🛠️ Skill Development</b><p>Students will enhance creativity, problem-solving, leadership, and teamwork skills.</p></div>
+                            <div class="info-tile"><b>🎯 Entrepreneurial Execution</b><p>Students will conceptualize, validate, and launch viable business ventures.</p></div>
+                            <div class="info-tile"><b>📈 Business Knowledge & Awareness</b><p>Students will gain knowledge of market opportunities, funding, financial planning, and legal compliance.</p></div>
+                            <div class="info-tile"><b>🌐 Networking & Ecosystem Engagement</b><p>Students will build professional connections with mentors, industry experts, and investors through events.</p></div>
+                            <div class="info-tile"><b>💼 Economic Contribution</b><p>Students will transition from job seekers to job creators, generating employment and supporting economic growth.</p></div>
+                            <div class="info-tile"><b>🏛️ Institutional Advancement</b><p>The institution will foster a culture of innovation, strengthen its reputation, and attract industry collaborations.</p></div>
+                            <div class="info-tile"><b>🌾 Societal & Rural Impact</b><p>Students will develop socially responsible and rural enterprises addressing community challenges.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <section class="section" id="programs">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Programs</span>
+                    <h2>Structured support for students who want to build.</h2>
+                </div>
+                <p class="section-note">The experience is designed around action: problem discovery, startup fundamentals, mentor feedback, technical prototyping, and practical exposure to industry.</p>
+            </div>
+
+            <div class="program-grid reveal">
+                <article class="card program-card">
+                    <div>
+                        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 13.5 10 19 20 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                        <h3>Idea Validation</h3>
+                        <p>Turn rough concepts into problem statements, user stories, early market assumptions, and testable next steps.</p>
+                    </div>
+                    <span class="meta">Discover / Validate</span>
+                </article>
+                <article class="card program-card">
+                    <div>
+                        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M4 8h16M6 16h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+                        <h3>Startup Workshops</h3>
+                        <p>Hands-on sessions around business models, pitching, product thinking, design, finance, and growth basics.</p>
+                    </div>
+                    <span class="meta">Learn / Practice</span>
+                </article>
+                <article class="card program-card">
+                    <div>
+                        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19V5h14v14H5Zm4-4 2.4-3 2 2.2L17 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                        <h3>Exposure Visits</h3>
+                        <p>Industry and ecosystem visits that help students see manufacturing, operations, innovation, and business up close.</p>
+                    </div>
+                    <span class="meta">Observe / Connect</span>
+                </article>
+                <article class="card program-card">
+                    <div>
+                        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5 5 9l7 4 7-4-7-4Zm-7 9 7 4 7-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                        <h3>Pitch & Incubate</h3>
+                        <p>Student teams refine their story, receive feedback, and progress toward pre-incubation and support channels.</p>
+                    </div>
+                    <span class="meta">Present / Grow</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="events">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Events</span>
+                    <h2>Recent activity from the EDC ecosystem.</h2>
+                </div>
+                <p class="section-note">The event feed uses your existing local data, so updates made through your content flow can continue appearing here.</p>
+            </div>
+            <div class="timeline-grid reveal" id="eventsGrid"></div>
+        </section>
+
+        <section class="section" id="team">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Team</span>
+                    <h2>Swipe through the student leaders moving the cell forward.</h2>
+                </div>
+                <p class="section-note">A focused team section with clean profile cards, using the local EDC images already present in your project.</p>
+            </div>
+            <div class="team-carousel reveal">
+                <div class="team-track" id="teamTrack"></div>
+            </div>
+            <div class="carousel-controls" style="margin-top:16px;">
+                <button type="button" id="teamPrev" aria-label="Previous team member">&#8592;</button>
+                <button type="button" id="teamNext" aria-label="Next team member">&#8594;</button>
+                <span class="team-count" id="teamCount">01 / 01</span>
+            </div>
+        </section>
+
+        <section class="section" id="testimonials">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Guest Testimonials</span>
+                    <h2>Voices from mentors, dignitaries, and industry guests.</h2>
+                </div>
+                <p class="section-note">This section is connected to the Guest Testimonials area in your admin panel.</p>
+            </div>
+            <div class="testimonial-grid reveal" id="testimonialGrid"></div>
+        </section>
+
+        <section class="section" id="startups">
+            <div class="section-head reveal">
+                <div>
+                    <span class="section-label">Incubated Startups</span>
+                    <h2>Student ventures and portfolio stories.</h2>
+                </div>
+                <p class="section-note">Startup cards are managed from the admin panel’s Incubated Startups tab.</p>
+            </div>
+            <div class="startup-grid reveal" id="startupGrid"></div>
+        </section>
+
+        <section class="section" id="contact">
+            <div class="contact-grid">
+                <div class="panel reveal">
+                    <span class="section-label">Contact</span>
+                    <h2>Talk to the EDC desk.</h2>
+                    <p class="section-note">Reach out for startup support, event collaboration, mentorship, student volunteering, or idea validation.</p>
+                    <div class="contact-list">
+                        <div class="contact-item"><b>Location</b><span>Activity Block, First Floor, Hyderabad Institute of Technology and Management, Medchal, Hyderabad.</span></div>
+                        <div class="contact-item"><b>Focus</b><span>Innovation, entrepreneurship, incubation readiness, workshops, and industry exposure.</span></div>
+                        <div class="contact-item"><b>Community</b><span>Open to curious builders, student founders, volunteers, designers, developers, and operators.</span></div>
+                    </div>
+                </div>
+
+                <div class="panel reveal">
+                    <form id="contactForm">
+                        <div class="field-row">
+                            <input type="text" id="query_name" name="name" placeholder="Full name" required>
+                            <input type="email" id="query_email" name="email" placeholder="Email address" required>
+                        </div>
+                        <textarea id="query_text" name="message" placeholder="Tell us what you want to build or ask..." required></textarea>
+                        <button class="primary-btn" type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                <strong>HITAM Entrepreneurship Development Cell</strong>
+                <p>Doing Engineering the Experiential Way.</p>
+            </div>
+            <div class="socials" id="socialLinks" aria-label="Social links"></div>
+        </div>
+    </footer>
+
+    <div class="modal" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+        <div class="modal-panel">
+            <div class="modal-head">
+                <div>
+                    <span class="section-label">Join EDC</span>
+                    <h2 id="joinTitle">Start your builder journey.</h2>
+                </div>
+                <button class="close-btn" type="button" data-close-join aria-label="Close form">x</button>
+            </div>
+            <form id="joinForm">
+                <input type="text" id="app_name" name="name" placeholder="Full name" required>
+                <input type="email" id="app_email" name="email" placeholder="Student email" required>
+                <div class="field-row">
+                    <input type="text" id="app_roll" name="roll" placeholder="Roll number" required>
+                    <input type="text" id="app_dept" name="department" placeholder="Department" required>
+                </div>
+                <input type="tel" id="app_phone" name="phone" placeholder="Mobile number" required>
+                <textarea id="app_skills" name="skills" placeholder="Skills, interests, or startup idea..." required></textarea>
+                <button class="primary-btn" type="submit">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal success-modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+        <div class="modal-panel">
+            <div class="success-icon" aria-hidden="true">✓</div>
+            <span class="section-label">EDC HITAM</span>
+            <h2 id="successTitle">Congratulations!</h2>
+            <p id="successMessage">Thank you. Your response has been received successfully.</p>
+            <button class="primary-btn" type="button" data-close-success>Done</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="mockData.js"></script>
+    <script>
+        const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
+        const cloudHeaders = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
+
+        const appData = {
+            blogs: [],
+            team: [],
+            events: [],
+            visitors: [],
+            startups: [],
+            socials: {},
+            stats: {}
+        };
+
+        let currentTeamIndex = 0;
+        let teamAutoTimer = null;
+        let ambientAudio = null;
+
+        const statsMap = [
+            ["initiatives", "Cell initiatives"],
+            ["mindsets", "Impacted innovators"],
+            ["workshops", "Workshops tracked"],
+            ["experts", "Advising experts"],
+            ["funding", "Grants shared"],
+            ["awards", "Prizes won"]
+        ];
+
+        function sanitizeInputString(value) {
+            return String(value || "").replace(/[<>"']/g, "").trim();
+        }
+
+        function formatNumber(value) {
+            const numeric = Number(value || 0);
+            return numeric.toLocaleString("en-IN") + "+";
+        }
+
+        function getData(primary, fallback) {
+            return Array.isArray(primary) ? primary : fallback;
+        }
+
+        async function fetchTable(table, order, fallback) {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${order}`, { headers: cloudHeaders });
+                if (!response.ok) throw new Error(`Unable to load ${table}`);
+                const data = await response.json();
+                return Array.isArray(data) && data.length ? data : fallback;
+            } catch (error) {
+                return fallback;
+            }
+        }
+
+        function localFallbacks() {
+            const savedSocials = JSON.parse(localStorage.getItem("edc_site_socials") || "null");
+            const savedStats = JSON.parse(localStorage.getItem("edc_site_stats") || "null");
+            return {
+                blogs: typeof db_blogs !== "undefined" ? db_blogs : (typeof initialBlogs !== "undefined" ? initialBlogs : []),
+                team: typeof db_team !== "undefined" ? db_team : (typeof initialTeam !== "undefined" ? initialTeam : []),
+                events: typeof db_events !== "undefined" ? db_events : (typeof initialEvents !== "undefined" ? initialEvents : []),
+                visitors: typeof db_visitors !== "undefined" ? db_visitors : (typeof initialVisitors !== "undefined" ? initialVisitors : []),
+                startups: typeof db_startups !== "undefined" ? db_startups : (typeof initialStartups !== "undefined" ? initialStartups : []),
+                socials: savedSocials || (typeof db_socials !== "undefined" ? db_socials : (typeof defaultSocials !== "undefined" ? defaultSocials : {})),
+                stats: savedStats || (typeof db_stats !== "undefined" ? db_stats : (typeof defaultStats !== "undefined" ? defaultStats : {}))
+            };
+        }
+
+        async function loadAdminDrivenData() {
+            const fallback = localFallbacks();
+            const [blogs, team, events, visitors, startups] = await Promise.all([
+                fetchTable("edc_blogs", "?order=date.desc,id.desc", fallback.blogs),
+                fetchTable("edc_team", "?order=sort_order.asc,id.desc", fallback.team),
+                fetchTable("edc_events", "?order=sort_order.asc,id.desc", fallback.events),
+                fetchTable("edc_visitors", "?order=id.desc", fallback.visitors),
+                fetchTable("edc_startups", "?order=id.desc", fallback.startups)
+            ]);
+
+            appData.blogs = blogs;
+            appData.team = team;
+            appData.events = events;
+            appData.visitors = visitors;
+            appData.startups = startups;
+            appData.socials = fallback.socials;
+            appData.stats = fallback.stats;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            window.setTimeout(() => toast.classList.remove("show"), 3400);
+        }
+
+        function renderMetrics() {
+            const stats = appData.stats || {};
+            const target = document.getElementById("metricsGrid");
+            target.innerHTML = statsMap.map(([key, label]) => `
+                <div class="metric">
+                    <strong>${formatNumber(stats[key])}</strong>
+                    <span>${label}</span>
+                </div>
+            `).join("");
+        }
+
+        function renderAnnouncements() {
+            const blogs = appData.blogs || [];
+            const featured = document.getElementById("featuredAnnouncement");
+            const list = document.getElementById("announcementList");
+
+            if (!blogs.length) {
+                featured.innerHTML = `<div><span class="section-label">No updates yet</span><h3>Announcements will appear here.</h3><p>Add updates from Daily Announcements in the admin panel.</p></div>`;
+                list.innerHTML = "";
+                return;
+            }
+
+            const first = blogs[0];
+            featured.innerHTML = `
+                <div>
+                    <div class="meta"><span>Latest Broadcast</span><span>${first.date || ""}</span></div>
+                    <h3>${first.title || "EDC Announcement"}</h3>
+                    <p>${first.content || ""}</p>
+                </div>
+                <a class="ghost-btn" href="#contact">Ask About This</a>
+            `;
+
+            list.innerHTML = blogs.slice(1, 4).map((item) => `
+                <article class="card announcement-item">
+                    <div class="meta"><span>${item.date || ""}</span></div>
+                    <h3>${item.title || "EDC Update"}</h3>
+                    <p>${item.content || ""}</p>
+                </article>
+            `).join("");
+        }
+
+        function imageSource(item, index) {
+            const raw = item && item.img ? String(item.img) : "";
+            if (raw.startsWith("http") || raw.startsWith("pictures/")) return raw;
+            if (raw && !raw.includes("/")) return `pictures/${raw}`;
+            return "edc-logo.png";
+        }
+
+        function renderEvents() {
+            const events = getData(appData.events, []);
+            const target = document.getElementById("eventsGrid");
+            target.innerHTML = events.slice(0, 4).map((event, index) => `
+                <article class="card event-card">
+                    <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
+                    <div class="event-body">
+                        <div class="meta"><span>${event.type || "event"}</span><span>${event.date || ""}</span></div>
+                        <h3>${event.title || "EDC Event"}</h3>
+                        <p>${event.outcome || event.content || "Student-led innovation activity at HITAM EDC."}</p>
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        function renderTeam() {
+            const team = getData(appData.team, []);
+            const target = document.getElementById("teamTrack");
+            target.innerHTML = team.map((member, index) => `
+                <article class="team-slide">
+                    <div class="team-photo">
+                        <img src="${imageSource(member, index)}" alt="${member.name || "EDC team member"}" onerror="this.src='edc-logo.png'">
+                    </div>
+                    <div class="team-card">
+                        <div class="meta"><span>${member.year || "EDC"}</span><span>Team Member</span></div>
+                        <h3>${member.name || "EDC Member"}</h3>
+                        <span>${member.role || "Student Coordinator"}</span>
+                        <p>${member.achievement || "Supporting EDC programs, outreach, and student innovation."}</p>
+                        ${member.linkedin ? `<a class="ghost-btn" href="${member.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>` : ""}
+                    </div>
+                </article>
+            `).join("");
+            currentTeamIndex = 0;
+            updateTeamCarousel();
+            startTeamAutoCarousel();
+        }
+
+        function updateTeamCarousel() {
+            const team = getData(appData.team, []);
+            const track = document.getElementById("teamTrack");
+            const count = document.getElementById("teamCount");
+            if (!track || !count) return;
+            if (!team.length) {
+                track.innerHTML = `<article class="team-slide"><div class="team-card"><h3>Team updates coming soon.</h3><p>Add board members from the admin panel to show them here.</p></div></article>`;
+                count.textContent = "00 / 00";
+                return;
+            }
+            currentTeamIndex = Math.max(0, Math.min(currentTeamIndex, team.length - 1));
+            const slides = Array.from(track.querySelectorAll(".team-slide"));
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active", "prev", "next");
+                if (index === currentTeamIndex) {
+                    slide.classList.add("active");
+                    return;
+                }
+                if (index === (currentTeamIndex - 1 + team.length) % team.length) {
+                    slide.classList.add("prev");
+                    return;
+                }
+                if (index === (currentTeamIndex + 1) % team.length) {
+                    slide.classList.add("next");
+                }
+            });
+            count.textContent = `${String(currentTeamIndex + 1).padStart(2, "0")} / ${String(team.length).padStart(2, "0")}`;
+        }
+
+        function startTeamAutoCarousel() {
+            window.clearInterval(teamAutoTimer);
+            const team = getData(appData.team, []);
+            if (team.length < 2) return;
+            teamAutoTimer = window.setInterval(() => {
+                currentTeamIndex = (currentTeamIndex + 1) % team.length;
+                updateTeamCarousel();
+            }, 5200);
+        }
+
+        function playSoftClick() {
+            try {
+                const audio = new (window.AudioContext || window.webkitAudioContext)();
+                const gain = audio.createGain();
+                const osc = audio.createOscillator();
+                gain.gain.setValueAtTime(0.0001, audio.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.035, audio.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.34);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(420, audio.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(620, audio.currentTime + 0.24);
+                osc.connect(gain).connect(audio.destination);
+                osc.start();
+                osc.stop(audio.currentTime + 0.36);
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+
+        function renderTestimonials() {
+            const visitors = getData(appData.visitors, []);
+            const target = document.getElementById("testimonialGrid");
+            if (!visitors.length) {
+                target.innerHTML = `<article class="card testimonial-card"><p>Guest testimonials will appear here after they are added in the admin panel.</p></article>`;
+                return;
+            }
+            target.innerHTML = visitors.slice(0, 6).map((visitor, index) => `
+                <article class="card testimonial-card">
+                    <p>"${visitor.message || "A valuable interaction with the HITAM EDC ecosystem."}"</p>
+                    <div class="testimonial-person">
+                        <img src="${imageSource(visitor, index + 2)}" alt="${visitor.name || "Guest"}" onerror="this.src='edc-logo.png'">
+                        <div>
+                            <b>${visitor.name || "Guest Mentor"}</b>
+                            <span>${visitor.designation || visitor.topic || "EDC Guest"}</span>
+                        </div>
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        function renderStartups() {
+            const startups = getData(appData.startups, []);
+            const target = document.getElementById("startupGrid");
+            if (!startups.length) {
+                target.innerHTML = `<article class="card startup-card"><h3>Startup portfolio coming soon.</h3><p>Add incubated startups from the admin panel to display them here.</p></article>`;
+                return;
+            }
+            target.innerHTML = startups.slice(0, 6).map((startup) => `
+                <article class="card startup-card">
+                    <div class="meta"><span>${startup.industry || "Startup"}</span></div>
+                    <h3>${startup.name || "Student Venture"}</h3>
+                    <p><strong>Founder:</strong> ${startup.founder || "EDC Founder"}</p>
+                    <p>${startup.solution || ""}</p>
+                    <p>${startup.metrics || ""}</p>
+                    ${startup.url ? `<a class="ghost-btn" href="${startup.url}" target="_blank" rel="noreferrer" style="margin-top:18px;">Visit Venture</a>` : ""}
+                </article>
+            `).join("");
+        }
+
+        function renderSocials() {
+            const socials = appData.socials || {};
+            const labels = [
+                ["linkedin", "in", "LinkedIn"],
+                ["instagram", "ig", "Instagram"],
+                ["youtube", "yt", "YouTube"],
+                ["website", "web", "Website"]
+            ];
+            const footerHtml = labels
+                .filter(([key]) => socials[key])
+                .map(([key, label, name]) => `<a href="${socials[key]}" target="_blank" rel="noreferrer" aria-label="${name}">${label}</a>`)
+                .join("");
+            document.getElementById("socialLinks").innerHTML = footerHtml;
+
+            const whatsapp = socials.whatsapp || "https://chat.whatsapp.com/LN0aAxHI5p5IJ4CXzrfUAX";
+            const sideLinks = [
+                socials.linkedin ? ["LinkedIn", socials.linkedin, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 10v8M7 7.2v.1M11 18v-4.6c0-2.2 3-2.4 3 0V18M4 4h16v16H4V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`] : null,
+                socials.instagram ? ["Instagram", socials.instagram, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5" stroke="currentColor" stroke-width="2"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Zm7.7-4.8h.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`] : null,
+                ["WhatsApp", whatsapp, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.5 18.5 6.4 15A7 7 0 1 1 9 17.6l-3.5.9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9.5 9.5c.5 2 2 3.5 4 4l1-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`]
+            ].filter(Boolean);
+            document.getElementById("sideSocialLinks").innerHTML = sideLinks
+                .map(([name, href, icon]) => `<a href="${href}" target="_blank" rel="noreferrer" aria-label="${name}" title="${name}">${icon}</a>`)
+                .join("");
+        }
+
+        function saveRecord(key, record) {
+            const current = JSON.parse(localStorage.getItem(key) || "[]");
+            current.push({ id: Date.now(), date: new Date().toISOString(), ...record });
+            localStorage.setItem(key, JSON.stringify(current));
+        }
+
+        function speakWelcomeIntro() {
+            if (!("speechSynthesis" in window)) return false;
+            window.speechSynthesis.cancel();
+            const voiceLine = new SpeechSynthesisUtterance("Welcome to Entrepreneurship Development Cell HITAM.");
+            voiceLine.rate = 0.88;
+            voiceLine.pitch = 1.02;
+            voiceLine.volume = 0.92;
+            window.speechSynthesis.speak(voiceLine);
+            return true;
+        }
+
+        function playApplauseSound() {
+            try {
+                const audio = new (window.AudioContext || window.webkitAudioContext)();
+                const master = audio.createGain();
+                master.gain.value = 0.16;
+                master.connect(audio.destination);
+
+                for (let i = 0; i < 18; i += 1) {
+                    const buffer = audio.createBuffer(1, audio.sampleRate * 0.08, audio.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let j = 0; j < data.length; j += 1) {
+                        data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / data.length, 1.8);
+                    }
+
+                    const source = audio.createBufferSource();
+                    const filter = audio.createBiquadFilter();
+                    const gain = audio.createGain();
+                    const start = audio.currentTime + Math.random() * 1.25;
+
+                    filter.type = "bandpass";
+                    filter.frequency.value = 1200 + Math.random() * 1800;
+                    filter.Q.value = 0.9;
+                    gain.gain.setValueAtTime(0.0001, start);
+                    gain.gain.exponentialRampToValueAtTime(0.55, start + 0.012);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
+
+                    source.buffer = buffer;
+                    source.connect(filter).connect(gain).connect(master);
+                    source.start(start);
+                    source.stop(start + 0.14);
+                }
+
+                [523.25, 659.25, 783.99].forEach((frequency, index) => {
+                    const tone = audio.createOscillator();
+                    const gain = audio.createGain();
+                    tone.type = "triangle";
+                    tone.frequency.value = frequency;
+                    gain.gain.setValueAtTime(0.0001, audio.currentTime + index * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.08, audio.currentTime + 0.06 + index * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.52 + index * 0.08);
+                    tone.connect(gain).connect(master);
+                    tone.start(audio.currentTime + index * 0.08);
+                    tone.stop(audio.currentTime + 0.62 + index * 0.08);
+                });
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+
+        function toggleAmbientSound() {
+            const button = document.getElementById("ambientToggle");
+            if (ambientAudio) {
+                ambientAudio.master.gain.exponentialRampToValueAtTime(0.0001, ambientAudio.context.currentTime + 0.5);
+                ambientAudio.sources.forEach((source) => source.stop(ambientAudio.context.currentTime + 0.55));
+                ambientAudio = null;
+                button.classList.remove("active");
+                button.setAttribute("aria-pressed", "false");
+                button.textContent = "Calm sound";
+                return;
+            }
+
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const master = context.createGain();
+                const filter = context.createBiquadFilter();
+                const delay = context.createDelay();
+                const feedback = context.createGain();
+                const sources = [];
+
+                master.gain.setValueAtTime(0.0001, context.currentTime);
+                master.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 1.2);
+                filter.type = "lowpass";
+                filter.frequency.value = 980;
+                delay.delayTime.value = 0.42;
+                feedback.gain.value = 0.18;
+
+                filter.connect(master).connect(context.destination);
+                filter.connect(delay).connect(feedback).connect(filter);
+
+                [196, 246.94, 329.63].forEach((frequency, index) => {
+                    const osc = context.createOscillator();
+                    const gain = context.createGain();
+                    const lfo = context.createOscillator();
+                    const lfoGain = context.createGain();
+
+                    osc.type = "sine";
+                    osc.frequency.value = frequency;
+                    gain.gain.value = 0.16 / (index + 1);
+                    lfo.type = "sine";
+                    lfo.frequency.value = 0.035 + index * 0.012;
+                    lfoGain.gain.value = 3 + index;
+                    lfo.connect(lfoGain).connect(osc.frequency);
+                    osc.connect(gain).connect(filter);
+                    osc.start();
+                    lfo.start();
+                    sources.push(osc, lfo);
+                });
+
+                ambientAudio = { context, master, sources };
+                button.classList.add("active");
+                button.setAttribute("aria-pressed", "true");
+                button.textContent = "Sound on";
+            } catch (error) {
+                showToast("Your browser blocked background sound until audio is allowed.");
+            }
+        }
+
+        function showSuccessPopup(title, message) {
+            const successModal = document.getElementById("successModal");
+            document.getElementById("successTitle").textContent = title;
+            document.getElementById("successMessage").textContent = message;
+            successModal.classList.add("open");
+            playApplauseSound();
+        }
+
+        function setupInteractions() {
+            const header = document.getElementById("siteHeader");
+            const progress = document.getElementById("progress");
+            const menu = document.getElementById("mobileMenu");
+            const joinModal = document.getElementById("joinModal");
+            const successModal = document.getElementById("successModal");
+            const ambientToggle = document.getElementById("ambientToggle");
+
+            document.getElementById("menuToggle").addEventListener("click", () => {
+                menu.classList.toggle("open");
+            });
+
+            ambientToggle.addEventListener("click", toggleAmbientSound);
+
+            document.querySelectorAll(".mobile-menu a").forEach((link) => {
+                link.addEventListener("click", () => menu.classList.remove("open"));
+            });
+
+            document.querySelectorAll("[data-open-join]").forEach((button) => {
+                button.addEventListener("click", () => joinModal.classList.add("open"));
+            });
+
+            document.querySelector("[data-close-join]").addEventListener("click", () => joinModal.classList.remove("open"));
+            joinModal.addEventListener("click", (event) => {
+                if (event.target === joinModal) joinModal.classList.remove("open");
+            });
+            document.querySelector("[data-close-success]").addEventListener("click", () => successModal.classList.remove("open"));
+            successModal.addEventListener("click", (event) => {
+                if (event.target === successModal) successModal.classList.remove("open");
+            });
+
+            document.getElementById("joinForm").addEventListener("submit", (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const fields = form.elements;
+                saveRecord("edc_applications", {
+                    name: sanitizeInputString(fields.name.value),
+                    email: sanitizeInputString(fields.email.value),
+                    roll: sanitizeInputString(fields.roll.value),
+                    dept: sanitizeInputString(fields.department.value),
+                    phone: sanitizeInputString(fields.phone.value),
+                    skills: sanitizeInputString(fields.skills.value)
+                });
+                form.reset();
+                joinModal.classList.remove("open");
+                showSuccessPopup("Congratulations!", "Thank you for applying to join the EDC HITAM team. Your application has been received successfully.");
+                showToast("Application saved. Thank you for joining the EDC journey.");
+            });
+
+            document.getElementById("contactForm").addEventListener("submit", (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const fields = form.elements;
+                saveRecord("edc_queries", {
+                    name: sanitizeInputString(fields.name.value),
+                    email: sanitizeInputString(fields.email.value),
+                    query: sanitizeInputString(fields.message.value)
+                });
+                form.reset();
+                showSuccessPopup("Congratulations!", "Thank you for reaching out to EDC HITAM. Your report/message has been received successfully.");
+                showToast("Message saved. Thank you for reaching out to EDC HITAM.");
+            });
+
+            document.getElementById("teamPrev").addEventListener("click", () => {
+                const total = getData(appData.team, []).length;
+                if (!total) return;
+                currentTeamIndex = (currentTeamIndex - 1 + total) % total;
+                updateTeamCarousel();
+                startTeamAutoCarousel();
+                playSoftClick();
+            });
+
+            document.getElementById("teamNext").addEventListener("click", () => {
+                const total = getData(appData.team, []).length;
+                if (!total) return;
+                currentTeamIndex = (currentTeamIndex + 1) % total;
+                updateTeamCarousel();
+                startTeamAutoCarousel();
+                playSoftClick();
+            });
+
+            const sections = Array.from(document.querySelectorAll("main section[id]"));
+            const navLinks = Array.from(document.querySelectorAll(".nav-links a"));
+
+            function updateScrollState() {
+                const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+                progress.style.width = scrollable > 0 ? `${(window.scrollY / scrollable) * 100}%` : "0";
+                header.classList.toggle("scrolled", window.scrollY > 20);
+
+                const marker = window.scrollY + 140;
+                const active = sections.reduce((current, section) => {
+                    return section.offsetTop <= marker ? section.id : current;
+                }, "about");
+                navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${active}`));
+            }
+
+            window.addEventListener("scroll", updateScrollState, { passive: true });
+            updateScrollState();
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) entry.target.classList.add("visible");
+                });
+            }, { threshold: 0.12 });
+
+            document.querySelectorAll(".reveal").forEach((node) => revealObserver.observe(node));
+        }
+
+        function playIntroSound() {
+            try {
+                const audio = new (window.AudioContext || window.webkitAudioContext)();
+                const master = audio.createGain();
+                master.gain.setValueAtTime(0.001, audio.currentTime);
+                master.gain.exponentialRampToValueAtTime(0.08, audio.currentTime + 0.08);
+                master.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 2.2);
+                master.connect(audio.destination);
+
+                [82.41, 123.47, 164.81].forEach((frequency, index) => {
+                    const osc = audio.createOscillator();
+                    const gain = audio.createGain();
+                    osc.type = index === 0 ? "sine" : "triangle";
+                    osc.frequency.setValueAtTime(frequency, audio.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(frequency * 1.5, audio.currentTime + 1.7);
+                    gain.gain.setValueAtTime(0.0001, audio.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.45 / (index + 1), audio.currentTime + 0.35);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 2.1);
+                    osc.connect(gain).connect(master);
+                    osc.start(audio.currentTime + index * 0.04);
+                    osc.stop(audio.currentTime + 2.25);
+                });
+            } catch (error) {
+                return false;
+            }
+            return true;
+        }
+
+        function runIntro() {
+            playIntroSound();
+            window.setTimeout(speakWelcomeIntro, 420);
+            window.setTimeout(() => {
+                const intro = document.getElementById("introScreen");
+                if (intro) intro.classList.add("hide");
+            }, 2850);
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            runIntro();
+            await loadAdminDrivenData();
+            renderAnnouncements();
+            renderMetrics();
+            renderEvents();
+            renderTeam();
+            renderTestimonials();
+            renderStartups();
+            renderSocials();
+            setupInteractions();
+        });
+    </script>
+</body>
+</html>
