@@ -1969,6 +1969,15 @@
             </div>
             <div class="socials" id="socialLinks" aria-label="Social links"></div>
         </div>
+        <div class="footer-container ...">
+        
+        <div class="footer-bottom" style="text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                © <span style="color: #fff; font-weight: 500;">Shaik Rehan 2026 </span> All Rights Reserved.
+            </p>
+        </div>
+
+    </div>
     </footer>
 
     <div class="modal" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
@@ -2442,112 +2451,224 @@
         }
 
         function setupInteractions() {
-            const header = document.getElementById("siteHeader");
-            const progress = document.getElementById("progress");
-            const menu = document.getElementById("mobileMenu");
-            const joinModal = document.getElementById("joinModal");
-            const successModal = document.getElementById("successModal");
-            const ambientToggle = document.getElementById("ambientToggle");
+    const header = document.getElementById("siteHeader");
+    const progress = document.getElementById("progress");
+    const menu = document.getElementById("mobileMenu");
+    const joinModal = document.getElementById("joinModal");
+    const successModal = document.getElementById("successModal");
+    const ambientToggle = document.getElementById("ambientToggle");
 
-            document.getElementById("menuToggle").addEventListener("click", () => {
-                menu.classList.toggle("open");
-            });
+    document.getElementById("menuToggle").addEventListener("click", () => {
+        menu.classList.toggle("open");
+    });
 
-            ambientToggle.addEventListener("click", toggleAmbientSound);
+    if (ambientToggle) {
+        ambientToggle.addEventListener("click", toggleAmbientSound);
+    }
 
-            document.querySelectorAll(".mobile-menu a").forEach((link) => {
-                link.addEventListener("click", () => menu.classList.remove("open"));
-            });
+    document.querySelectorAll(".mobile-menu a").forEach((link) => {
+        link.addEventListener("click", () => menu.classList.remove("open"));
+    });
 
-            document.querySelectorAll("[data-open-join]").forEach((button) => {
-                button.addEventListener("click", () => joinModal.classList.add("open"));
-            });
+    document.querySelectorAll("[data-open-join]").forEach((button) => {
+        button.addEventListener("click", () => joinModal.classList.add("open"));
+    });
 
-            document.querySelector("[data-close-join]").addEventListener("click", () => joinModal.classList.remove("open"));
-            joinModal.addEventListener("click", (event) => {
-                if (event.target === joinModal) joinModal.classList.remove("open");
-            });
-            document.querySelector("[data-close-success]").addEventListener("click", () => successModal.classList.remove("open"));
-            successModal.addEventListener("click", (event) => {
-                if (event.target === successModal) successModal.classList.remove("open");
-            });
+    const closeJoinBtn = document.querySelector("[data-close-join]");
+    if (closeJoinBtn) {
+        closeJoinBtn.addEventListener("click", () => joinModal.classList.remove("open"));
+    }
+    
+    joinModal.addEventListener("click", (event) => {
+        if (event.target === joinModal) joinModal.classList.remove("open");
+    });
 
-            document.getElementById("joinForm").addEventListener("submit", (event) => {
-                event.preventDefault();
-                const form = event.currentTarget;
-                const fields = form.elements;
-                saveRecord("edc_applications", {
-                    name: sanitizeInputString(fields.name.value),
-                    email: sanitizeInputString(fields.email.value),
-                    roll: sanitizeInputString(fields.roll.value),
-                    dept: sanitizeInputString(fields.department.value),
-                    phone: sanitizeInputString(fields.phone.value),
-                    skills: sanitizeInputString(fields.skills.value)
+    const closeSuccessBtn = document.querySelector("[data-close-success]");
+    if (closeSuccessBtn) {
+        closeSuccessBtn.addEventListener("click", () => successModal.classList.remove("open"));
+    }
+    
+    successModal.addEventListener("click", (event) => {
+        if (event.target === successModal) successModal.classList.remove("open");
+    });
+
+    // ==========================================================================
+    // 🛠️ CONNECTED TO CLOUD: Join EDC Application Form
+    // ==========================================================================
+    const joinForm = document.getElementById("joinForm");
+    if (joinForm) {
+        joinForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            console.log("🚀 Join form processing initialized...");
+            
+            const form = event.currentTarget;
+            const fields = form.elements;
+            const submitBtn = form.querySelector("button[type='submit']");
+            
+            const payload = {
+                name: sanitizeInputString(fields.name.value),
+                email: sanitizeInputString(fields.email.value),
+                roll: sanitizeInputString(fields.roll.value),
+                dept: sanitizeInputString(fields.department.value) // Maps to 'dept' column
+            };
+
+            try {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Sending application...";
+                }
+
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/edc_applications`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify(payload)
                 });
+
+                console.log("📥 Applications Table Response Code:", response.status);
+
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    throw new Error(`Database rejected raw post: ${errorDetails}`);
+                }
+
+                // Complete interaction lifecycle only on success block
                 form.reset();
                 joinModal.classList.remove("open");
                 showSuccessPopup("Congratulations!", "Thank you for applying to join the EDC HITAM team. Your application has been received successfully.");
-                showToast("Application saved. Thank you for joining the EDC journey.");
-            });
+                showToast("Application securely logged to live database!");
 
-            document.getElementById("contactForm").addEventListener("submit", (event) => {
-                event.preventDefault();
-                const form = event.currentTarget;
-                const fields = form.elements;
-                saveRecord("edc_queries", {
-                    name: sanitizeInputString(fields.name.value),
-                    email: sanitizeInputString(fields.email.value),
-                    query: sanitizeInputString(fields.message.value)
+            } catch (error) {
+                console.error("🔴 Submission Failed:", error);
+                alert("Could not process application entry. Technical logs: " + error.message);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Submit Application";
+                }
+            }
+        });
+    }
+
+    // ==========================================================================
+    // 🛠️ CONNECTED TO CLOUD: Contact Us Queries Form
+    // ==========================================================================
+    const contactForm = document.getElementById("contactForm");
+    if (contactForm) {
+        contactForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            console.log("🚀 Query loop initialization processing...");
+            
+            const form = event.currentTarget;
+            const fields = form.elements;
+            const submitBtn = form.querySelector("button[type='submit']");
+            
+            const payload = {
+                name: sanitizeInputString(fields.name.value),
+                email: sanitizeInputString(fields.email.value),
+                message: sanitizeInputString(fields.message.value) // Matches 'message' column rename
+            };
+
+            try {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Sending message...";
+                }
+
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/edc_queries`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify(payload)
                 });
+
+                console.log("📥 Queries Table Response Code:", response.status);
+
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    throw new Error(`Database rejected message query: ${errorDetails}`);
+                }
+
                 form.reset();
                 showSuccessPopup("Congratulations!", "Thank you for reaching out to EDC HITAM. Your report/message has been received successfully.");
-                showToast("Message saved. Thank you for reaching out to EDC HITAM.");
-            });
+                showToast("Message recorded. Thank you for connecting with us!");
 
-            document.getElementById("teamPrev").addEventListener("click", () => {
-                const total = getData(appData.team, []).length;
-                if (!total) return;
-                currentTeamIndex = (currentTeamIndex - 1 + total) % total;
-                updateTeamCarousel();
-                startTeamAutoCarousel();
-                playSoftClick();
-            });
-
-            document.getElementById("teamNext").addEventListener("click", () => {
-                const total = getData(appData.team, []).length;
-                if (!total) return;
-                currentTeamIndex = (currentTeamIndex + 1) % total;
-                updateTeamCarousel();
-                startTeamAutoCarousel();
-                playSoftClick();
-            });
-
-            const sections = Array.from(document.querySelectorAll("main section[id]"));
-            const navLinks = Array.from(document.querySelectorAll(".nav-links a"));
-
-            function updateScrollState() {
-                const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-                progress.style.width = scrollable > 0 ? `${(window.scrollY / scrollable) * 100}%` : "0";
-                header.classList.toggle("scrolled", window.scrollY > 20);
-
-                const marker = window.scrollY + 140;
-                const active = sections.reduce((current, section) => {
-                    return section.offsetTop <= marker ? section.id : current;
-                }, "about");
-                navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${active}`));
+            } catch (error) {
+                console.error("🔴 Query Transfer Error:", error);
+                alert("Could not save your message request. Details: " + error.message);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Send Message";
+                }
             }
+        });
+    }
 
-            window.addEventListener("scroll", updateScrollState, { passive: true });
-            updateScrollState();
+    // ==========================================================================
+    // CAROUSELS AND SCROLL LAYOUT CONTROL LOGIC
+    // ==========================================================================
+    const teamPrev = document.getElementById("teamPrev");
+    if (teamPrev) {
+        teamPrev.addEventListener("click", () => {
+            const total = getData(appData.team, []).length;
+            if (!total) return;
+            currentTeamIndex = (currentTeamIndex - 1 + total) % total;
+            updateTeamCarousel();
+            startTeamAutoCarousel();
+            playSoftClick();
+        });
+    }
 
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) entry.target.classList.add("visible");
-                });
-            }, { threshold: 0.12 });
+    const teamNext = document.getElementById("teamNext");
+    if (teamNext) {
+        teamNext.addEventListener("click", () => {
+            const total = getData(appData.team, []).length;
+            if (!total) return;
+            currentTeamIndex = (currentTeamIndex + 1) % total;
+            updateTeamCarousel();
+            startTeamAutoCarousel();
+            playSoftClick();
+        });
+    }
 
-            document.querySelectorAll(".reveal").forEach((node) => revealObserver.observe(node));
+    const sections = Array.from(document.querySelectorAll("main section[id]"));
+    const navLinks = Array.from(document.querySelectorAll(".nav-links a"));
+
+    function updateScrollState() {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        if (progress) {
+            progress.style.width = scrollable > 0 ? `${(window.scrollY / scrollable) * 100}%` : "0";
         }
+        if (header) {
+            header.classList.toggle("scrolled", window.scrollY > 20);
+        }
+
+        const marker = window.scrollY + 140;
+        const active = sections.reduce((current, section) => {
+            return section.offsetTop <= marker ? section.id : current;
+        }, "about");
+        
+        navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${active}`));
+    }
+
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    updateScrollState();
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("visible");
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach((node) => revealObserver.observe(node));
+}
 
         function playIntroSound() {
             try {
