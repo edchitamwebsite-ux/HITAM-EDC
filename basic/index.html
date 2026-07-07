@@ -136,8 +136,20 @@
         }
 
         @keyframes starFall {
-            from { transform: translate3d(0, -12vh, 0); }
-            to { transform: translate3d(var(--drift), 116vh, 0); }
+            0% { 
+                /* Stars start slightly outside the top viewport edge at a randomized horizontal spot */
+                transform: translate3d(0, -10vh, 0) scale(0.5); 
+                opacity: 0;
+            }
+            15% {
+                opacity: var(--opacity);
+            }
+            100% { 
+                /* 🌟 MAGIC FIX: Combines your custom inline --drift variable with a vertical sweep */
+                /* This makes them fly diagonally, left-to-right, or right-to-left based on their values */
+                transform: translate3d(calc(var(--drift) * 2.5), 110vh, 0) scale(1.2); 
+                opacity: 0;
+            }
         }
 
         .intro-screen {
@@ -613,12 +625,13 @@
         .hero-logo-stage img {
             position: relative;
             z-index: 2;
-            width: min(230px, 52%);
-            padding: 24px;
-            border-radius: 18px;
-            background: #fff;
-            box-shadow: 0 22px 82px rgba(69, 212, 131, 0.24);
-            animation: logoFloat 5.5s ease-in-out infinite;
+            width: min(280px, 70%);             /* Made it larger so it's super easy to read */
+            border-radius: 12px;
+            /* 🌟 THE REAL FIX: Removed background #fff entirely so there are no outer white blocks */
+            background: transparent !important; 
+            object-fit: contain;                 
+            filter: drop-shadow(0 0 25px rgba(69, 212, 131, 0.4)); /* 🌟 Adds a gorgeous neon green glow directly around the logo shape */
+            animation: logoFloat 5.3s ease-in-out infinite;
         }
 
         .orbit-label {
@@ -997,25 +1010,106 @@
             line-height: 1.62;
         }
 
+        /* ==========================================================================
+           🎪 CELL INITIATIVES EVENTS CAROUSEL TRACK (Fixed Proportions Patch)
+           ========================================================================== */
         .timeline-grid {
-            grid-template-columns: repeat(2, 1fr);
+            position: relative;
+            min-height: 520px; /* Expanded outer boundaries slightly */
+            overflow: hidden;
+            border: 1px solid rgba(69, 212, 131, 0.18);
+            border-radius: 8px;
+            background:
+                linear-gradient(90deg, rgba(7, 16, 17, 0.9), rgba(7, 16, 17, 0.25) 50%, rgba(7, 16, 17, 0.9)),
+                radial-gradient(circle at 50% 20%, rgba(69, 212, 131, 0.12), transparent 48%);
+        }
+
+        .timeline-grid::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1.5px);
+            background-size: 72px 72px;
+            opacity: 0.28;
+            pointer-events: none;
         }
 
         .event-card {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            width: min(640px, 90vw); /* Expanded panel scale for reading comfort */
+            min-height: 420px;       /* Adapts cleanly if outcome content text wraps */
             display: grid;
-            grid-template-columns: 155px 1fr;
-            min-height: 190px;
+            grid-template-columns: 1fr 1.3fr; /* Balances typography footprint over visual assets */
             overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.72);
+            filter: blur(1.5px);
+            transition:
+                transform 780ms cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 560ms ease,
+                filter 560ms ease,
+                z-index 560ms ease;
+        }
+
+        .event-card.active,
+        .event-card.prev,
+        .event-card.next {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .event-card.active {
+            z-index: 4;
+            transform: translateX(-50%) scale(1.05);
+            filter: blur(0);
+        }
+
+        .event-card.prev {
+            z-index: 2;
+            transform: translateX(calc(-50% - min(30vw, 420px))) scale(0.86);
+            filter: blur(0.5px);
+        }
+
+        .event-card.next {
+            z-index: 2;
+            transform: translateX(calc(-50% + min(30vw, 420px))) scale(0.86);
+            filter: blur(0.5px);
         }
 
         .event-card img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain !important;
+            object-position: center;
+            background-color: #0d1718;
+            padding: 12px; /* Extra padding stops images touching borders */
+            border-right: 1px solid var(--line);
         }
 
         .event-body {
-            padding: 20px;
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Keeps text stacked elegantly from the top */
+            background: rgba(0, 0, 0, 0.85);
+            overflow-y: auto; /* Adds a clean container scroll fallback if description text runs very long */
+            max-height: 420px;
+        }
+
+        .event-body h3 {
+            font-size: 1.15rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .event-body p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 0.84rem;
+            line-height: 1.6;
         }
 
         .meta {
@@ -2156,10 +2250,19 @@
             return "edc-logo.png";
         }
 
+        let currentEventIndex = 0;
+        let eventAutoTimer = null;
+
         function renderEvents() {
             const events = getData(appData.events, []);
             const target = document.getElementById("eventsGrid");
-            target.innerHTML = events.slice(0, 4).map((event, index) => `
+            
+            if (!events.length) {
+                target.innerHTML = `<article class="event-card active"><div class="event-body"><h3>Initiatives coming soon.</h3><p>Add events from the administrative dashboard panel.</p></div></article>`;
+                return;
+            }
+
+            target.innerHTML = events.map((event, index) => `
                 <article class="card event-card">
                     <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
                     <div class="event-body">
@@ -2169,6 +2272,40 @@
                     </div>
                 </article>
             `).join("");
+
+            currentEventIndex = 0;
+            updateEventsCarousel();
+            startEventsAutoCarousel();
+        }
+
+        function updateEventsCarousel() {
+            const events = getData(appData.events, []);
+            const track = document.getElementById("eventsGrid");
+            if (!track || !events.length) return;
+
+            currentEventIndex = Math.max(0, Math.min(currentEventIndex, events.length - 1));
+            const slides = Array.from(track.querySelectorAll(".event-card"));
+            
+            slides.forEach((slide, index) => {
+                slide.classList.remove("active", "prev", "next");
+                if (index === currentEventIndex) {
+                    slide.classList.add("active");
+                } else if (index === (currentEventIndex - 1 + events.length) % events.length) {
+                    slide.classList.add("prev");
+                } else if (index === (currentEventIndex + 1) % events.length) {
+                    slide.classList.add("next");
+                }
+            });
+        }
+
+        function startEventsAutoCarousel() {
+            window.clearInterval(eventAutoTimer);
+            const events = getData(appData.events, []);
+            if (events.length < 2) return;
+            eventAutoTimer = window.setInterval(() => {
+                currentEventIndex = (currentEventIndex + 1) % events.length;
+                updateEventsCarousel();
+            }, 4500); // Transitions automatically every 4.5 seconds
         }
 
         function renderTeam() {
