@@ -3,8 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HITAM | Entrepreneurship Development Cell</title>
+    <title>Entrepreneurship Development Cell (EDC) | Hyderabad Institute of Technology and Management (HITAM)</title>
+    <meta name="description" content="Official website of the Entrepreneurship Development Cell (EDC) at Hyderabad Institute of Technology and Management (HITAM). Explore startup programs, innovation initiatives, events, workshops, registrations, and entrepreneurship opportunities.">
+    <meta name="keywords" content="HITAM EDC, EDC HITAM, Entrepreneurship Development Cell HITAM, Hyderabad Institute of Technology and Management, Startup Cell, Innovation Cell, Student Entrepreneurship, Startup Incubation Hyderabad, Concept Trio, HITAM Events">
+    <meta name="author" content="Shaik Rehan">
+    <meta name="robots" content="index, follow">
+    <meta name="google-site-verification" content="PASTE_GOOGLE_SEARCH_CONSOLE_VERIFICATION_HERE">
+    <meta name="msvalidate.01" content="PASTE_BING_VERIFICATION_HERE">
+    <link rel="canonical" id="canonicalUrl" href="">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="EDC HITAM">
+    <meta property="og:title" content="Entrepreneurship Development Cell (EDC) | HITAM">
+    <meta property="og:description" content="Startup programs, innovation initiatives, events, and entrepreneurship opportunities at HITAM.">
+    <meta property="og:image" content="edc-logo.png">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Entrepreneurship Development Cell (EDC) | HITAM">
+    <meta name="twitter:description" content="Startup programs, innovation initiatives, events, and entrepreneurship opportunities at HITAM.">
+    <meta name="twitter:image" content="edc-logo.png">
     <link rel="icon" type="image/png" href="edc-logo.png">
+    <link rel="apple-touch-icon" href="edc-logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F7A43">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1789,14 +1809,15 @@
                 <a href="#announcements">News</a>
                 <a href="#about">About</a>
                 <a href="#programs">Programs</a>
-                <a href="#events">Events</a>
+                <a href="index.html?page=events">Current Events</a>
                 <a href="#team">Team</a>
                 <a href="#testimonials">Guests</a>
                 <a href="#contact">Contact</a>
             </nav>
 
             <div class="nav-actions">
-                <a class="ghost-btn" href="admin-site-settings.html">Admin</a>
+                <button class="ghost-btn" type="button" id="participantLogin">Participant Login</button>
+                <a class="ghost-btn" href="admin.html">Admin</a>
                 <button class="primary-btn" type="button" data-open-join>Join EDC</button>
                 <button class="icon-btn" type="button" id="menuToggle" aria-label="Open menu">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1809,11 +1830,12 @@
             <a href="#announcements">News</a>
             <a href="#about">About</a>
             <a href="#programs">Programs</a>
-            <a href="#events">Events</a>
+            <a href="index.html?page=events">Current Events</a>
             <a href="#team">Team</a>
             <a href="#testimonials">Guests</a>
             <a href="#contact">Contact</a>
-            <a href="admin-site-settings.html">Admin</a>
+            <button class="ghost-btn" type="button" id="participantLoginMobile">Participant Login</button>
+            <a href="admin.html">Admin</a>
         </nav>
     </header>
 
@@ -2152,6 +2174,12 @@
         }
 
         async function fetchTable(table, order, fallback) {
+            // Admin writes are stored locally in this standalone portal. Prefer them
+            // so a stale/unavailable cloud response can never hide Admin changes.
+            try {
+                const local = JSON.parse(localStorage.getItem(table) || "null");
+                if (Array.isArray(local) && local.length) return local;
+            } catch (error) { /* use the supplied fallback below */ }
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${order}`, { headers: cloudHeaders });
                 if (!response.ok) throw new Error(`Unable to load ${table}`);
@@ -2398,12 +2426,12 @@
             }
             target.innerHTML = visitors.slice(0, 6).map((visitor, index) => `
                 <article class="card testimonial-card">
-                    <p>"${visitor.message || "A valuable interaction with the HITAM EDC ecosystem."}"</p>
+                    <p>&ldquo;${sanitizeInputString(visitor.message || "A valuable interaction with the HITAM EDC ecosystem.")}&rdquo;</p>
                     <div class="testimonial-person">
-                        <img src="${imageSource(visitor, index + 2)}" alt="${visitor.name || "Guest"}" onerror="this.src='edc-logo.png'">
+                        <img src="${imageSource(visitor, index + 2)}" alt="${sanitizeInputString(visitor.name || "Guest")}" onerror="this.src='edc-logo.png'">
                         <div>
-                            <b>${visitor.name || "Guest Mentor"}</b>
-                            <span>${visitor.designation || visitor.topic || "EDC Guest"}</span>
+                            <b>${sanitizeInputString(visitor.name || "Guest Mentor")}</b>
+                            <span>${sanitizeInputString(visitor.designation || visitor.topic || "EDC Guest")}</span>
                         </div>
                     </div>
                 </article>
@@ -2856,6 +2884,118 @@
             renderSocials();
             setupInteractions();
         });
+    </script>
+    <script>
+    /* Single-file Event Management & Registration Portal */
+    (() => {
+        const portalKey = 'edc_portal_events', registrationKey = 'edc_event_registrations';
+        const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+        const events = () => JSON.parse(localStorage.getItem(portalKey) || JSON.stringify(typeof initialPortalEvents !== 'undefined' ? initialPortalEvents : []));
+        const registrations = () => JSON.parse(localStorage.getItem(registrationKey) || '[]');
+        const image = raw => raw ? (String(raw).startsWith('http') || String(raw).includes('/') ? raw : `pictures/${raw}`) : 'edc-logo.png';
+        const money = value => Number(value || 0) ? `₹${Number(value).toLocaleString('en-IN')}` : 'Free';
+        const fmt = value => value ? new Intl.DateTimeFormat('en-IN', { day:'numeric', month:'short', year:'numeric' }).format(new Date(value)) : 'Dates to be announced';
+        function injectStyles() {
+            const style = document.createElement('style');
+            style.textContent = `.portal{max-width:1180px;margin:0 auto;padding:130px 24px 80px}.portal-hero{position:relative;overflow:hidden;padding:58px;border:1px solid var(--line-strong);border-radius:22px;background:linear-gradient(100deg,rgba(6,20,18,.96),rgba(9,31,28,.67)),var(--event-banner) center/cover}.portal-kicker{color:var(--green);font-weight:800;letter-spacing:.14em;font-size:.72rem;text-transform:uppercase}.portal h1{font-size:clamp(2.5rem,7vw,5.5rem);margin:.4rem 0}.portal h2{font-size:clamp(1.7rem,4vw,2.5rem);margin-bottom:14px}.portal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 48px}.portal-stat,.portal-card{background:rgba(16,31,31,.82);border:1px solid var(--line);border-radius:15px;padding:20px}.portal-stat b{display:block;font-size:1.5rem;color:var(--green)}.portal-layout{display:grid;grid-template-columns:1.35fr .65fr;gap:22px}.portal-card h3{margin:8px 0}.portal-card p{color:var(--muted);line-height:1.7}.track-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px;margin-top:18px}.track{border:1px solid var(--line);border-radius:13px;padding:17px;background:rgba(255,255,255,.025)}.track span{color:var(--gold);font-size:.8rem}.portal-list{padding-left:18px;color:var(--muted);line-height:1.8;white-space:pre-line}.event-select{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.event-select button{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 15px;border-radius:999px;cursor:pointer}.event-select button.active{background:var(--green);color:#052019}.registration-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px}.registration-modal.open{display:flex}.registration-box{width:min(820px,100%);max-height:92vh;overflow:auto;background:#0d1718;border:1px solid var(--line-strong);border-radius:20px;padding:27px}.reg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.reg-grid input,.reg-grid select,.reg-grid textarea{width:100%;background:#142123;border:1px solid var(--line);border-radius:9px;padding:12px;color:white;font:inherit}.reg-grid textarea{min-height:88px;grid-column:1/-1}.reg-wide{grid-column:1/-1}.portal-status{display:inline-block;padding:5px 9px;border-radius:99px;background:rgba(69,212,131,.13);color:var(--green);font-size:.72rem;font-weight:800;text-transform:uppercase}@media(max-width:740px){.portal{padding:105px 15px 55px}.portal-hero{padding:30px 24px}.portal-grid,.portal-layout,.reg-grid{grid-template-columns:1fr}.portal-layout{gap:14px}}`;
+            document.head.append(style);
+        }
+        function countdown(date) { const d = new Date(date).getTime() - Date.now(); if (d <= 0) return 'Starting soon'; const n = Math.floor(d / 1000); return `${Math.floor(n/86400)} Days ${String(Math.floor(n%86400/3600)).padStart(2,'0')} Hours ${String(Math.floor(n%3600/60)).padStart(2,'0')} Minutes`; }
+        function renderEventPage(id) {
+            const all = events(); let event = all.find(e => String(e.id) === String(id)) || all.find(e => e.featured) || all[0];
+            const main = document.querySelector('main');
+            if (!event) { main.innerHTML = '<section class="portal"><h1>No current events yet.</h1><p>Check back soon for the next EDC HITAM experience.</p></section>'; return; }
+            const regCount = registrations().filter(r => r.eventId === event.id).length;
+            const tracks = (event.subevents || []).map(s => `<article class="track"><span>${esc(s.prize || 'Competition')}</span><h3>${esc(s.name)}</h3><p>${esc(s.description || '')}</p><small>${esc(s.time || '')} · ${esc(s.venue || '')}</small></article>`).join('');
+            main.innerHTML = `<section class="portal"><div class="portal-hero" style="--event-banner:url('${image(event.banner)}')"><span class="portal-kicker">EDC HITAM EVENT MANAGEMENT & REGISTRATION PORTAL</span><div class="portal-status">${esc(event.status || 'upcoming')}</div><h1>${esc(event.name)}</h1><p>${esc(event.description)}</p><p><strong>${fmt(event.startDate)} – ${fmt(event.endDate)}</strong> · ${esc(event.venue || 'HITAM')}</p><div class="hero-actions"><button class="primary-btn" id="openRegistration">Register Now</button><a class="ghost-btn" href="index.html">Back to EDC</a></div></div><div class="portal-grid"><div class="portal-stat"><b>${countdown(event.startDate)}</b><span>until the event</span></div><div class="portal-stat"><b>${esc(event.prizePool || '—')}</b><span>prize pool</span></div><div class="portal-stat"><b>${regCount || '500+'}</b><span>participants registered</span></div></div><div class="event-select">${all.filter(e=>e.status!=='completed').map(e=>`<button class="${e.id===event.id?'active':''}" data-event-id="${esc(e.id)}">${esc(e.name)}</button>`).join('')}</div><div class="portal-layout"><div class="portal-card"><span class="portal-kicker">About the event</span><h2>Make your idea count.</h2><p>${esc(event.about || event.description)}</p><h3 style="margin-top:28px">Competition tracks</h3><div class="track-grid">${tracks || '<p>Tracks will be announced shortly.</p>'}</div><h3 style="margin-top:28px">Schedule</h3><p class="portal-list">${esc(event.schedule || 'Schedule will be announced shortly.')}</p></div><aside><div class="portal-card"><span class="portal-kicker">Registration</span><h3>${money(event.fee)} ${Number(event.fee) ? 'per participant' : ''}</h3><p>Registration closes ${fmt(event.deadline)}. Team size: ${event.minTeam || 1}–${event.maxTeam || 1}.</p><button class="primary-btn" id="openRegistration2">Register for ${esc(event.name)}</button></div><div class="portal-card" style="margin-top:16px"><h3>Eligibility</h3><p>${esc(event.eligibility || 'Open to students.')}</p><h3>Contact</h3><p>${esc(event.contactNumbers || 'EDC HITAM Desk')}</p><h3>Rules</h3><p>${esc(event.rules || 'Rules will be announced shortly.')}</p></div></aside></div></section>`;
+            document.querySelectorAll('[data-event-id]').forEach(b => b.onclick = () => { history.pushState({}, '', `index.html?page=events&event=${encodeURIComponent(b.dataset.eventId)}`); renderEventPage(b.dataset.eventId); });
+            ['openRegistration','openRegistration2'].forEach(key => document.getElementById(key).onclick = () => openRegistration(event));
+            const heroLabel = document.querySelector('.portal-hero .portal-kicker');
+            if (heroLabel) heroLabel.textContent = event.heroKicker || 'CURRENT EVENT';
+            const heroCta = document.getElementById('openRegistration');
+            if (heroCta) heroCta.textContent = event.heroCta || 'Register Now';
+            const eventHeading = document.querySelector('.portal-card h2');
+            if (eventHeading) eventHeading.textContent = event.contentHeading || 'Make your idea count.';
+            const detailHost = document.querySelector('.portal-layout > div');
+            if (detailHost && (event.highlights || event.video || event.brochure || event.winnerDetails || (event.gallery || []).length || (event.certificates || []).length)) {
+                const mediaItems = (event.gallery || []).map(src => `<img loading="lazy" src="${image(src)}" alt="${esc(event.name)} gallery image" style="width:100%;aspect-ratio:1.4;object-fit:cover;border-radius:10px">`).join('');
+                detailHost.insertAdjacentHTML('beforeend', `<section style="margin-top:30px"><h3>Highlights</h3><p class="portal-list">${esc(event.highlights || '')}</p>${event.video ? `<p><a class="ghost-btn" target="_blank" rel="noopener" href="${esc(event.video)}">Watch event video</a></p>` : ''}${event.brochure ? `<p><a class="ghost-btn" target="_blank" rel="noopener" href="${esc(event.brochure)}">Download brochure</a></p>` : ''}${event.winnerDetails ? `<h3 style="margin-top:22px">Winners & results</h3><p class="portal-list">${esc(event.winnerDetails)}</p>` : ''}${mediaItems ? `<div class="track-grid" style="margin-top:18px">${mediaItems}</div>` : ''}${(event.certificates || []).length ? `<h3 style="margin-top:22px">Certificates</h3>${event.certificates.map(c => `<p><a class="ghost-btn" target="_blank" rel="noopener" href="${esc(c)}">View certificate</a></p>`).join('')}` : ''}</section>`);
+            }
+            if (event.status === 'live' && event.liveBanner) document.querySelector('.portal').insertAdjacentHTML('afterbegin', `<div class="portal-status" style="margin-bottom:12px">🔴 LIVE NOW — ${esc(event.liveBanner)}</div>`);
+        }
+        function openRegistration(event) {
+            const modal = document.createElement('div'); modal.className = 'registration-modal open';
+            const members = Array.from({length:Math.max(0,Number(event.maxTeam || 1)-1)},(_,i)=>`<input name="member${i+1}" placeholder="Member ${i+1} name">`).join('');
+            modal.innerHTML = `<div class="registration-box"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">${esc(event.name)}</span><h2>Premium registration</h2><p style="color:var(--muted);margin-bottom:18px">${Number(event.fee) ? `Pay ${money(event.fee)} via ${esc(event.upiId || 'the displayed UPI ID')} and upload your proof.` : 'This event is free to register.'}</p><form id="eventRegistration" class="reg-grid"><input required name="fullName" placeholder="Full name"><input required type="email" name="email" placeholder="Email"><input required name="phone" placeholder="Phone"><input required name="college" placeholder="College"><input name="branch" placeholder="Branch"><input name="year" placeholder="Year"><select name="gender"><option value="">Gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select><input name="rollNumber" placeholder="Roll number"><input class="reg-wide" name="teamName" placeholder="Team name (optional)"><input class="reg-wide" name="teamLeader" placeholder="Team leader"><div class="reg-wide">${members}</div><input name="emergencyContact" placeholder="Emergency contact"><select name="foodPreference"><option>Food preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>None</option></select><select name="accommodation"><option value="No">Accommodation required?</option><option>Yes</option><option>No</option></select>${Number(event.fee) ? `<input name="transactionId" required placeholder="Transaction ID / UPI reference"><input type="file" name="paymentScreenshot" accept="image/*">` : ''}<label class="reg-wide" style="color:var(--muted)"><input required type="checkbox" name="terms"> I agree to the event rules and terms.</label><button class="primary-btn reg-wide" type="submit">Submit registration</button></form></div>`;
+            document.body.append(modal); modal.querySelector('button').onclick = () => modal.remove(); modal.onclick = e => { if(e.target===modal) modal.remove(); };
+            modal.querySelector('form').onsubmit = e => { e.preventDefault(); const data = Object.fromEntries(new FormData(e.currentTarget)); const rows=registrations(); rows.push({id:Date.now(), eventId:event.id,eventName:event.name,status:Number(event.fee)?'pending payment':'approved',createdAt:new Date().toISOString(),...data,paymentScreenshot:data.paymentScreenshot?.name||''}); localStorage.setItem(registrationKey,JSON.stringify(rows)); modal.remove(); alert('Registration received. You will receive a confirmation after verification.'); renderEventPage(event.id); };
+        }
+        document.addEventListener('DOMContentLoaded', () => { if (new URLSearchParams(location.search).get('page') !== 'events') return; injectStyles(); document.querySelector('.intro-screen')?.remove(); document.querySelector('.social-sidebar')?.remove(); document.querySelector('.ambient-toggle')?.remove(); const id = new URLSearchParams(location.search).get('event'); renderEventPage(id); });
+    })();
+    </script>
+    <script>
+    /* Premium interaction, search, analytics and discoverability enhancement layer */
+    (() => {
+        const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+        const read = (key, fallback=[]) => { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } };
+        const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+        const record = (type, data={}) => { const rows=read('edc_analytics',[]); rows.push({id:Date.now()+Math.random(),type,data,page:location.pathname+location.search,at:new Date().toISOString()}); write('edc_analytics',rows.slice(-1200)); };
+        const addStyle = () => { const style=document.createElement('style'); style.textContent=`.search-launch{border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--muted);border-radius:999px;padding:10px 13px;cursor:pointer;font:inherit;font-size:.78rem}.search-launch:hover{border-color:var(--green);color:var(--text)}.global-search{position:fixed;inset:0;z-index:12000;background:rgba(2,9,10,.78);backdrop-filter:blur(16px);display:none;align-items:flex-start;justify-content:center;padding:12vh 18px}.global-search.open{display:flex}.search-panel{width:min(760px,100%);max-height:76vh;overflow:auto;background:#0e191a;border:1px solid var(--line-strong);border-radius:20px;box-shadow:var(--shadow);padding:18px}.search-box{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px}.search-box input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:1.1rem}.search-result{display:block;padding:15px 8px;border-bottom:1px solid var(--line);transition:.2s}.search-result:hover{padding-left:16px;background:rgba(69,212,131,.07)}.search-result small{color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.search-result p{color:var(--muted);margin-top:5px;font-size:.88rem}.magnetic{transition:transform .18s ease,box-shadow .18s ease}.card,.panel,.program-card,.event-card,.testimonial-card,.startup-card{will-change:transform}.card:hover,.panel:hover{box-shadow:0 25px 55px rgba(0,0,0,.28)}.section{position:relative}.section::before{content:"";position:absolute;width:260px;height:260px;left:-120px;top:10%;border-radius:50%;background:radial-gradient(circle,rgba(45,200,184,.08),transparent 70%);pointer-events:none}.team-slide.active .team-card{box-shadow:0 20px 60px rgba(69,212,131,.12)}@media(max-width:1040px){.search-launch{font-size:0;padding:10px}.search-launch::after{content:"⌕";font-size:1.1rem}}`; document.head.append(style); };
+        const searchItems = () => {
+            const raw=[]; const data=window.appData || {};
+            (data.blogs||[]).forEach(x=>raw.push({type:'Blog',title:x.title,text:x.content,href:'#announcements'}));
+            (data.events||[]).forEach(x=>raw.push({type:'Event',title:x.title,text:x.outcome,href:'#events'}));
+            read('edc_portal_events', typeof initialPortalEvents !== 'undefined' ? initialPortalEvents : []).forEach(x=>raw.push({type:'Current Event',title:x.name,text:x.description,href:`index.html?page=events&event=${encodeURIComponent(x.id)}`}));
+            (data.team||[]).forEach(x=>raw.push({type:'Team',title:x.name,text:`${x.role||''} ${x.achievement||''}`,href:'#team'}));
+            (data.visitors||[]).forEach(x=>raw.push({type:'Visitor',title:x.name,text:`${x.designation||''} ${x.org||''} ${x.topic||''}`,href:'#testimonials'}));
+            (data.startups||[]).forEach(x=>raw.push({type:'Industry / Startup',title:x.name,text:`${x.industry||''} ${x.solution||''}`,href:'#startups'}));
+            [['Program','Idea Validation','Problem discovery, customer assumptions and validation','#programs'],['Program','Startup Workshops','Business models, pitching and product thinking','#programs'],['Program','Exposure Visits','Industry and ecosystem visits','#programs'],['Program','Pitch & Incubate','Refine and launch viable ventures','#programs']].forEach(([type,title,text,href])=>raw.push({type,title,text,href})); return raw;
+        };
+        const mountSearch = () => {
+            const action=document.querySelector('.nav-actions'); if(!action || document.getElementById('searchLaunch')) return;
+            const button=document.createElement('button');button.id='searchLaunch';button.className='search-launch';button.type='button';button.innerHTML='⌕ <span>Search EDC</span>';button.setAttribute('aria-label','Search EDC HITAM');action.prepend(button);
+            const modal=document.createElement('div');modal.id='globalSearch';modal.className='global-search';modal.innerHTML=`<div class="search-panel" role="dialog" aria-modal="true" aria-label="Search EDC HITAM"><div class="search-box"><input id="globalSearchInput" autocomplete="off" placeholder="Search blogs, events, people, visitors, programs…"><button class="icon-btn" type="button" aria-label="Close search">×</button></div><div id="searchResults"><p style="color:var(--muted);padding:20px 8px">Start typing to search the entire EDC platform.</p></div></div>`;document.body.append(modal);
+            const open=()=>{modal.classList.add('open');document.getElementById('globalSearchInput').focus();};const close=()=>modal.classList.remove('open');button.onclick=open;modal.querySelector('button').onclick=close;modal.onclick=e=>{if(e.target===modal)close();};window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();open();}if(e.key==='Escape')close();});
+            const input=modal.querySelector('input'), results=modal.querySelector('#searchResults');input.oninput=()=>{const q=input.value.trim().toLowerCase();if(!q){results.innerHTML='<p style="color:var(--muted);padding:20px 8px">Start typing to search the entire EDC platform.</p>';return;}record('search',{q});const matches=searchItems().filter(x=>`${x.title} ${x.text} ${x.type}`.toLowerCase().includes(q)).slice(0,12);results.innerHTML=matches.length?matches.map(x=>`<a class="search-result" href="${esc(x.href)}"><small>${esc(x.type)}</small><strong>${esc(x.title)}</strong><p>${esc(x.text||'')}</p></a>`).join(''):'<p style="color:var(--muted);padding:20px 8px">No results found. Try another word.</p>';};
+        };
+        const enhance = () => {
+            document.querySelectorAll('img').forEach(img=>{img.loading='lazy';if(!img.alt)img.alt='EDC HITAM visual';});
+            new MutationObserver(rows=>rows.forEach(row=>row.addedNodes.forEach(node=>{if(node.nodeType===1)node.querySelectorAll?.('img').forEach(img=>{img.loading='lazy';if(!img.alt)img.alt='EDC HITAM visual';});}))).observe(document.body,{childList:true,subtree:true});
+            document.querySelectorAll('.primary-btn,.ghost-btn').forEach(btn=>{btn.classList.add('magnetic');btn.addEventListener('pointermove',e=>{const r=btn.getBoundingClientRect();btn.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.08}px,${(e.clientY-r.top-r.height/2)*.08}px)`;});btn.addEventListener('pointerleave',()=>btn.style.transform='');});
+            const track=document.getElementById('teamTrack');if(track){let start=0;track.addEventListener('pointerdown',e=>{start=e.clientX;track.setPointerCapture?.(e.pointerId);});track.addEventListener('pointerup',e=>{if(Math.abs(e.clientX-start)>45){const b=document.getElementById(e.clientX<start?'teamNext':'teamPrev');b?.click();}});const carousel=track.closest('.team-carousel');carousel?.addEventListener('mouseenter',()=>window.clearInterval(window.teamAutoTimer));carousel?.addEventListener('mouseleave',()=>window.startTeamAutoCarousel?.());}
+        };
+        const seo = () => { const url=location.href.split('#')[0];document.getElementById('canonicalUrl')?.setAttribute('href',url);document.getElementById('ogUrl')?.setAttribute('content',url);const json={'@context':'https://schema.org','@graph':[{'@type':'EducationalOrganization','name':'Entrepreneurship Development Cell, HITAM','url':url,'logo':new URL('edc-logo.png',url).href,'address':{'@type':'PostalAddress','addressLocality':'Hyderabad','addressRegion':'Telangana','addressCountry':'IN'}},{'@type':'WebSite','name':'EDC HITAM','url':url,'potentialAction':{'@type':'SearchAction','target':url+'?q={search_term_string}','query-input':'required name=search_term_string'}}]};const script=document.createElement('script');script.type='application/ld+json';script.textContent=JSON.stringify(json);document.head.append(script); };
+        document.addEventListener('DOMContentLoaded',()=>{addStyle();record('visit');seo();window.setTimeout(()=>{mountSearch();enhance();},700);});
+    })();
+    </script>
+    <script>
+    /* Admin-controlled site settings and local notification bridge. */
+    (() => {
+        const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+        const append = (key, item) => { const list=read(key)||[]; list.push(item); localStorage.setItem(key,JSON.stringify(list.slice(-500))); };
+        document.addEventListener('DOMContentLoaded', () => {
+            const settings=read('edc_website_settings')||{};
+            if(settings.name) document.title=settings.name+' | Entrepreneurship Development Cell, HITAM';
+            if(settings.description) document.querySelector('meta[name="description"]')?.setAttribute('content',settings.description);
+            if(settings.primary) document.documentElement.style.setProperty('--green',settings.primary);
+            if(settings.logo){ document.querySelector('link[rel="icon"]')?.setAttribute('href',settings.logo); document.querySelectorAll('img[src="edc-logo.png"]').forEach(img=>img.src=settings.logo); }
+            document.getElementById('contactForm')?.addEventListener('submit', e => { const f=e.currentTarget; append('edc_contact_queries',{name:f.elements.name?.value||'',email:f.elements.email?.value||'',message:f.elements.message?.value||'',createdAt:new Date().toISOString()}); }, {capture:true});
+        });
+    })();
+    </script>
+    <script>
+    /* Participant access: locally hashed credentials, approval-gated QR pass, and dashboard. */
+    (() => {
+        const hash = async text => { const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)); return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join(''); };
+        const esc = value => String(value ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+        const getRows = () => { try{return JSON.parse(localStorage.getItem('edc_event_registrations')||'[]')}catch{return[]} };
+        const saveRows = rows => localStorage.setItem('edc_event_registrations',JSON.stringify(rows));
+        const qr = r => `EDC|${r.participantId||r.id}|${r.eventId}|${r.teamName||'IND'}|${r.status}`;
+        const openDashboard = registration => { const m=document.createElement('div');m.className='registration-modal open';const approved=registration.status==='approved';m.innerHTML=`<div class="registration-box"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">Participant dashboard</span><h2>Welcome, ${esc(registration.fullName)}</h2><div class="portal-grid" style="margin:18px 0"><div class="portal-stat"><b>${esc(registration.eventName)}</b><span>registered event</span></div><div class="portal-stat"><b>${esc(registration.status)}</b><span>payment status</span></div><div class="portal-stat"><b>${esc(registration.participantId||'Pending ID')}</b><span>participant ID</span></div></div><div class="portal-card"><h3>Team & registration</h3><p>${esc(registration.teamName||'Individual registration')} · ${esc(registration.college||'')}</p>${approved?`<h3 style="margin-top:20px">Event entry pass</h3><p class="portal-list">${esc(qr(registration))}</p><button id="downloadPass" class="primary-btn">Download QR pass</button>`:`<p style="margin-top:18px;color:var(--gold)">Your pass will unlock after the Admin approves payment. No QR is created before approval.</p>`}<h3 style="margin-top:20px">Certificates & downloads</h3><p>Certificates and event downloads will appear here after the organizer publishes them.</p></div></div>`;document.body.append(m);m.querySelector('button').onclick=()=>m.remove();const button=m.querySelector('#downloadPass');if(button)button.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`EDC HITAM EVENT PASS\n${qr(registration)}`],{type:'text/plain'}));a.download='edc-event-pass.txt';a.click();};};
+        const openLogin = () => { const m=document.createElement('div');m.className='registration-modal open';m.innerHTML=`<div class="registration-box" style="max-width:480px"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">Participant Login</span><h2>Access your event dashboard</h2><form class="reg-grid" id="participantAccess"><input class="reg-wide" type="email" name="email" required placeholder="Registered email"><input class="reg-wide" type="password" name="password" required placeholder="Password"><label class="reg-wide" style="color:var(--muted)"><input type="checkbox" name="remember"> Remember this device</label><button class="primary-btn reg-wide">Sign in</button></form></div>`;document.body.append(m);m.querySelector('button').onclick=()=>m.remove();m.querySelector('form').onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.currentTarget)),row=getRows().find(r=>String(r.email).toLowerCase()===String(d.email).toLowerCase());if(!row||!row.passwordHash||await hash(d.password)!==row.passwordHash){alert('Incorrect email or password.');return;}if(d.remember)localStorage.setItem('edc_participant_session',String(row.id));m.remove();openDashboard(row);};};
+        document.addEventListener('DOMContentLoaded',()=>{document.getElementById('participantLogin')?.addEventListener('click',openLogin);document.getElementById('participantLoginMobile')?.addEventListener('click',openLogin);const saved=localStorage.getItem('edc_participant_session');if(saved&&new URLSearchParams(location.search).get('participant')==='dashboard'){const row=getRows().find(r=>String(r.id)===saved);if(row)openDashboard(row);}});
+        new MutationObserver(()=>{ document.querySelectorAll('#eventRegistration').forEach(form=>{if(form.dataset.secured)return;form.dataset.secured='true';const email=form.querySelector('[name="email"]');email?.insertAdjacentHTML('afterend','<input required minlength="8" type="password" name="participantPassword" placeholder="Create password"><input required type="password" name="participantConfirmPassword" placeholder="Confirm password">');form.addEventListener('submit',async e=>{e.preventDefault();e.stopImmediatePropagation();const data=Object.fromEntries(new FormData(form));if(data.participantPassword!==data.participantConfirmPassword){alert('Passwords do not match.');return;}const rows=getRows();const eventId=new URLSearchParams(location.search).get('event')||JSON.parse(localStorage.getItem('edc_portal_events')||'[]').find(x=>x.featured)?.id;if(rows.some(r=>String(r.eventId)===String(eventId)&&String(r.email).toLowerCase()===String(data.email).toLowerCase())){alert('This email is already registered for this event.');return;}const event=(JSON.parse(localStorage.getItem('edc_portal_events')||'[]')).find(x=>String(x.id)===String(eventId))||{};const passwordHash=await hash(data.participantPassword);delete data.participantPassword;delete data.participantConfirmPassword;delete data.terms;delete data.paymentScreenshot;rows.push({...data,id:Date.now(),participantId:'EDC-'+Date.now().toString(36).toUpperCase(),eventId,eventName:event.name||'EDC Event',status:Number(event.fee)?'pending payment':'approved',passwordHash,createdAt:new Date().toISOString()});saveRows(rows);form.closest('.registration-modal')?.remove();alert('Registration received. Use Participant Login to track approval and access your pass.');},true);}); }).observe(document.body,{childList:true,subtree:true});
+    })();
     </script>
 </body>
 </html>

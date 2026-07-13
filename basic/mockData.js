@@ -74,3 +74,47 @@ let db_applications = fetchTable('edc_applications', []);
 let db_socials = fetchTable('edc_site_socials', defaultSocials);
 let db_videos = fetchTable('edc_problem_videos', defaultProblemVideos);
 let db_logs = fetchTable('edc_admin_audit_logs', []);
+
+// EDC Event Management & Registration Portal ---------------------------------
+// Kept separately from the historic `edc_events` feed so the portal can grow
+// without changing the existing content table or requiring a backend migration.
+const initialPortalEvents = [{
+    id: "concept-trio-2026",
+    name: "Concept Trio",
+    status: "upcoming",
+    featured: true,
+    banner: "11july.png",
+    logo: "edc-logo.png",
+    startDate: "2026-07-25T09:00",
+    endDate: "2026-07-27T18:00",
+    deadline: "2026-07-23T23:59",
+    venue: "HITAM Campus, Activity Block",
+    location: "Medchal, Hyderabad",
+    description: "HITAM's flagship multi-disciplinary innovation festival for makers, designers, founders, and problem solvers.",
+    about: "Build bold ideas with mentors, compete across tracks, and turn campus energy into real-world solutions.",
+    rules: "Teams must follow the published track rules. Decisions of the organizing committee are final.",
+    eligibility: "Open to undergraduate and postgraduate students.",
+    fee: 199,
+    prizePool: "₹1,00,000",
+    minTeam: 1,
+    maxTeam: 4,
+    facultyCoordinators: "Dr. Sreeramulu M, Dr. Santosh Naik",
+    studentCoordinators: "EDC HITAM Student Team",
+    sponsors: "HITAM Innovation & Incubation Centre",
+    qrCode: "",
+    upiId: "edc.hitam@upi",
+    socialLinks: "https://instagram.com",
+    contactNumbers: "+91 90000 00000",
+    schedule: "25 Jul — Opening & ideation\n26 Jul — Build, mentor reviews & qualifiers\n27 Jul — Final pitches & awards",
+    faq: "Can I register alone? Yes, individual registration is supported.\nCan I join a team later? Yes, before registrations close.",
+    highlights: "500+ participants • 8 competition tracks • mentor reviews • certificates for all participants",
+    subevents: [
+        { id: "ux", name: "UI/UX", description: "Design experiences that solve a real user problem.", fee: 0, prize: "₹15,000", coordinator: "Design Team", venue: "Design Studio", time: "25 Jul, 10:00 AM", maxTeams: 40, registrationOpen: "2026-06-20", registrationClose: "2026-07-23" },
+        { id: "code", name: "Coding", description: "Build and ship a working solution under pressure.", fee: 0, prize: "₹25,000", coordinator: "Tech Team", venue: "CSE Lab", time: "25 Jul, 10:00 AM", maxTeams: 50, registrationOpen: "2026-06-20", registrationClose: "2026-07-23" },
+        { id: "ai", name: "AI", description: "Prototype an AI-first product for campus or community.", fee: 0, prize: "₹20,000", coordinator: "AI Club", venue: "AI Lab", time: "26 Jul, 9:30 AM", maxTeams: 35, registrationOpen: "2026-06-20", registrationClose: "2026-07-23" }
+    ],
+    gallery: [], winners: [], certificates: [], media: []
+}];
+
+const db_portal_events = fetchTable('edc_portal_events', initialPortalEvents);
+const db_event_registrations = fetchTable('edc_event_registrations', []);
