@@ -4461,24 +4461,56 @@
           m.querySelector("button").onclick = () => m.remove();
           m.querySelector("form").onsubmit = async (e) => {
             e.preventDefault();
-            const d = Object.fromEntries(new FormData(e.currentTarget)),
-              row = getRows().find(
-                (r) =>
-                  String(r.email).toLowerCase() ===
-                  String(d.email).toLowerCase(),
+            const d = Object.fromEntries(new FormData(e.currentTarget));
+            const resultsPane = m.querySelector("#participantAccess button");
+            
+            try {
+              if (resultsPane) resultsPane.textContent = "Verifying Credentials...";
+              
+              // Compute password hash locally to match database record verification
+              const computedInputHash = await hash(d.password);
+              
+              // Query Supabase directly for a row matching the credentials globally
+              const response = await fetch(
+                `${SUPABASE_URL}/rest/v1/edc_event_registrations?email=eq.${encodeURIComponent(d.email.toLowerCase())}`,
+                {
+                  headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${SUPABASE_KEY}`
+                  }
+                }
               );
-            if (
-              !row ||
-              !row.passwordHash ||
-              (await hash(d.password)) !== row.passwordHash
-            ) {
-              alert("Incorrect email or password.");
-              return;
+              
+              const records = await response.json();
+              const cloudRow = Array.isArray(records) ? records[0] : null;
+              
+              if (!cloudRow || cloudRow.passwordHash !== computedInputHash) {
+                alert("Invalid configuration profile mapping signature. Access Denied.");
+                return;
+              }
+              
+              // Normalize data properties cleanly from snake_case back into standard dashboard display structures
+              const standardizedRow = {
+                ...cloudRow,
+                fullName: cloudRow.student_name,
+                rollNumber: cloudRow.roll_number,
+                teamName: cloudRow.team_name,
+                eventName: cloudRow.event_name
+              };
+              
+              if (d.remember) {
+                localStorage.setItem("edc_participant_session", String(standardizedRow.id));
+              }
+              
+              m.remove();
+              openDashboard(standardizedRow);
+              
+            } catch (err) {
+              console.error("🔴 Live Cloud Verification Handshake Fault:", err);
+              alert("Authentication server timeout. Please check your data connection.");
+            } finally {
+              if (resultsPane) resultsPane.textContent = "Sign in";
             }
-            if (d.remember)
-              localStorage.setItem("edc_participant_session", String(row.id));
-            m.remove();
-            openDashboard(row);
           };
         };
         document.addEventListener("DOMContentLoaded", () => {
