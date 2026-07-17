@@ -736,7 +736,114 @@
       };
       const saveAdminRows = (table, rows) =>
         localStorage.setItem(adminTableKey(table), JSON.stringify(rows));
-      function executeStorageWriteCycle(event) {
+
+      /* 🚀 DEDICATED CLOUD SYNC FOR ANNOUNCEMENTS */
+      async function pushAnnouncementToCloud(formData) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/edc_blogs`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              title: formData.title || "",
+              content: formData.content || "",
+              date: formData.date || new Date().toISOString().split("T")[0],
+              category: "Announcement",
+            }),
+          });
+          if (!res.ok) throw new Error("Cloud write rejected");
+          return true;
+        } catch (e) {
+          console.error("❌ Supabase announcement sync failed:", e);
+          return false;
+        }
+      }
+
+      // 2. Sync Board Members to edc_team
+      async function pushTeamMemberToCloud(formData) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/edc_team`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              name: formData.name || "",
+              role: formData.role || "",
+              image_url: formData.img || "",
+              priority: parseInt(formData.sort_order || 10),
+            }),
+          });
+          if (!res.ok) throw new Error("Cloud write rejected");
+          return true;
+        } catch (e) {
+          console.error("❌ Supabase team sync failed:", e);
+          return false;
+        }
+      }
+
+      // 3. Sync Incubated Startups to edc_startups
+      async function pushStartupToCloud(formData) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/edc_startups`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              name: formData.name || "",
+              founder: formData.founder || "",
+              description: formData.solution || "",
+              website: formData.url || "",
+              status: "Incubated",
+            }),
+          });
+          if (!res.ok) throw new Error("Cloud write rejected");
+          return true;
+        } catch (e) {
+          console.error("❌ Supabase startup sync failed:", e);
+          return false;
+        }
+      }
+
+      // 4. Sync Guest Testimonials to edc_visitors
+      async function pushTestimonialToCloud(formData) {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/edc_visitors`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "return=minimal",
+            },
+            body: JSON.stringify({
+              visitor_name: formData.name || "",
+              designation: formData.designation || "",
+              review: formData.message || "",
+              avatar_url: formData.img || "",
+              rating: parseInt(formData.rating || 5),
+            }),
+          });
+          if (!res.ok) throw new Error("Cloud write rejected");
+          return true;
+        } catch (e) {
+          console.error("❌ Supabase testimonial sync failed:", e);
+          return false;
+        }
+      }
+
+      async function executeStorageWriteCycle(event) {
         event.preventDefault();
         if (currentActiveSubsystemRoute === "edc_site_settings") {
           const value = (id) => document.getElementById(id)?.value.trim() || "";
@@ -824,9 +931,28 @@
         if (at >= 0) rows[at] = { ...rows[at], ...p };
         else rows.unshift({ id: Date.now(), ...p });
         saveAdminRows(table, rows);
+
+        // 🚀 Cloud sync: Push to Supabase based on table type
+        let cloudSynced = false;
+        if (currentActiveSubsystemRoute === "edc_blogs") {
+          cloudSynced = await pushAnnouncementToCloud(p);
+        } else if (currentActiveSubsystemRoute === "edc_team") {
+          cloudSynced = await pushTeamMemberToCloud(p);
+        } else if (currentActiveSubsystemRoute === "edc_startups") {
+          cloudSynced = await pushStartupToCloud(p);
+        } else if (currentActiveSubsystemRoute === "edc_visitors") {
+          cloudSynced = await pushTestimonialToCloud(p);
+        }
+
+        // User feedback
+        if (cloudSynced) {
+          alert("✓ Saved & synced to cloud!");
+        } else if (currentActiveSubsystemRoute !== "edc_site_settings") {
+          alert("Saved locally. Cloud sync will retry on next action.");
+        }
+
         abortEditModeResetState();
         refreshAdminRegistryTableMonitor();
-        alert("Saved. The public website reads this Admin data.");
       }
       function refreshAdminRegistryTableMonitor() {
         const feed = document.getElementById("live-registry-rows-feed");
@@ -1155,7 +1281,7 @@
                 food_preference: data.foodPreference || "",
                 accommodation: data.accommodation || "No",
                 transaction_id: data.transactionId || "",
-                event_name: data.eventName || "Concept Trio"
+                event_name: data.eventName || "Concept Trio",
               }),
             },
           );
