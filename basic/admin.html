@@ -1252,39 +1252,55 @@
         document.body.append(modal);
         draw();
       }
-      async function saveToSupabase(data) {
+      async function saveToSupabase(registration, mode = "insert") {
+        const payload = {
+          id: registration.id ?? Date.now(),
+          student_name:
+            registration.fullName || registration.student_name || "",
+          email: registration.email || "",
+          phone: registration.phone || "",
+          college: registration.college || "",
+          department: registration.branch || registration.department || "",
+          year: registration.year || "",
+          gender: registration.gender || "",
+          roll_number:
+            registration.rollNumber || registration.roll_number || "",
+          team_name:
+            registration.teamName || registration.team_name || "Individual",
+          team_leader:
+            registration.teamLeader || registration.team_leader || "",
+          member_1: registration.member1 || registration.member_1 || "",
+          member_2: registration.member2 || registration.member_2 || "",
+          member_3: registration.member3 || registration.member_3 || "",
+          emergency_contact:
+            registration.emergencyContact ||
+            registration.emergency_contact ||
+            "",
+          food_preference:
+            registration.foodPreference || registration.food_preference || "",
+          accommodation: registration.accommodation || "No",
+          transaction_id:
+            registration.transactionId || registration.transaction_id || "",
+          event_id: registration.eventId || registration.event_id || null,
+          event_name: registration.eventName || registration.event_name || "",
+          status: registration.status || "pending",
+        };
         try {
-          const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/${adminTableKey(currentActiveSubsystemRoute)}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                apikey: SUPABASE_KEY,
-                Authorization: `Bearer ${SUPABASE_KEY}`,
-              },
-              body: JSON.stringify({
-                student_name: data.fullName || "",
-                email: data.email || "",
-                phone: data.phone || "",
-                college: data.college || "",
-                department: data.branch || "",
-                year: data.year || "",
-                gender: data.gender || "",
-                roll_number: data.rollNumber || "",
-                team_name: data.teamName || "Individual",
-                team_leader: data.teamLeader || "",
-                member_1: data.member1 || "",
-                member_2: data.member2 || "",
-                member_3: data.member3 || "",
-                emergency_contact: data.emergencyContact || "",
-                food_preference: data.foodPreference || "",
-                accommodation: data.accommodation || "No",
-                transaction_id: data.transactionId || "",
-                event_name: data.eventName || "Concept Trio",
-              }),
+          const endpoint = `${SUPABASE_URL}/rest/v1/edc_event_registrations`;
+          const url =
+            mode === "update" && payload.id
+              ? `${endpoint}?id=eq.${encodeURIComponent(payload.id)}`
+              : endpoint;
+          const res = await fetch(url, {
+            method: mode === "update" ? "PATCH" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "return=minimal",
             },
-          );
+            body: JSON.stringify(payload),
+          });
           return res.ok;
         } catch (e) {
           console.error("Supabase sync handshake exception error log:", e);
@@ -1292,88 +1308,128 @@
         }
       }
       function viewRegistrationDetails(reg) {
+        const members = [reg.member1, reg.member2, reg.member3]
+          .filter(Boolean)
+          .join(" • ");
         const m = document.createElement("div");
         m.className = "fixed inset-0 z-[30001] bg-black/80 overflow-auto p-4";
-        const details = `<div class="grid md:grid-cols-2 gap-3 text-xs"><div><b class="text-slate-400">Full Name</b><p>${portalEsc(reg.fullName)}</p></div><div><b class="text-slate-400">Email</b><p>${portalEsc(reg.email)}</p></div><div><b class="text-slate-400">Phone</b><p>${portalEsc(reg.phone)}</p></div><div><b class="text-slate-400">College</b><p>${portalEsc(reg.college || "—")}</p></div><div><b class="text-slate-400">Branch</b><p>${portalEsc(reg.branch || "—")}</p></div><div><b class="text-slate-400">Year</b><p>${portalEsc(reg.year || "—")}</p></div><div><b class="text-slate-400">Gender</b><p>${portalEsc(reg.gender || "—")}</p></div><div><b class="text-slate-400">Roll Number</b><p>${portalEsc(reg.rollNumber || "—")}</p></div><div><b class="text-slate-400">Team Name</b><p>${portalEsc(reg.teamName || "Individual")}</p></div><div><b class="text-slate-400">Team Leader</b><p>${portalEsc(reg.teamLeader || "—")}</p></div><div><b class="text-slate-400">Emergency Contact</b><p>${portalEsc(reg.emergencyContact || "—")}</p></div><div><b class="text-slate-400">Food Preference</b><p>${portalEsc(reg.foodPreference || "—")}</p></div><div><b class="text-slate-400">Accommodation</b><p>${portalEsc(reg.accommodation || "—")}</p></div><div><b class="text-slate-400">Payment Status</b><p><span class="font-bold ${reg.status === "approved" ? "text-emerald-400" : "text-amber-400"}">${portalEsc(reg.status)}</span></p></div><div><b class="text-slate-400">Transaction ID</b><p>${portalEsc(reg.transactionId || "—")}</p></div></div>`;
-        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between mb-4"><h2 class="font-extrabold text-lg">${portalEsc(reg.fullName)} - Complete Registration</h2><button class="text-xl">×</button></div>${details}</div>`;
+        const details = `<div class="grid md:grid-cols-2 gap-3 text-xs"><div><b class="text-slate-400">Full Name</b><p>${portalEsc(reg.fullName || reg.student_name || "—")}</p></div><div><b class="text-slate-400">Email</b><p>${portalEsc(reg.email || "—")}</p></div><div><b class="text-slate-400">Phone</b><p>${portalEsc(reg.phone || "—")}</p></div><div><b class="text-slate-400">College</b><p>${portalEsc(reg.college || "—")}</p></div><div><b class="text-slate-400">Branch</b><p>${portalEsc(reg.branch || reg.department || "—")}</p></div><div><b class="text-slate-400">Year</b><p>${portalEsc(reg.year || "—")}</p></div><div><b class="text-slate-400">Gender</b><p>${portalEsc(reg.gender || "—")}</p></div><div><b class="text-slate-400">Roll Number</b><p>${portalEsc(reg.rollNumber || reg.roll_number || "—")}</p></div><div><b class="text-slate-400">Team Name</b><p>${portalEsc(reg.teamName || reg.team_name || "Individual")}</p></div><div><b class="text-slate-400">Team Leader</b><p>${portalEsc(reg.teamLeader || reg.team_leader || "—")}</p></div><div><b class="text-slate-400">Team Members</b><p>${portalEsc(members || "No additional members")}</p></div><div><b class="text-slate-400">Emergency Contact</b><p>${portalEsc(reg.emergencyContact || reg.emergency_contact || "—")}</p></div><div><b class="text-slate-400">Food Preference</b><p>${portalEsc(reg.foodPreference || reg.food_preference || "—")}</p></div><div><b class="text-slate-400">Accommodation</b><p>${portalEsc(reg.accommodation || "—")}</p></div><div><b class="text-slate-400">Payment Status</b><p><span class="font-bold ${reg.status === "approved" ? "text-emerald-400" : reg.status === "rejected" ? "text-red-400" : "text-amber-400"}">${portalEsc(reg.status || "pending")}</span></p></div><div><b class="text-slate-400">Transaction ID</b><p>${portalEsc(reg.transactionId || reg.transaction_id || "—")}</p></div><div><b class="text-slate-400">Event</b><p>${portalEsc(reg.eventName || reg.event_name || "—")}</p></div><div><b class="text-slate-400">Registration ID</b><p>${portalEsc(String(reg.id || "—"))}</p></div></div>`;
+        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between mb-4"><h2 class="font-extrabold text-lg">${portalEsc(reg.fullName || reg.student_name || "Registration")} - Complete Registration</h2><button class="text-xl">×</button></div>${details}</div>`;
         document.body.append(m);
         m.querySelector("button").onclick = () => m.remove();
       }
       function openRegistrations(eventId) {
-        const event = portalEvents().find((e) => e.id === eventId),
-          rows = portalRead(PORTAL_REGISTRATIONS).filter(
-            (r) => r.eventId === eventId,
-          );
+        const event = portalEvents().find((e) => e.id === eventId);
+        const baseRows = portalRead(PORTAL_REGISTRATIONS).filter(
+          (r) => r.eventId === eventId,
+        );
         const m = document.createElement("div");
         m.className = "fixed inset-0 z-[30000] bg-black/80 overflow-auto p-4";
-        m.innerHTML = `<div class="max-w-6xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between gap-3"><div><p class="text-emerald-400 text-[10px] font-black uppercase">${portalEsc(event?.name || "Event")}</p><h2 class="font-extrabold text-xl">Registrations (${rows.length})</h2></div><div><button id="csv" class="bg-emerald-600 px-3 py-2 rounded-xl text-xs font-bold">Download CSV</button><button id="x" class="ml-2 text-xl">×</button></div></div><input id="searchRegs" placeholder="Search name, email, team..." class="my-4 w-full p-3 bg-slate-800 rounded-xl"><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-slate-400"><tr><th class="p-3 text-left">Participant</th><th class="p-3 text-left">Team</th><th class="p-3 text-left">Payment</th><th class="p-3 text-left">Action</th></tr></thead><tbody id="regRows"></tbody></table></div></div>`;
+        m.innerHTML = `<div class="max-w-6xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between gap-3"><div><p class="text-emerald-400 text-[10px] font-black uppercase">${portalEsc(event?.name || "Event")}</p><h2 class="font-extrabold text-xl">Registrations (${baseRows.length})</h2></div><div><button id="csv" class="bg-emerald-600 px-3 py-2 rounded-xl text-xs font-bold">Download CSV</button><button id="x" class="ml-2 text-xl">×</button></div></div><input id="searchRegs" placeholder="Search name, email, team..." class="my-4 w-full p-3 bg-slate-800 rounded-xl"><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-slate-400"><tr><th class="p-3 text-left">Participant</th><th class="p-3 text-left">Team</th><th class="p-3 text-left">Payment</th><th class="p-3 text-left">Action</th></tr></thead><tbody id="regRows"></tbody></table></div></div>`;
         document.body.append(m);
-        const draw = (list) =>
-          (m.querySelector("#regRows").innerHTML =
-            list
-              .map(
-                (r) =>
-                  `<tr class="border-t border-slate-800"><td class="p-3"><b>${portalEsc(r.fullName)}</b><br><span class="text-slate-400">${portalEsc(r.email)} · ${portalEsc(r.phone)}</span><br><button class="text-sky-400 text-[10px] mt-1 font-bold">View all details</button></td><td class="p-3">${portalEsc(r.teamName || "Individual")}</td><td class="p-3"><span class="${r.status === "approved" ? "text-emerald-400" : "text-amber-400"}">${portalEsc(r.status)}</span><br>${portalEsc(r.transactionId || "")}</td><td class="p-3"><button class="text-emerald-400 mr-2 approve-btn" data-id="${r.id}">Approve</button><button class="text-red-400 reject-btn" data-id="${r.id}">Reject</button></td></tr>`,
-              )
-              .join("") ||
-            '<tr><td class="p-5 text-slate-400" colspan="4">No registrations yet.</td></tr>');
-        draw(rows);
+        let visibleRows = baseRows.slice();
+        const draw = (list) => {
+          visibleRows = list.slice();
+          m.querySelector("#regRows").innerHTML = list.length
+            ? list
+                .map(
+                  (r) =>
+                    `<tr class="border-t border-slate-800"><td class="p-3"><b>${portalEsc(r.fullName || r.student_name || "Unnamed")}</b><br><span class="text-slate-400">${portalEsc(r.email || "")} · ${portalEsc(r.phone || "")}</span><br><button type="button" class="text-sky-400 text-[10px] mt-1 font-bold view-details-btn" data-id="${r.id}">View all details</button></td><td class="p-3">${portalEsc(r.teamName || r.team_name || "Individual")}</td><td class="p-3"><span class="${r.status === "approved" ? "text-emerald-400" : r.status === "rejected" ? "text-red-400" : "text-amber-400"}">${portalEsc(r.status || "pending")}</span><br>${portalEsc(r.transactionId || r.transaction_id || "")}</td><td class="p-3"><button type="button" class="text-emerald-400 mr-2 approve-btn" data-id="${r.id}">Approve</button><button type="button" class="text-red-400 reject-btn" data-id="${r.id}">Reject</button></td></tr>`,
+                )
+                .join("")
+            : '<tr><td class="p-5 text-slate-400" colspan="4">No registrations yet.</td></tr>';
+          m.querySelectorAll(".view-details-btn").forEach((btn) => {
+            btn.onclick = () => {
+              const reg = list.find(
+                (row) => String(row.id) === String(btn.dataset.id),
+              );
+              if (reg) viewRegistrationDetails(reg);
+            };
+          });
+          m.querySelectorAll(".approve-btn").forEach((btn) => {
+            btn.onclick = async () => {
+              const reg = list.find(
+                (row) => String(row.id) === String(btn.dataset.id),
+              );
+              if (!reg) return;
+              const nextStatus = "approved";
+              const allRows = portalRead(PORTAL_REGISTRATIONS).map((entry) =>
+                String(entry.id) === String(reg.id)
+                  ? { ...entry, status: nextStatus }
+                  : entry,
+              );
+              portalWrite(PORTAL_REGISTRATIONS, allRows);
+              const saved = await saveToSupabase(
+                { ...reg, status: nextStatus },
+                "update",
+              );
+              if (!saved) {
+                console.warn("Supabase approval update failed for", reg.id);
+              }
+              const query = m.querySelector("#searchRegs").value.toLowerCase();
+              const filtered = allRows
+                .filter((entry) => entry.eventId === eventId)
+                .filter(
+                  (entry) =>
+                    !query ||
+                    JSON.stringify(entry).toLowerCase().includes(query),
+                );
+              draw(filtered);
+              alert(
+                saved
+                  ? "✓ Approved and synced to Supabase."
+                  : "✓ Approved locally. Cloud sync may need a retry.",
+              );
+            };
+          });
+          m.querySelectorAll(".reject-btn").forEach((btn) => {
+            btn.onclick = async () => {
+              const reg = list.find(
+                (row) => String(row.id) === String(btn.dataset.id),
+              );
+              if (!reg) return;
+              const nextStatus = "rejected";
+              const allRows = portalRead(PORTAL_REGISTRATIONS).map((entry) =>
+                String(entry.id) === String(reg.id)
+                  ? { ...entry, status: nextStatus }
+                  : entry,
+              );
+              portalWrite(PORTAL_REGISTRATIONS, allRows);
+              const saved = await saveToSupabase(
+                { ...reg, status: nextStatus },
+                "update",
+              );
+              if (!saved) {
+                console.warn("Supabase rejection update failed for", reg.id);
+              }
+              const query = m.querySelector("#searchRegs").value.toLowerCase();
+              const filtered = allRows
+                .filter((entry) => entry.eventId === eventId)
+                .filter(
+                  (entry) =>
+                    !query ||
+                    JSON.stringify(entry).toLowerCase().includes(query),
+                );
+              draw(filtered);
+              alert(
+                saved
+                  ? "✓ Rejected and synced to Supabase."
+                  : "✓ Rejected locally. Cloud sync may need a retry.",
+              );
+            };
+          });
+        };
+        draw(baseRows);
         m.querySelector("#x").onclick = () => m.remove();
-        m.querySelectorAll(".approve-btn").forEach((btn) => {
-          btn.onclick = async () => {
-            const reg = rows.find((r) => String(r.id) === btn.dataset.id);
-            if (!reg) return;
-            const saved = await saveToSupabase(reg);
-            if (saved) {
-              alert("✓ Approved and saved to Supabase!");
-              reg.status = "approved";
-              portalWrite(PORTAL_REGISTRATIONS, [
-                ...portalRead(PORTAL_REGISTRATIONS).filter(
-                  (r) => r.id !== reg.id,
-                ),
-                reg,
-              ]);
-            } else {
-              alert("⚠ Supabase error. Check console.");
-            }
-          };
-        });
-        m.querySelectorAll(".reject-btn").forEach((btn) => {
-          btn.onclick = () => {
-            const id = btn.dataset.id;
-            const regs = portalRead(PORTAL_REGISTRATIONS);
-            const idx = regs.findIndex((r) => r.id === id);
-            if (idx >= 0) {
-              regs[idx].status = "rejected";
-              portalWrite(PORTAL_REGISTRATIONS, regs);
-            }
-            alert("Registration rejected.");
-          };
-        });
         m.querySelector("#csv").onclick = () =>
-          downloadCsv("registrations.csv", rows);
-        m.querySelectorAll(".approve-btn, .reject-btn").forEach(
-          (btn) =>
-            (btn.onclick = ((origClick) => () => {
-              origClick.call(btn);
-              setTimeout(() => draw(rows), 100);
-            })(btn.onclick)),
-        );
+          downloadCsv("registrations.csv", visibleRows);
         m.querySelector("#searchRegs").oninput = (e) => {
           const q = e.target.value.toLowerCase();
-          draw(rows.filter((r) => JSON.stringify(r).toLowerCase().includes(q)));
+          const filtered = baseRows.filter(
+            (r) => !q || JSON.stringify(r).toLowerCase().includes(q),
+          );
+          draw(filtered);
         };
-        m.querySelectorAll("button.text-sky-400").forEach(
-          (btn) =>
-            (btn.onclick = (() => {
-              const idx = Array.from(m.querySelectorAll("tbody tr")).indexOf(
-                btn.closest("tr"),
-              );
-              if (idx >= 0) {
-                viewRegistrationDetails(rows[idx]);
-              }
-            })()),
-        );
       }
 
       /* Admin enhancement layer: all values remain local and shared with index.html. */

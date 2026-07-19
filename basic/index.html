@@ -2261,7 +2261,9 @@
     <main id="home">
       <section class="hero">
         <div class="hero-copy reveal">
-          <span class="eyebrow">Hyderabad Institute of Technology and Management</span>
+          <span class="eyebrow"
+            >Hyderabad Institute of Technology and Management</span
+          >
           <h1>Build ideas. <span>Launch futures.</span></h1>
           <p class="hero-lede">
             A student-led innovation ecosystem where builders learn
@@ -3898,6 +3900,8 @@
           );
         const registrations = () =>
           JSON.parse(localStorage.getItem(registrationKey) || "[]");
+        const writeRegistrations = (rows) =>
+          localStorage.setItem(registrationKey, JSON.stringify(rows));
         const image = (raw) =>
           raw
             ? String(raw).startsWith("http") || String(raw).includes("/")
@@ -4013,6 +4017,57 @@
                 `<div class="portal-status" style="margin-bottom:12px">🔴 LIVE NOW — ${esc(event.liveBanner)}</div>`,
               );
         }
+        async function syncRegistrationToSupabase(registration) {
+          const payload = {
+            id: registration.id ?? Date.now(),
+            event_id: registration.eventId || null,
+            event_name: registration.eventName || "",
+            student_name: registration.fullName || "",
+            email: registration.email || "",
+            phone: registration.phone || "",
+            college: registration.college || "",
+            department: registration.branch || "",
+            year: registration.year || "",
+            gender: registration.gender || "",
+            roll_number: registration.rollNumber || "",
+            team_name: registration.teamName || "Individual",
+            team_leader: registration.teamLeader || "",
+            member_1: registration.member1 || "",
+            member_2: registration.member2 || "",
+            member_3: registration.member3 || "",
+            emergency_contact: registration.emergencyContact || "",
+            food_preference: registration.foodPreference || "",
+            accommodation: registration.accommodation || "No",
+            transaction_id: registration.transactionId || "",
+            status: registration.status || "pending",
+            payment_screenshot: registration.paymentScreenshot || "",
+          };
+
+          try {
+            const response = await fetch(
+              `${SUPABASE_URL}/rest/v1/edc_event_registrations`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: SUPABASE_KEY,
+                  Authorization: `Bearer ${SUPABASE_KEY}`,
+                  Prefer: "return=minimal",
+                },
+                body: JSON.stringify(payload),
+              },
+            );
+            if (!response.ok) {
+              const text = await response.text();
+              throw new Error(text || "Supabase insert failed");
+            }
+            return true;
+          } catch (error) {
+            console.error("Registration sync failed:", error);
+            return false;
+          }
+        }
+
         function openRegistration(event) {
           const modal = document.createElement("div");
           modal.className = "registration-modal open";
@@ -4027,11 +4082,10 @@
           modal.onclick = (e) => {
             if (e.target === modal) modal.remove();
           };
-          modal.querySelector("form").onsubmit = (e) => {
+          modal.querySelector("form").onsubmit = async (e) => {
             e.preventDefault();
             const data = Object.fromEntries(new FormData(e.currentTarget));
-            const rows = registrations();
-            rows.push({
+            const row = {
               id: Date.now(),
               eventId: event.id,
               eventName: event.name,
@@ -4039,11 +4093,16 @@
               createdAt: new Date().toISOString(),
               ...data,
               paymentScreenshot: data.paymentScreenshot?.name || "",
-            });
-            localStorage.setItem(registrationKey, JSON.stringify(rows));
+            };
+            const rows = registrations();
+            rows.push(row);
+            writeRegistrations(rows);
+            const synced = await syncRegistrationToSupabase(row);
             modal.remove();
             alert(
-              "Registration received. You will receive a confirmation after verification.",
+              synced
+                ? "Registration received and saved to Supabase."
+                : "Registration saved locally. Cloud sync failed, but the admin can still review it in the portal.",
             );
             renderEventPage(event.id);
           };
@@ -4463,51 +4522,58 @@
             e.preventDefault();
             const d = Object.fromEntries(new FormData(e.currentTarget));
             const resultsPane = m.querySelector("#participantAccess button");
-            
+
             try {
-              if (resultsPane) resultsPane.textContent = "Verifying Credentials...";
-              
+              if (resultsPane)
+                resultsPane.textContent = "Verifying Credentials...";
+
               // Compute password hash locally to match database record verification
               const computedInputHash = await hash(d.password);
-              
+
               // Query Supabase directly for a row matching the credentials globally
               const response = await fetch(
                 `${SUPABASE_URL}/rest/v1/edc_event_registrations?email=eq.${encodeURIComponent(d.email.toLowerCase())}`,
                 {
                   headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${SUPABASE_KEY}`
-                  }
-                }
+                    apikey: SUPABASE_KEY,
+                    Authorization: `Bearer ${SUPABASE_KEY}`,
+                  },
+                },
               );
-              
+
               const records = await response.json();
               const cloudRow = Array.isArray(records) ? records[0] : null;
-              
+
               if (!cloudRow || cloudRow.passwordHash !== computedInputHash) {
-                alert("Invalid configuration profile mapping signature. Access Denied.");
+                alert(
+                  "Invalid configuration profile mapping signature. Access Denied.",
+                );
                 return;
               }
-              
+
               // Normalize data properties cleanly from snake_case back into standard dashboard display structures
               const standardizedRow = {
                 ...cloudRow,
                 fullName: cloudRow.student_name,
                 rollNumber: cloudRow.roll_number,
                 teamName: cloudRow.team_name,
-                eventName: cloudRow.event_name
+                eventName: cloudRow.event_name,
               };
-              
+
               if (d.remember) {
-                localStorage.setItem("edc_participant_session", String(standardizedRow.id));
+                localStorage.setItem(
+                  "edc_participant_session",
+                  String(standardizedRow.id),
+                );
               }
-              
+
               m.remove();
               openDashboard(standardizedRow);
-              
             } catch (err) {
               console.error("🔴 Live Cloud Verification Handshake Fault:", err);
-              alert("Authentication server timeout. Please check your data connection.");
+              alert(
+                "Authentication server timeout. Please check your data connection.",
+              );
             } finally {
               if (resultsPane) resultsPane.textContent = "Sign in";
             }
