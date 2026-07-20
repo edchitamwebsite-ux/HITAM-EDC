@@ -4017,10 +4017,17 @@
                 `<div class="portal-status" style="margin-bottom:12px">🔴 LIVE NOW — ${esc(event.liveBanner)}</div>`,
               );
         }
+        const createRegistrationId = () =>
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `reg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
         async function syncRegistrationToSupabase(registration) {
+          const registrationId =
+            typeof registration.id === "string" && registration.id.includes("-")
+              ? registration.id
+              : createRegistrationId();
           const payload = {
-            id: registration.id ?? Date.now(),
-            event_id: registration.eventId || null,
+            id: registrationId,
             event_name: registration.eventName || "",
             student_name: registration.fullName || "",
             email: registration.email || "",
@@ -4071,40 +4078,16 @@
         function openRegistration(event) {
           const modal = document.createElement("div");
           modal.className = "registration-modal open";
-          const members = Array.from(
-            { length: Math.max(0, Number(event.maxTeam || 1) - 1) },
-            (_, i) =>
-              `<input name="member${i + 1}" placeholder="Member ${i + 1} name">`,
-          ).join("");
-          modal.innerHTML = `<div class="registration-box"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">${esc(event.name)}</span><h2>Premium registration</h2><p style="color:var(--muted);margin-bottom:18px">${Number(event.fee) ? `Pay ${money(event.fee)} via ${esc(event.upiId || "the displayed UPI ID")} and upload your proof.` : "This event is free to register."}</p><form id="eventRegistration" class="reg-grid"><input required name="fullName" placeholder="Full name"><input required type="email" name="email" placeholder="Email"><input required name="phone" placeholder="Phone"><input required name="college" placeholder="College"><input name="branch" placeholder="Branch"><input name="year" placeholder="Year"><select name="gender"><option value="">Gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select><input name="rollNumber" placeholder="Roll number"><input class="reg-wide" name="teamName" placeholder="Team name (optional)"><input class="reg-wide" name="teamLeader" placeholder="Team leader"><div class="reg-wide">${members}</div><input name="emergencyContact" placeholder="Emergency contact"><select name="foodPreference"><option>Food preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>None</option></select><select name="accommodation"><option value="No">Accommodation required?</option><option>Yes</option><option>No</option></select>${Number(event.fee) ? `<input name="transactionId" required placeholder="Transaction ID / UPI reference"><input type="file" name="paymentScreenshot" accept="image/*">` : ""}<label class="reg-wide" style="color:var(--muted)"><input required type="checkbox" name="terms"> I agree to the event rules and terms.</label><button class="primary-btn reg-wide" type="submit">Submit registration</button></form></div>`;
+          const maxTeamMembers = Math.max(0, Number(event.maxTeam || 1) - 1);
+          let members = "";
+          for (let i = 0; i < maxTeamMembers; i++) {
+            members += `<input name="member${i + 1}" placeholder="Member ${i + 1} name">`;
+          }
+          modal.innerHTML = `<div class="registration-box"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">${esc(event.name)}</span><h2>Premium registration</h2><p style="color:var(--muted);margin-bottom:18px">${Number(event.fee) ? `Pay ${money(event.fee)} via ${esc(event.upiId || "the displayed UPI ID")} and upload your proof.` : "This event is free to register."}</p><form id="eventRegistration" class="reg-grid"><input required name="fullName" placeholder="Full name"><input required type="email" name="email" placeholder="Email"><input required minlength="8" type="password" name="participantPassword" placeholder="Create password"><input required type="password" name="participantConfirmPassword" placeholder="Confirm password"><input required name="phone" placeholder="Phone"><input required name="college" placeholder="College"><input required name="branch" placeholder="Branch"><input required name="year" placeholder="Year"><select required name="gender"><option value="">Gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select><input required name="rollNumber" placeholder="Roll number"><input class="reg-wide" name="teamName" placeholder="Team name (optional)"><input class="reg-wide" name="teamLeader" placeholder="Team leader"><div class="reg-wide grid gap-2">${members}</div><input required name="emergencyContact" placeholder="Emergency contact"><select required name="foodPreference"><option value="">Food preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>None</option></select><select required name="accommodation"><option value="No">Accommodation required?</option><option>Yes</option><option>No</option></select><div class="reg-wide"><label style="color:var(--muted); display:block; margin-bottom:4px;">Choose File / Screenshot:</label><input type="file" name="paymentScreenshot" accept="image/*"></div>${Number(event.fee) ? `<input name="transactionId" required placeholder="Transaction ID / UPI reference">` : ""}<label class="reg-wide" style="color:var(--muted)"><input required type="checkbox" name="terms"> I agree to the event rules and terms.</label><button class="primary-btn reg-wide" type="submit">Submit registration</button></form></div>`;
           document.body.append(modal);
           modal.querySelector("button").onclick = () => modal.remove();
           modal.onclick = (e) => {
             if (e.target === modal) modal.remove();
-          };
-          modal.querySelector("form").onsubmit = async (e) => {
-            e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.currentTarget));
-            const row = {
-              id: Date.now(),
-              eventId: event.id,
-              eventName: event.name,
-              status: Number(event.fee) ? "pending payment" : "approved",
-              createdAt: new Date().toISOString(),
-              ...data,
-              paymentScreenshot: data.paymentScreenshot?.name || "",
-            };
-            const rows = registrations();
-            rows.push(row);
-            writeRegistrations(rows);
-            const synced = await syncRegistrationToSupabase(row);
-            modal.remove();
-            alert(
-              synced
-                ? "Registration received and saved to Supabase."
-                : "Registration saved locally. Cloud sync failed, but the admin can still review it in the portal.",
-            );
-            renderEventPage(event.id);
           };
         }
         document.addEventListener("DOMContentLoaded", () => {
@@ -4490,6 +4473,63 @@
         };
         const saveRows = (rows) =>
           localStorage.setItem("edc_event_registrations", JSON.stringify(rows));
+        const createRegistrationId = () =>
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `reg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const syncRegistrationToSupabase = async (registration) => {
+          const registrationId =
+            typeof registration.id === "string" && registration.id.includes("-")
+              ? registration.id
+              : createRegistrationId();
+          const payload = {
+            id: registrationId,
+            event_name: registration.eventName || "",
+            student_name: registration.fullName || "",
+            email: registration.email || "",
+            phone: registration.phone || "",
+            college: registration.college || "",
+            department: registration.branch || "",
+            year: registration.year || "",
+            gender: registration.gender || "",
+            roll_number: registration.rollNumber || "",
+            team_name: registration.teamName || "Individual",
+            team_leader: registration.teamLeader || "",
+            member_1: registration.member1 || "",
+            member_2: registration.member2 || "",
+            member_3: registration.member3 || "",
+            emergency_contact: registration.emergencyContact || "",
+            food_preference: registration.foodPreference || "",
+            accommodation: registration.accommodation || "No",
+            transaction_id: registration.transactionId || "",
+            status: registration.status || "pending",
+            payment_screenshot: registration.paymentScreenshot || "",
+          };
+
+          try {
+            const response = await fetch(
+              `${SUPABASE_URL}/rest/v1/edc_event_registrations`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: SUPABASE_KEY,
+                  Authorization: `Bearer ${SUPABASE_KEY}`,
+                  Prefer: "return=minimal",
+                },
+                body: JSON.stringify(payload),
+              },
+            );
+            if (!response.ok) {
+              const text = await response.text();
+              throw new Error(text || "Supabase insert failed");
+            }
+            return true;
+          } catch (error) {
+            console.error("Registration sync failed:", error);
+            return false;
+          }
+        };
         const qr = (r) =>
           `EDC|${r.participantId || r.id}|${r.eventId}|${r.teamName || "IND"}|${r.status}`;
         const openDashboard = (registration) => {
@@ -4600,17 +4640,13 @@
           document.querySelectorAll("#eventRegistration").forEach((form) => {
             if (form.dataset.secured) return;
             form.dataset.secured = "true";
-            const email = form.querySelector('[name="email"]');
-            email?.insertAdjacentHTML(
-              "afterend",
-              '<input required minlength="8" type="password" name="participantPassword" placeholder="Create password"><input required type="password" name="participantConfirmPassword" placeholder="Confirm password">',
-            );
             form.addEventListener(
               "submit",
               async (e) => {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                const data = Object.fromEntries(new FormData(form));
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
                 if (
                   data.participantPassword !== data.participantConfirmPassword
                 ) {
@@ -4639,21 +4675,40 @@
                     localStorage.getItem("edc_portal_events") || "[]",
                   ).find((x) => String(x.id) === String(eventId)) || {};
                 const passwordHash = await hash(data.participantPassword);
-                delete data.participantPassword;
-                delete data.participantConfirmPassword;
-                delete data.terms;
-                delete data.paymentScreenshot;
-                rows.push({
-                  ...data,
-                  id: Date.now(),
+                
+                const fileAsset = formData.get("paymentScreenshot");
+                const fileNameString = fileAsset && fileAsset.name ? fileAsset.name : "";
+
+                const row = {
+                  id: createRegistrationId(),
                   participantId: "EDC-" + Date.now().toString(36).toUpperCase(),
                   eventId,
                   eventName: event.name || "EDC Event",
-                  status: Number(event.fee) ? "pending payment" : "approved",
+                  status: "pending",
                   passwordHash,
                   createdAt: new Date().toISOString(),
-                });
+                  fullName: data.fullName,
+                  email: data.email,
+                  phone: data.phone,
+                  college: data.college,
+                  branch: data.branch,
+                  year: data.year,
+                  gender: data.gender,
+                  rollNumber: data.rollNumber,
+                  teamName: data.teamName || "Individual",
+                  teamLeader: data.teamLeader || "",
+                  member1: data.member1 || "",
+                  member2: data.member2 || "",
+                  member3: data.member3 || "",
+                  emergencyContact: data.emergencyContact,
+                  foodPreference: data.foodPreference,
+                  accommodation: data.accommodation,
+                  transactionId: data.transactionId || "",
+                  paymentScreenshot: fileNameString
+                };
+                rows.push(row);
                 saveRows(rows);
+                await syncRegistrationToSupabase(row);
                 form.closest(".registration-modal")?.remove();
                 alert(
                   "Registration received. Use Participant Login to track approval and access your pass.",

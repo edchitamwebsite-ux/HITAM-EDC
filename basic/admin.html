@@ -1074,7 +1074,9 @@
           regs = portalRead(PORTAL_REGISTRATIONS),
           total = regs.length,
           paid = regs.filter((r) => r.status === "approved").length,
-          pending = regs.filter((r) => r.status === "pending payment").length;
+          pending = regs.filter(
+            (r) => (r.status || "pending").toLowerCase() === "pending",
+          ).length;
         const panel = document.getElementById("event-portal-console");
         panel.innerHTML = `<section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl"><div class="flex flex-wrap gap-3 justify-between items-start mb-6"><div><p class="text-emerald-400 font-black tracking-widest text-[10px] uppercase">EDC HITAM Event Management & Registration Portal</p><h2 class="text-2xl font-extrabold mt-1">Events, registrations, payments & outcomes</h2></div><div class="flex gap-2"><button onclick="closeEventPortalConsole()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold">Back to content</button><button onclick="openEventEditor()" class="px-4 py-2 rounded-xl bg-emerald-600 text-xs font-black">+ Add Event</button></div></div><div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-7"><div class="bg-slate-950 p-4 rounded-xl"><b class="text-xl block">${evs.length}</b><span class="text-[10px] text-slate-400 uppercase">Events</span></div><div class="bg-slate-950 p-4 rounded-xl"><b class="text-xl block">${total}</b><span class="text-[10px] text-slate-400 uppercase">Registrations</span></div><div class="bg-slate-950 p-4 rounded-xl"><b class="text-xl block text-emerald-400">${paid}</b><span class="text-[10px] text-slate-400 uppercase">Approved</span></div><div class="bg-slate-950 p-4 rounded-xl"><b class="text-xl block text-amber-400">${pending}</b><span class="text-[10px] text-slate-400 uppercase">Pending</span></div><div class="bg-slate-950 p-4 rounded-xl"><b class="text-xl block">₹${regs
           .filter((r) => r.status === "approved")
@@ -1253,8 +1255,14 @@
         draw();
       }
       async function saveToSupabase(registration, mode = "insert") {
+        const registrationId =
+          typeof registration.id === "string" && registration.id.includes("-")
+            ? registration.id
+            : typeof crypto !== "undefined" && crypto.randomUUID
+              ? crypto.randomUUID()
+              : `reg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
         const payload = {
-          id: registration.id ?? Date.now(),
+          id: registrationId,
           student_name:
             registration.fullName || registration.student_name || "",
           email: registration.email || "",
@@ -1281,9 +1289,10 @@
           accommodation: registration.accommodation || "No",
           transaction_id:
             registration.transactionId || registration.transaction_id || "",
-          event_id: registration.eventId || registration.event_id || null,
           event_name: registration.eventName || registration.event_name || "",
           status: registration.status || "pending",
+          payment_screenshot: registration.paymentScreenshot || registration.payment_screenshot || "",
+          password_hash: registration.passwordHash || registration.password_hash || ""
         };
         try {
           const endpoint = `${SUPABASE_URL}/rest/v1/edc_event_registrations`;
@@ -1307,129 +1316,225 @@
           return false;
         }
       }
-      function viewRegistrationDetails(reg) {
-        const members = [reg.member1, reg.member2, reg.member3]
-          .filter(Boolean)
-          .join(" • ");
+      const renderRows = (rows) => {
+          m.querySelector("#regRows").innerHTML = rows.length
+            ? rows
+                .map((reg) => {
+                  const status = (reg.status || "pending").toLowerCase();
+                  const statusClass =
+                    status === "approved"
+                      ? "text-emerald-400"
+                      : status === "rejected"
+                        ? "text-red-400"
+                        : "text-amber-400";
+                  const showActions = status === "pending" || !status;
+                  
+                  // Ensure we grab fields cleanly whether they come from Supabase snake_case or LocalStorage camelCase
+                  const studentName = reg.student_name || reg.fullName || "Unnamed";
+                  const rollNumber = reg.roll_number || reg.rollNumber || "—";
+                  const eventName = reg.event_name || reg.eventName || "—";
+                  
+                  return `<tr class="border-t border-slate-800"><td classfunction viewRegistrationDetails(reg) {
+        // Handle variations between database columns (member_1) and local variables (member1)
+        const m1 = reg.member_1 || reg.member1;
+        const m2 = reg.member_2 || reg.member2;
+        const m3 = reg.member_3 || reg.member3;
+        const members = [m1, m2, m3].filter(Boolean).join(" • ");
+        
         const m = document.createElement("div");
         m.className = "fixed inset-0 z-[30001] bg-black/80 overflow-auto p-4";
-        const details = `<div class="grid md:grid-cols-2 gap-3 text-xs"><div><b class="text-slate-400">Full Name</b><p>${portalEsc(reg.fullName || reg.student_name || "—")}</p></div><div><b class="text-slate-400">Email</b><p>${portalEsc(reg.email || "—")}</p></div><div><b class="text-slate-400">Phone</b><p>${portalEsc(reg.phone || "—")}</p></div><div><b class="text-slate-400">College</b><p>${portalEsc(reg.college || "—")}</p></div><div><b class="text-slate-400">Branch</b><p>${portalEsc(reg.branch || reg.department || "—")}</p></div><div><b class="text-slate-400">Year</b><p>${portalEsc(reg.year || "—")}</p></div><div><b class="text-slate-400">Gender</b><p>${portalEsc(reg.gender || "—")}</p></div><div><b class="text-slate-400">Roll Number</b><p>${portalEsc(reg.rollNumber || reg.roll_number || "—")}</p></div><div><b class="text-slate-400">Team Name</b><p>${portalEsc(reg.teamName || reg.team_name || "Individual")}</p></div><div><b class="text-slate-400">Team Leader</b><p>${portalEsc(reg.teamLeader || reg.team_leader || "—")}</p></div><div><b class="text-slate-400">Team Members</b><p>${portalEsc(members || "No additional members")}</p></div><div><b class="text-slate-400">Emergency Contact</b><p>${portalEsc(reg.emergencyContact || reg.emergency_contact || "—")}</p></div><div><b class="text-slate-400">Food Preference</b><p>${portalEsc(reg.foodPreference || reg.food_preference || "—")}</p></div><div><b class="text-slate-400">Accommodation</b><p>${portalEsc(reg.accommodation || "—")}</p></div><div><b class="text-slate-400">Payment Status</b><p><span class="font-bold ${reg.status === "approved" ? "text-emerald-400" : reg.status === "rejected" ? "text-red-400" : "text-amber-400"}">${portalEsc(reg.status || "pending")}</span></p></div><div><b class="text-slate-400">Transaction ID</b><p>${portalEsc(reg.transactionId || reg.transaction_id || "—")}</p></div><div><b class="text-slate-400">Event</b><p>${portalEsc(reg.eventName || reg.event_name || "—")}</p></div><div><b class="text-slate-400">Registration ID</b><p>${portalEsc(String(reg.id || "—"))}</p></div></div>`;
-        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between mb-4"><h2 class="font-extrabold text-lg">${portalEsc(reg.fullName || reg.student_name || "Registration")} - Complete Registration</h2><button class="text-xl">×</button></div>${details}</div>`;
+        const details = `<div class="grid md:grid-cols-2 gap-3 text-xs"><div><b class="text-slate-400">Full Name</b><p>${adminEsc(reg.student_name || reg.fullName || "—")}</p></div><div><b class="text-slate-400">Email</b><p>${adminEsc(reg.email || "—")}</p></div><div><b class="text-slate-400">Phone</b><p>${adminEsc(reg.phone || "—")}</p></div><div><b class="text-slate-400">College</b><p>${adminEsc(reg.college || "—")}</p></div><div><b class="text-slate-400">Branch</b><p>${adminEsc(reg.department || reg.branch || "—")}</p></div><div><b class="text-slate-400">Year</b><p>${adminEsc(reg.year || "—")}</p></div><div><b class="text-slate-400">Gender</b><p>${adminEsc(reg.gender || "—")}</p></div><div><b class="text-slate-400">Roll Number</b><p>${adminEsc(reg.roll_number || reg.rollNumber || "—")}</p></div><div><b class="text-slate-400">Team Name</b><p>${adminEsc(reg.team_name || reg.teamName || "Individual")}</p></div><div><b class="text-slate-400">Team Leader</b><p>${adminEsc(reg.team_leader || reg.teamLeader || "—")}</p></div><div><b class="text-slate-400">Team Members</b><p>${adminEsc(members || "No additional members")}</p></div><div><b class="text-slate-400">Emergency Contact</b><p>${adminEsc(reg.emergency_contact || reg.emergencyContact || "—")}</p></div><div><b class="text-slate-400">Food Preference</b><p>${adminEsc(reg.food_preference || reg.foodPreference || "—")}</p></div><div><b class="text-slate-400">Accommodation</b><p>${adminEsc(reg.accommodation || "—")}</p></div><div><b class="text-slate-400">Payment Status</b><p><span class="font-bold ${reg.status === "approved" ? "text-emerald-400" : reg.status === "rejected" ? "text-red-400" : "text-amber-400"}">${adminEsc(reg.status || "pending")}</span></p></div><div><b class="text-slate-400">Transaction ID</b><p>${adminEsc(reg.transaction_id || reg.transactionId || "—")}</p></div><div><b class="text-slate-400">Event</b><p>${adminEsc(reg.event_name || reg.eventName || "—")}</p></div><div><b class="text-slate-400">Registration ID</b><p>${adminEsc(String(reg.id || "—"))}</p></div></div>`;
+        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between mb-4"><h2 class="font-extrabold text-lg">${adminEsc(reg.student_name || reg.fullName || "Registration")} - Complete Registration</h2><button class="text-xl">×</button></div>${details}</div>`;
         document.body.append(m);
         m.querySelector("button").onclick = () => m.remove();
+      }="p-3"><div class="font-bold">${portalEsc(studentName)}</div><div class="text-[10px] text-slate-500">${portalEsc(reg.phone || "")}</div></td><td class="p-3">${portalEsc(rollNumber)}</td><td class="p-3">${portalEsc(reg.email || "")}</td><td class="p-3">${portalEsc(eventName)}</td><td class="p-3"><span class="font-bold ${statusClass}">${portalEsc(status)}</span></td><td class="p-3">${showActions ? `<button type="button" class="bg-emerald-600 text-white px-2 py-1 rounded mr-2 approve-btn" data-id="${reg.id}">Approve</button><button type="button" class="bg-red-600 text-white px-2 py-1 rounded reject-btn" data-id="${reg.id}">Reject</button>` : '<span class="text-slate-400">Decision made</span>'}</td></tr>`;
+                })
+                .join("")
+            : '<tr><td class="p-5 text-slate-400" colspan="6">No registrations yet.</td></tr>';
+      async function fetchRegistrationsFromSupabase(eventId, eventName) {
+        try {
+          const url = `${SUPABASE_URL}/rest/v1/edc_event_registrations?select=*`;
+          const res = await fetch(url, {
+            headers: {
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+            },
+          });
+          if (!res.ok) throw new Error(await res.text());
+          const rows = await res.json();
+          if (!Array.isArray(rows)) return [];
+          const normalizedEventId = String(eventId || "").trim();
+          const normalizedEventName = String(eventName || "")
+            .trim()
+            .toLowerCase();
+          if (!normalizedEventId && !normalizedEventName) return rows;
+          return rows.filter((row) => {
+            const rowEventId = String(row.event_id ?? row.eventId ?? "").trim();
+            const rowEventName = String(row.event_name ?? row.eventName ?? "")
+              .trim()
+              .toLowerCase();
+            const matchesId =
+              normalizedEventId && rowEventId === normalizedEventId;
+            const matchesName =
+              normalizedEventName &&
+              (rowEventName === normalizedEventName ||
+                rowEventName.includes(normalizedEventName) ||
+                normalizedEventName.includes(rowEventName));
+            return matchesId || matchesName;
+          });
+        } catch (error) {
+          console.error("Failed to fetch registrations from Supabase:", error);
+          return [];
+        }
       }
+
+      async function updateRegistrationStatusInSupabase(id, newStatus) {
+        try {
+          const payload = { status: newStatus };
+          const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/edc_event_registrations?id=eq.${encodeURIComponent(id)}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                Prefer: "return=minimal",
+              },
+              body: JSON.stringify(payload),
+            },
+          );
+          return res.ok;
+        } catch (error) {
+          console.error(`Failed to update status to ${newStatus}:`, error);
+          return false;
+        }
+      }
+
       function openRegistrations(eventId) {
         const event = portalEvents().find((e) => e.id === eventId);
-        const baseRows = portalRead(PORTAL_REGISTRATIONS).filter(
-          (r) => r.eventId === eventId,
-        );
         const m = document.createElement("div");
         m.className = "fixed inset-0 z-[30000] bg-black/80 overflow-auto p-4";
-        m.innerHTML = `<div class="max-w-6xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between gap-3"><div><p class="text-emerald-400 text-[10px] font-black uppercase">${portalEsc(event?.name || "Event")}</p><h2 class="font-extrabold text-xl">Registrations (${baseRows.length})</h2></div><div><button id="csv" class="bg-emerald-600 px-3 py-2 rounded-xl text-xs font-bold">Download CSV</button><button id="x" class="ml-2 text-xl">×</button></div></div><input id="searchRegs" placeholder="Search name, email, team..." class="my-4 w-full p-3 bg-slate-800 rounded-xl"><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-slate-400"><tr><th class="p-3 text-left">Participant</th><th class="p-3 text-left">Team</th><th class="p-3 text-left">Payment</th><th class="p-3 text-left">Action</th></tr></thead><tbody id="regRows"></tbody></table></div></div>`;
+        m.innerHTML = `<div class="max-w-6xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between gap-3"><div><p class="text-emerald-400 text-[10px] font-black uppercase">${portalEsc(event?.name || "Event")}</p><h2 class="font-extrabold text-xl">Event registrations</h2></div><div><button id="csv" class="bg-emerald-600 px-3 py-2 rounded-xl text-xs font-bold">Download CSV</button><button id="x" class="ml-2 text-xl">×</button></div></div><input id="searchRegs" placeholder="Search name, email, roll number..." class="my-4 w-full p-3 bg-slate-800 rounded-xl"><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-slate-400"><tr><th class="p-3 text-left">Student</th><th class="p-3 text-left">Roll</th><th class="p-3 text-left">Email</th><th class="p-3 text-left">Event</th><th class="p-3 text-left">Status</th><th class="p-3 text-left">Actions</th></tr></thead><tbody id="regRows"></tbody></table></div></div>`;
         document.body.append(m);
-        let visibleRows = baseRows.slice();
-        const draw = (list) => {
-          visibleRows = list.slice();
-          m.querySelector("#regRows").innerHTML = list.length
-            ? list
-                .map(
-                  (r) =>
-                    `<tr class="border-t border-slate-800"><td class="p-3"><b>${portalEsc(r.fullName || r.student_name || "Unnamed")}</b><br><span class="text-slate-400">${portalEsc(r.email || "")} · ${portalEsc(r.phone || "")}</span><br><button type="button" class="text-sky-400 text-[10px] mt-1 font-bold view-details-btn" data-id="${r.id}">View all details</button></td><td class="p-3">${portalEsc(r.teamName || r.team_name || "Individual")}</td><td class="p-3"><span class="${r.status === "approved" ? "text-emerald-400" : r.status === "rejected" ? "text-red-400" : "text-amber-400"}">${portalEsc(r.status || "pending")}</span><br>${portalEsc(r.transactionId || r.transaction_id || "")}</td><td class="p-3"><button type="button" class="text-emerald-400 mr-2 approve-btn" data-id="${r.id}">Approve</button><button type="button" class="text-red-400 reject-btn" data-id="${r.id}">Reject</button></td></tr>`,
-                )
+
+        const renderRows = (rows) => {
+          m.querySelector("#regRows").innerHTML = rows.length
+            ? rows
+                .map((reg) => {
+                  const status = (reg.status || "pending").toLowerCase();
+                  const statusClass =
+                    status === "approved"
+                      ? "text-emerald-400"
+                      : status === "rejected"
+                        ? "text-red-400"
+                        : "text-amber-400";
+                  const showActions = status === "pending" || !status;
+                  
+                  // Ensure we grab fields cleanly whether they come from Supabase snake_case or LocalStorage camelCase
+                  const studentName = reg.student_name || reg.fullName || "Unnamed";
+                  const rollNumber = reg.roll_number || reg.rollNumber || "—";
+                  const eventName = reg.event_name || reg.eventName || "—";
+                  
+                  // Add a click handler to the row cells to open full view, while leaving action buttons isolated
+                  return `<tr class="border-t border-slate-800 hover:bg-slate-850/55 cursor-pointer registration-row-item" data-reg-index="${rows.indexOf(reg)}">
+                    <td class="p-3"><div class="font-bold">${portalEsc(studentName)}</div><div class="text-[10px] text-slate-500">${portalEsc(reg.phone || "")}</div></td>
+                    <td class="p-3">${portalEsc(rollNumber)}</td>
+                    <td class="p-3">${portalEsc(reg.email || "")}</td>
+                    <td class="p-3">${portalEsc(eventName)}</td>
+                    <td class="p-3"><span class="font-bold ${statusClass}">${portalEsc(status)}</span></td>
+                    <td class="p-3" onclick="event.stopPropagation();">${showActions ? `<button type="button" class="bg-emerald-600 text-white px-2 py-1 rounded mr-2 approve-btn" data-id="${reg.id}">Approve</button><button type="button" class="bg-red-600 text-white px-2 py-1 rounded reject-btn" data-id="${reg.id}">Reject</button>` : '<span class="text-slate-400">Decision made</span>'}</td>
+                  </tr>`;
+                })
                 .join("")
-            : '<tr><td class="p-5 text-slate-400" colspan="4">No registrations yet.</td></tr>';
-          m.querySelectorAll(".view-details-btn").forEach((btn) => {
-            btn.onclick = () => {
-              const reg = list.find(
-                (row) => String(row.id) === String(btn.dataset.id),
-              );
-              if (reg) viewRegistrationDetails(reg);
+            : '<tr><td class="p-5 text-slate-400" colspan="6">No registrations yet.</td></tr>';
+
+          // Bind the full detail viewer pop-up layout to row cell interactions safely
+          m.querySelectorAll(".registration-row-item").forEach((rowEl) => {
+            rowEl.onclick = () => {
+              const idx = rowEl.dataset.regIndex;
+              if (rows[idx]) viewRegistrationDetails(rows[idx]);
             };
           });
+
           m.querySelectorAll(".approve-btn").forEach((btn) => {
             btn.onclick = async () => {
-              const reg = list.find(
-                (row) => String(row.id) === String(btn.dataset.id),
+              const id = btn.dataset.id;
+              const updated = await updateRegistrationStatusInSupabase(
+                id,
+                "approved",
               );
-              if (!reg) return;
-              const nextStatus = "approved";
-              const allRows = portalRead(PORTAL_REGISTRATIONS).map((entry) =>
-                String(entry.id) === String(reg.id)
-                  ? { ...entry, status: nextStatus }
-                  : entry,
-              );
-              portalWrite(PORTAL_REGISTRATIONS, allRows);
-              const saved = await saveToSupabase(
-                { ...reg, status: nextStatus },
-                "update",
-              );
-              if (!saved) {
-                console.warn("Supabase approval update failed for", reg.id);
+              if (!updated) {
+                alert("Could not update the registration in Supabase.");
+                return;
               }
-              const query = m.querySelector("#searchRegs").value.toLowerCase();
-              const filtered = allRows
-                .filter((entry) => entry.eventId === eventId)
-                .filter(
-                  (entry) =>
-                    !query ||
-                    JSON.stringify(entry).toLowerCase().includes(query),
-                );
-              draw(filtered);
-              alert(
-                saved
-                  ? "✓ Approved and synced to Supabase."
-                  : "✓ Approved locally. Cloud sync may need a retry.",
+              const currentRows = await fetchRegistrationsFromSupabase(
+                eventId,
+                event?.name,
               );
+              renderRows(currentRows);
+              alert("Registration approved.");
             };
           });
+
           m.querySelectorAll(".reject-btn").forEach((btn) => {
             btn.onclick = async () => {
-              const reg = list.find(
-                (row) => String(row.id) === String(btn.dataset.id),
+              const id = btn.dataset.id;
+              const updated = await updateRegistrationStatusInSupabase(
+                id,
+                "rejected",
               );
-              if (!reg) return;
-              const nextStatus = "rejected";
-              const allRows = portalRead(PORTAL_REGISTRATIONS).map((entry) =>
-                String(entry.id) === String(reg.id)
-                  ? { ...entry, status: nextStatus }
-                  : entry,
-              );
-              portalWrite(PORTAL_REGISTRATIONS, allRows);
-              const saved = await saveToSupabase(
-                { ...reg, status: nextStatus },
-                "update",
-              );
-              if (!saved) {
-                console.warn("Supabase rejection update failed for", reg.id);
+              if (!updated) {
+                alert("Could not update the registration in Supabase.");
+                return;
               }
-              const query = m.querySelector("#searchRegs").value.toLowerCase();
-              const filtered = allRows
-                .filter((entry) => entry.eventId === eventId)
-                .filter(
-                  (entry) =>
-                    !query ||
-                    JSON.stringify(entry).toLowerCase().includes(query),
-                );
-              draw(filtered);
-              alert(
-                saved
-                  ? "✓ Rejected and synced to Supabase."
-                  : "✓ Rejected locally. Cloud sync may need a retry.",
+              const currentRows = await fetchRegistrationsFromSupabase(
+                eventId,
+                event?.name,
               );
+              renderRows(currentRows);
+              alert("Registration rejected.");
             };
           });
         };
-        draw(baseRows);
-        m.querySelector("#x").onclick = () => m.remove();
-        m.querySelector("#csv").onclick = () =>
-          downloadCsv("registrations.csv", visibleRows);
-        m.querySelector("#searchRegs").oninput = (e) => {
-          const q = e.target.value.toLowerCase();
-          const filtered = baseRows.filter(
-            (r) => !q || JSON.stringify(r).toLowerCase().includes(q),
+
+        const loadRows = async () => {
+          const rows = await fetchRegistrationsFromSupabase(
+            eventId,
+            event?.name,
           );
-          draw(filtered);
+          let filtered = rows;
+          const q = m.querySelector("#searchRegs").value.toLowerCase();
+          if (q) {
+            filtered = rows.filter((reg) =>
+              JSON.stringify(reg).toLowerCase().includes(q),
+            );
+          }
+          renderRows(filtered);
         };
+
+        m.querySelector("#x").onclick = () => m.remove();
+        m.querySelector("#csv").onclick = async () => {
+          const rows = await fetchRegistrationsFromSupabase(
+            eventId,
+            event?.name,
+          );
+          downloadCsv("registrations.csv", rows);
+        };
+        m.querySelector("#searchRegs").oninput = async () => {
+          const rows = await fetchRegistrationsFromSupabase(
+            eventId,
+            event?.name,
+          );
+          const q = m.querySelector("#searchRegs").value.toLowerCase();
+          const filtered = q
+            ? rows.filter((reg) =>
+                JSON.stringify(reg).toLowerCase().includes(q),
+              )
+            : rows;
+          renderRows(filtered);
+        };
+        loadRows();
       }
 
       /* Admin enhancement layer: all values remain local and shared with index.html. */
