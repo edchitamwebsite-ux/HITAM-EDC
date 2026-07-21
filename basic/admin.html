@@ -1316,26 +1316,8 @@
           return false;
         }
       }
-      const renderRows = (rows) => {
-          m.querySelector("#regRows").innerHTML = rows.length
-            ? rows
-                .map((reg) => {
-                  const status = (reg.status || "pending").toLowerCase();
-                  const statusClass =
-                    status === "approved"
-                      ? "text-emerald-400"
-                      : status === "rejected"
-                        ? "text-red-400"
-                        : "text-amber-400";
-                  const showActions = status === "pending" || !status;
-                  
-                  // Ensure we grab fields cleanly whether they come from Supabase snake_case or LocalStorage camelCase
-                  const studentName = reg.student_name || reg.fullName || "Unnamed";
-                  const rollNumber = reg.roll_number || reg.rollNumber || "—";
-                  const eventName = reg.event_name || reg.eventName || "—";
-                  
-                  return `<tr class="border-t border-slate-800"><td classfunction viewRegistrationDetails(reg) {
-        // Handle variations between database columns (member_1) and local variables (member1)
+
+            function viewRegistrationDetails(reg) {
         const m1 = reg.member_1 || reg.member1;
         const m2 = reg.member_2 || reg.member2;
         const m3 = reg.member_3 || reg.member3;
@@ -1347,13 +1329,11 @@
         m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 rounded-2xl p-6"><div class="flex justify-between mb-4"><h2 class="font-extrabold text-lg">${adminEsc(reg.student_name || reg.fullName || "Registration")} - Complete Registration</h2><button class="text-xl">×</button></div>${details}</div>`;
         document.body.append(m);
         m.querySelector("button").onclick = () => m.remove();
-      }="p-3"><div class="font-bold">${portalEsc(studentName)}</div><div class="text-[10px] text-slate-500">${portalEsc(reg.phone || "")}</div></td><td class="p-3">${portalEsc(rollNumber)}</td><td class="p-3">${portalEsc(reg.email || "")}</td><td class="p-3">${portalEsc(eventName)}</td><td class="p-3"><span class="font-bold ${statusClass}">${portalEsc(status)}</span></td><td class="p-3">${showActions ? `<button type="button" class="bg-emerald-600 text-white px-2 py-1 rounded mr-2 approve-btn" data-id="${reg.id}">Approve</button><button type="button" class="bg-red-600 text-white px-2 py-1 rounded reject-btn" data-id="${reg.id}">Reject</button>` : '<span class="text-slate-400">Decision made</span>'}</td></tr>`;
-                })
-                .join("")
-            : '<tr><td class="p-5 text-slate-400" colspan="6">No registrations yet.</td></tr>';
+      }
+
       async function fetchRegistrationsFromSupabase(eventId, eventName) {
         try {
-          const url = `${SUPABASE_URL}/rest/v1/edc_event_registrations?select=*`;
+          const url = `${SUPABASE_URL}/rest/v1/edc_event_registrations?select=id,student_name,roll_number,email,event_name,status,phone,event_id`;
           const res = await fetch(url, {
             headers: {
               apikey: SUPABASE_KEY,
