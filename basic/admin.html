@@ -1026,19 +1026,28 @@
         localStorage.setItem(k, JSON.stringify(v));
         if (k === PORTAL_EVENTS && Array.isArray(v)) {
           for (const item of v) {
-            const payload = { ...item };
-            if (!payload.date || String(payload.date).trim() === '') {
-              payload.date = new Date().toISOString().split('T')[0];
-            }
-            const isUpdate = Boolean(payload.id && !String(payload.id).startsWith('event-'));
+            // Build a payload mapped directly to your Supabase edc_events columns
+            const rawDate = item.startDate || item.date || new Date().toISOString().split('T')[0];
+            const cleanDate = (rawDate.includes('T') ? rawDate.split('T')[0] : rawDate) || new Date().toISOString().split('T')[0];
+
+            const payload = {
+              title: item.name || item.title || "Untitled Event",
+              type: item.status || item.type || "workshops",
+              date: cleanDate,
+              speaker: item.facultyCoordinators || item.studentCoordinators || item.speaker || "EDC Desk",
+              outcome: item.description || item.about || item.outcome || "EDC HITAM Innovation Event",
+              img: item.banner || item.logo || item.img || "edc-logo.png",
+              sort_order: parseInt(item.sort_order) || 1
+            };
+
+            // If updating an existing record with a integer/UUID primary key, attach id
+            const isUpdate = Boolean(item.id && !String(item.id).startsWith('event-'));
             const url = isUpdate 
-              ? `${SUPABASE_URL}/rest/v1/edc_events?id=eq.${encodeURIComponent(payload.id)}`
+              ? `${SUPABASE_URL}/rest/v1/edc_events?id=eq.${encodeURIComponent(item.id)}`
               : `${SUPABASE_URL}/rest/v1/edc_events`;
 
-            if (!isUpdate) delete payload.id;
-
             try {
-              await fetch(url, {
+              const res = await fetch(url, {
                 method: isUpdate ? 'PATCH' : 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -1048,6 +1057,13 @@
                 },
                 body: JSON.stringify(payload)
               });
+
+              if (!res.ok) {
+                const errData = await res.json();
+                console.error("❌ Supabase Event Sync Error:", errData);
+              } else {
+                console.log("✅ Event successfully synced to Supabase!");
+              }
             } catch (e) {
               console.error("Cloud event portal sync failed:", e);
             }
