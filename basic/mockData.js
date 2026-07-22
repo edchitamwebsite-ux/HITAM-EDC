@@ -191,7 +191,7 @@ let db_logs = fetchTable("edc_admin_audit_logs", []);
 const initialPortalEvents = [
   {
     id: "concept-trio-2026",
-    name: "Concept Trio",
+    name: "Concept Fusion",
     status: "upcoming",
     featured: true,
     banner: "11july.png",
@@ -272,5 +272,5 @@ const initialPortalEvents = [
   },
 ];
 
-const db_portal_events = fetchTable("edc_portal_events", initialPortalEvents);
+const db_portal_events = fetchTable("edc_events", initialPortalEvents);
 const db_event_registrations = fetchTable("edc_event_registrations", []);

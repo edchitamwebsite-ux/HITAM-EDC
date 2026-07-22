@@ -1010,7 +1010,7 @@
         refreshAdminRegistryTableMonitor();
       }
       /* EDC HITAM Event Management & Registration Portal — local admin console */
-      const PORTAL_EVENTS = "edc_portal_events",
+      const PORTAL_EVENTS = "edc_events",
         PORTAL_REGISTRATIONS = "edc_event_registrations";
       const portalRead = (k) => {
         const saved = localStorage.getItem(k);
@@ -1022,7 +1022,23 @@
         }
         return [];
       };
-      const portalWrite = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      const portalWrite = async (k, v) => {
+        localStorage.setItem(k, JSON.stringify(v));
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/edc_portal_events`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              Prefer: "resolution=merge-duplicates",
+            },
+            body: JSON.stringify(v),
+          });
+        } catch (e) {
+          console.error("Cloud event portal sync failed:", e);
+        }
+      };
       const portalEsc = (v) =>
         String(v ?? "").replace(
           /[&<>'"]/g,

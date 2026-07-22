@@ -13,7 +13,7 @@
     />
     <meta
       name="keywords"
-      content="HITAM EDC, EDC HITAM, Entrepreneurship Development Cell HITAM, Hyderabad Institute of Technology and Management, Startup Cell, Innovation Cell, Student Entrepreneurship, Startup Incubation Hyderabad, Concept Trio, HITAM Events"
+      content="HITAM EDC, EDC HITAM, Entrepreneurship Development Cell HITAM, Hyderabad Institute of Technology and Management, Startup Cell, Innovation Cell, Student Entrepreneurship, Startup Incubation Hyderabad, HITAM Events, EDC"
     />
     <meta name="author" content="Shaik Rehan" />
     <meta name="robots" content="index, follow" />
@@ -3875,7 +3875,7 @@
     <script>
       /* Single-file Event Management & Registration Portal */
       (() => {
-        const portalKey = "edc_portal_events",
+        const portalKey = "edc_events",
           registrationKey = "edc_event_registrations";
         const esc = (value) =>
           String(value ?? "").replace(
@@ -3889,8 +3889,12 @@
                 '"': "&quot;",
               })[c],
           );
-        const events = () =>
-          JSON.parse(
+        const events = () => {
+          const cached = localStorage.getItem(portalKey);
+          if (cached && cached.includes("Concept Fusion")) {
+            localStorage.removeItem(portalKey);
+          }
+          return JSON.parse(
             localStorage.getItem(portalKey) ||
               JSON.stringify(
                 typeof initialPortalEvents !== "undefined"
@@ -3898,6 +3902,7 @@
                   : [],
               ),
           );
+        };
         const registrations = () =>
           JSON.parse(localStorage.getItem(registrationKey) || "[]");
         const writeRegistrations = (rows) =>
