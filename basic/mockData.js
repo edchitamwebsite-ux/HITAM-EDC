@@ -275,9 +275,6 @@ const initialPortalEvents = [
 const db_portal_events = fetchTable("edc_events", initialPortalEvents);
 const db_event_registrations = fetchTable("edc_event_registrations", []);
 // Ensure your credentials are set at the top of your file
-// Credentials
-const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_94ZHLmBs67bQKAAaXipjdg_UfFt44h0";
 
 /**
  * Updates an event row in the edc_events table
