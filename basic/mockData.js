@@ -274,3 +274,47 @@ const initialPortalEvents = [
 
 const db_portal_events = fetchTable("edc_events", initialPortalEvents);
 const db_event_registrations = fetchTable("edc_event_registrations", []);
+// Ensure your credentials are set at the top of your file
+// Credentials
+const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_94ZHLmBs67bQKAAaXipjdg_UfFt44h0";
+
+/**
+ * Updates an event row in the edc_events table
+ * @param {string|number} eventId - Primary key ID of the row
+ * @param {Object} updatedFields - Key-value pair of columns to update
+ */
+async function updateEventInSupabase(eventId, updatedFields) {
+  if (!eventId) {
+    alert("Error: Missing Event ID for update.");
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/edc_events?id=eq.${eventId}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(updatedFields)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Successfully updated in Supabase:", data);
+      alert("Event updated successfully!");
+      return true;
+    } else {
+      const errorData = await response.json();
+      console.error("Supabase API Error:", errorData);
+      alert("Failed to update: " + (errorData.message || response.statusText));
+      return false;
+    }
+  } catch (err) {
+    console.error("Network connection error:", err);
+    alert("Network error while updating event.");
+    return false;
+  }
+}
