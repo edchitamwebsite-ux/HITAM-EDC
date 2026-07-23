@@ -2946,26 +2946,32 @@
       }
 
       async function fetchTable(table, order, fallback) {
-        // Admin writes are stored locally in this standalone portal. Prefer them
-        // so a stale/unavailable cloud response can never hide Admin changes.
-        try {
-          const local = JSON.parse(localStorage.getItem(table) || "null");
-          if (Array.isArray(local) && local.length) return local;
-        } catch (error) {
-          /* use the supplied fallback below */
-        }
-        try {
-          const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/${table}${order}`,
-            { headers: cloudHeaders },
-          );
-          if (!response.ok) throw new Error(`Unable to load ${table}`);
-          const data = await response.json();
-          return Array.isArray(data) && data.length ? data : fallback;
-        } catch (error) {
-          return fallback;
-        }
+  // 1. Always attempt to fetch live cloud data from Supabase FIRST
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${order}`, { 
+      headers: cloudHeaders 
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        // Cache fresh cloud data to local storage as fallback
+        localStorage.setItem(table, JSON.stringify(data));
+        return data;
       }
+    }
+  } catch (error) {
+    console.warn(`Cloud fetch failed for ${table}, falling back to local storage:`, error);
+  }
+
+  // 2. Offline / Error Fallback: Check localStorage only if cloud request failed
+  try {
+    const local = JSON.parse(localStorage.getItem(table) || "null");
+    if (Array.isArray(local) && local.length > 0) return local;
+  } catch (error) {}
+
+  // 3. Absolute fallback to hardcoded seed data
+  return fallback;
+}
 
       function localFallbacks() {
         const savedSocials = JSON.parse(

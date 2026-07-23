@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EDC Master Administrative Terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link class="js-meta-tag" icon="image/png" href="edc-logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -244,6 +245,8 @@
       const SUPABASE_URL = "https://kxsinhfsjmqrfkmoqelw.supabase.co";
       const SUPABASE_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w";
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabase = supabaseClient; // Makes it accessible globally
       let currentActiveSubsystemRoute = "edc_blogs";
 
       let activeEditEntityIdReference = null;
@@ -844,116 +847,141 @@
       }
 
       async function executeStorageWriteCycle(event) {
-        event.preventDefault();
-        if (currentActiveSubsystemRoute === "edc_site_settings") {
-          const value = (id) => document.getElementById(id)?.value.trim() || "";
-          const number = (id) =>
-            Math.max(0, Number(document.getElementById(id)?.value) || 0);
-          localStorage.setItem(
-            "edc_site_socials",
-            JSON.stringify({
-              linkedin: value("set_linkedin"),
-              instagram: value("set_instagram"),
-              whatsapp: value("set_whatsapp"),
-              youtube: value("set_youtube"),
-              website: value("set_website"),
-            }),
-          );
-          localStorage.setItem(
-            "edc_site_stats",
-            JSON.stringify({
-              initiatives: number("set_initiatives"),
-              mindsets: number("set_mindsets"),
-              workshops: number("set_workshops"),
-              experts: number("set_experts"),
-              funding: number("set_funding"),
-              awards: number("set_awards"),
-            }),
-          );
-          refreshAdminRegistryTableMonitor();
-          alert(
-            "Site settings saved. Refresh the homepage to see the changes.",
-          );
-          return;
-        }
-        const table = adminTableKey(currentActiveSubsystemRoute);
-        const value = (id) => document.getElementById(id)?.value ?? "";
-        let p = {};
-        if (currentActiveSubsystemRoute === "edc_blogs")
-          p = {
-            title: value("val_title"),
-            date: value("val_date"),
-            content: value("val_content"),
-          };
-        else if (currentActiveSubsystemRoute === "edc_team")
-          p = {
-            name: value("val_name"),
-            role: value("val_role"),
-            year: value("val_year"),
-            achievement: value("val_achievement"),
-            img: value("val_img"),
-            sort_order: Number(value("val_sort_order")) || 0,
-          };
-        else if (currentActiveSubsystemRoute === "edc_events")
-          p = {
-            title: value("ev_title"),
-            type: value("ev_type"),
-            date: value("ev_date"),
-            speaker: value("ev_speaker"),
-            outcome: value("ev_outcome"),
-            img: value("ev_img"),
-            sort_order: Number(value("val_sort_order")) || 0,
-          };
-        else if (currentActiveSubsystemRoute === "edc_startups")
-          p = {
-            name: value("st_name"),
-            founder: value("st_founder"),
-            industry: value("st_ind"),
-            solution: value("st_sol"),
-            metrics: value("st_met"),
-            url: value("st_url"),
-          };
-        else if (currentActiveSubsystemRoute === "edc_visitors")
-          p = {
-            name: value("vis_name"),
-            designation: value("vis_des"),
-            org: value("vis_org"),
-            date: value("vis_date"),
-            topic: value("vis_top"),
-            message: value("vis_msg"),
-            img: value("vis_img"),
-          };
-        else return;
-        const rows = adminRows(table),
-          at = rows.findIndex(
-            (r) => String(r.id) === String(activeEditEntityIdReference),
-          );
-        if (at >= 0) rows[at] = { ...rows[at], ...p };
-        else rows.unshift({ id: Date.now(), ...p });
-        saveAdminRows(table, rows);
+  event.preventDefault();
+  if (currentActiveSubsystemRoute === "edc_site_settings") {
+    const value = (id) => document.getElementById(id)?.value.trim() || "";
+    const number = (id) =>
+      Math.max(0, Number(document.getElementById(id)?.value) || 0);
+    localStorage.setItem(
+      "edc_site_socials",
+      JSON.stringify({
+        linkedin: value("set_linkedin"),
+        instagram: value("set_instagram"),
+        whatsapp: value("set_whatsapp"),
+        youtube: value("set_youtube"),
+        website: value("set_website"),
+      }),
+    );
+    localStorage.setItem(
+      "edc_site_stats",
+      JSON.stringify({
+        initiatives: number("set_initiatives"),
+        mindsets: number("set_mindsets"),
+        workshops: number("set_workshops"),
+        experts: number("set_experts"),
+        funding: number("set_funding"),
+        awards: number("set_awards"),
+      }),
+    );
+    refreshAdminRegistryTableMonitor();
+    alert(
+      "Site settings saved. Refresh the homepage to see the changes.",
+    );
+    return;
+  }
+  const table = adminTableKey(currentActiveSubsystemRoute);
+  const value = (id) => document.getElementById(id)?.value ?? "";
+  let p = {};
+  if (currentActiveSubsystemRoute === "edc_blogs")
+    p = {
+      title: value("val_title"),
+      date: value("val_date"),
+      content: value("val_content"),
+    };
+  else if (currentActiveSubsystemRoute === "edc_team")
+    p = {
+      name: value("val_name"),
+      role: value("val_role"),
+      year: value("val_year"),
+      achievement: value("val_achievement"),
+      img: value("val_img"),
+      sort_order: Number(value("val_sort_order")) || 0,
+    };
+  else if (currentActiveSubsystemRoute === "edc_events")
+    p = {
+      title: value("ev_title"),
+      type: value("ev_type"),
+      date: value("ev_date") || new Date().toISOString().split('T')[0],
+      speaker: value("ev_speaker"),
+      outcome: value("ev_outcome"),
+      img: value("ev_img"),
+      sort_order: Number(value("val_sort_order")) || 0,
+    };
+  else if (currentActiveSubsystemRoute === "edc_startups")
+    p = {
+      name: value("st_name"),
+      founder: value("st_founder"),
+      industry: value("st_ind"),
+      solution: value("st_sol"),
+      metrics: value("st_met"),
+      url: value("st_url"),
+    };
+  else if (currentActiveSubsystemRoute === "edc_visitors")
+    p = {
+      name: value("vis_name"),
+      designation: value("vis_des"),
+      org: value("vis_org"),
+      date: value("vis_date"),
+      topic: value("vis_top"),
+      message: value("vis_msg"),
+      img: value("vis_img"),
+    };
+  else return;
 
-        // 🚀 Cloud sync: Push to Supabase based on table type
-        let cloudSynced = false;
-        if (currentActiveSubsystemRoute === "edc_blogs") {
-          cloudSynced = await pushAnnouncementToCloud(p);
-        } else if (currentActiveSubsystemRoute === "edc_team") {
-          cloudSynced = await pushTeamMemberToCloud(p);
-        } else if (currentActiveSubsystemRoute === "edc_startups") {
-          cloudSynced = await pushStartupToCloud(p);
-        } else if (currentActiveSubsystemRoute === "edc_visitors") {
-          cloudSynced = await pushTestimonialToCloud(p);
-        }
+  const rows = adminRows(table),
+    at = rows.findIndex(
+      (r) => String(r.id) === String(activeEditEntityIdReference),
+    );
+  if (at >= 0) rows[at] = { ...rows[at], ...p };
+  else rows.unshift({ id: Date.now(), ...p });
+  saveAdminRows(table, rows);
 
-        // User feedback
-        if (cloudSynced) {
-          alert("✓ Saved & synced to cloud!");
-        } else if (currentActiveSubsystemRoute !== "edc_site_settings") {
-          alert("Saved locally. Cloud sync will retry on next action.");
-        }
+  // 🚀 Cloud sync: Push to Supabase based on table type
+  let cloudSynced = false;
+  if (currentActiveSubsystemRoute === "edc_blogs") {
+    cloudSynced = await pushAnnouncementToCloud(p);
+  } else if (currentActiveSubsystemRoute === "edc_team") {
+    cloudSynced = await pushTeamMemberToCloud(p);
+  } else if (currentActiveSubsystemRoute === "edc_startups") {
+    cloudSynced = await pushStartupToCloud(p);
+  } else if (currentActiveSubsystemRoute === "edc_visitors") {
+    cloudSynced = await pushTestimonialToCloud(p);
+  } else if (currentActiveSubsystemRoute === "edc_events") {
+    // 🔥 Missing piece added: Push event to Supabase
+    try {
+      const isUpdate = activeEditEntityIdReference !== null;
+      const url = isUpdate
+        ? `${SUPABASE_URL}/rest/v1/edc_events?id=eq.${activeEditEntityIdReference}`
+        : `${SUPABASE_URL}/rest/v1/edc_events`;
+      
+      const res = await fetch(url, {
+        method: isUpdate ? 'PATCH' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(p)
+      });
+      cloudSynced = res.ok;
+      if (!res.ok) console.error("Supabase Error:", await res.json());
+    } catch(e) {
+      console.error("Cloud event sync error:", e);
+      cloudSynced = false;
+    }
+  }
 
-        abortEditModeResetState();
-        refreshAdminRegistryTableMonitor();
-      }
+  // User feedback
+  if (cloudSynced) {
+    alert("✓ Saved & synced to cloud!");
+  } else if (currentActiveSubsystemRoute !== "edc_site_settings") {
+    alert("Saved locally. Cloud sync will retry on next action.");
+  }
+
+  abortEditModeResetState();
+  refreshAdminRegistryTableMonitor();
+}
       function refreshAdminRegistryTableMonitor() {
         const feed = document.getElementById("live-registry-rows-feed");
         if (!feed) return;
@@ -1023,53 +1051,51 @@
         return [];
       };
       const portalWrite = async (k, v) => {
-        localStorage.setItem(k, JSON.stringify(v));
-        if (k === PORTAL_EVENTS && Array.isArray(v)) {
-          for (const item of v) {
-            // Build a payload mapped directly to your Supabase edc_events columns
-            const rawDate = item.startDate || item.date || new Date().toISOString().split('T')[0];
-            const cleanDate = (rawDate.includes('T') ? rawDate.split('T')[0] : rawDate) || new Date().toISOString().split('T')[0];
+  localStorage.setItem(k, JSON.stringify(v));
+  if (k === PORTAL_EVENTS && Array.isArray(v)) {
+    for (const item of v) {
+      const rawDate = item.startDate || item.date || new Date().toISOString().split('T')[0];
+      const cleanDate = (rawDate.includes('T') ? rawDate.split('T')[0] : rawDate) || new Date().toISOString().split('T')[0];
 
-            const payload = {
-              title: item.name || item.title || "Untitled Event",
-              type: item.status || item.type || "workshops",
-              date: cleanDate,
-              speaker: item.facultyCoordinators || item.studentCoordinators || item.speaker || "EDC Desk",
-              outcome: item.description || item.about || item.outcome || "EDC HITAM Innovation Event",
-              img: item.banner || item.logo || item.img || "edc-logo.png",
-              sort_order: parseInt(item.sort_order) || 1
-            };
-
-            // If updating an existing record with a integer/UUID primary key, attach id
-            const isUpdate = Boolean(item.id && !String(item.id).startsWith('event-'));
-            const url = isUpdate 
-              ? `${SUPABASE_URL}/rest/v1/edc_events?id=eq.${encodeURIComponent(item.id)}`
-              : `${SUPABASE_URL}/rest/v1/edc_events`;
-
-            try {
-              const res = await fetch(url, {
-                method: isUpdate ? 'PATCH' : 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'apikey': SUPABASE_KEY,
-                  'Authorization': `Bearer ${SUPABASE_KEY}`,
-                  'Prefer': 'return=representation'
-                },
-                body: JSON.stringify(payload)
-              });
-
-              if (!res.ok) {
-                const errData = await res.json();
-                console.error("❌ Supabase Event Sync Error:", errData);
-              } else {
-                console.log("✅ Event successfully synced to Supabase!");
-              }
-            } catch (e) {
-              console.error("Cloud event portal sync failed:", e);
-            }
-          }
-        }
+      const payload = {
+        title: item.name || item.title || "Untitled Event",
+        type: item.status || item.type || "workshops",
+        date: cleanDate,
+        speaker: item.facultyCoordinators || item.studentCoordinators || item.speaker || "EDC Desk",
+        outcome: item.description || item.about || item.outcome || "EDC HITAM Innovation Event",
+        img: item.banner || item.logo || item.img || "edc-logo.png",
+        sort_order: parseInt(item.sort_order) || 1
       };
+
+      const isUpdate = Boolean(item.id && !String(item.id).startsWith('event-'));
+      const url = isUpdate 
+        ? `${SUPABASE_URL}/rest/v1/edc_events?id=eq.${encodeURIComponent(item.id)}`
+        : `${SUPABASE_URL}/rest/v1/edc_events`;
+
+      try {
+        const res = await fetch(url, {
+          method: isUpdate ? 'PATCH' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          console.error("❌ Supabase Event Sync Error:", errData);
+        } else {
+          console.log("✅ Event successfully synced to Supabase!");
+        }
+      } catch (e) {
+        console.error("Cloud event portal sync failed:", e);
+      }
+    }
+  }
+};
       const portalEsc = (v) =>
         String(v ?? "").replace(
           /[&<>'"]/g,
@@ -1747,6 +1773,74 @@
         renderEventPortalAdmin();
       }
       document.addEventListener("DOMContentLoaded", updateNotificationBadge);
+      // Universal Supabase Saver - Handles messy fields & schema variations cleanly
+async function universalSupabaseSave(tableName, rawData, editId = null) {
+  // 1. Clean up empty strings -> null so Postgres date/number types don't crash
+  const cleanData = {};
+  for (const [key, value] of Object.entries(rawData)) {
+    if (value === "" || value === undefined) {
+      cleanData[key] = null;
+    } else {
+      cleanData[key] = value;
+    }
+  }
+
+  // 2. Map common field variations dynamically if saving to edc_events
+  if (tableName === "edc_events") {
+    cleanData.title = cleanData.title || cleanData.name || "Untitled Event";
+    cleanData.date = cleanData.date || cleanData.startDate || new Date().toISOString().split('T')[0];
+    cleanData.type = cleanData.type || cleanData.status || "workshops";
+    cleanData.speaker = cleanData.speaker || cleanData.facultyCoordinators || cleanData.studentCoordinators || "EDC Desk";
+    cleanData.outcome = cleanData.outcome || cleanData.description || cleanData.about || "EDC HITAM Event";
+    cleanData.img = cleanData.img || cleanData.banner || cleanData.logo || "edc-logo.png";
+    cleanData.sort_order = parseInt(cleanData.sort_order) || 1;
+
+    // Clean up temporary frontend keys so Supabase doesn't complain about unknown columns
+    delete cleanData.name;
+    delete cleanData.startDate;
+    delete cleanData.status;
+    delete cleanData.facultyCoordinators;
+    delete cleanData.studentCoordinators;
+    delete cleanData.description;
+    delete cleanData.about;
+    delete cleanData.banner;
+    delete cleanData.logo;
+  }
+
+  // 3. Handle Update vs Insert
+  const isUpdate = editId !== null && !String(editId).startsWith("event-");
+  const endpoint = `${SUPABASE_URL}/rest/v1/${tableName}${isUpdate ? `?id=eq.${encodeURIComponent(editId)}` : ""}`;
+
+  try {
+    console.log(`🚀 Sending sanitized data to Supabase table [${tableName}]:`, cleanData);
+
+    const response = await fetch(endpoint, {
+      method: isUpdate ? "PATCH" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Prefer": "return=representation"
+      },
+      body: JSON.stringify(cleanData)
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      console.error("❌ Supabase Sync Failed:", err);
+      alert(`❌ Database Error: ${err.message || err.details}`);
+      return false;
+    }
+
+    console.log(`✅ Successfully written to ${tableName}`);
+    return true;
+
+  } catch (err) {
+    console.error("❌ Network / Script Exception:", err);
+    alert("❌ Network Error: " + err.message);
+    return false;
+  }
+}
     </script>
   </body>
 </html>
