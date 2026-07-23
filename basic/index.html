@@ -3029,31 +3029,64 @@
       }
 
       async function loadAdminDrivenData() {
-        const fallback = localFallbacks();
-        const [blogs, team, events, visitors, startups] = await Promise.all([
-          fetchTable("edc_blogs", "?order=date.desc,id.desc", fallback.blogs),
-          fetchTable(
-            "edc_team",
-            "?order=sort_order.asc,id.desc",
-            fallback.team,
-          ),
-          fetchTable(
-            "edc_events",
-            "?order=sort_order.asc,id.desc",
-            fallback.events,
-          ),
-          fetchTable("edc_visitors", "?order=id.desc", fallback.visitors),
-          fetchTable("edc_startups", "?order=id.desc", fallback.startups),
-        ]);
+  const fallback = localFallbacks();
+  const [blogs, team, rawEvents, visitors, startups] = await Promise.all([
+    fetchTable("edc_blogs", "?order=date.desc,id.desc", fallback.blogs),
+    fetchTable(
+      "edc_team",
+      "?order=sort_order.asc,id.desc",
+      fallback.team,
+    ),
+    fetchTable(
+      "edc_events",
+      "?order=sort_order.asc,id.desc",
+      fallback.events,
+    ),
+    fetchTable("edc_visitors", "?order=id.desc", fallback.visitors),
+    fetchTable("edc_startups", "?order=id.desc", fallback.startups),
+  ]);
 
-        appData.blogs = blogs;
-        appData.team = team;
-        appData.events = events;
-        appData.visitors = visitors;
-        appData.startups = startups;
-        appData.socials = fallback.socials;
-        appData.stats = fallback.stats;
-      }
+  // Map Supabase database columns back to camelCase properties for the UI
+  const events = (rawEvents || []).map((row) => ({
+    id: row.id,
+    name: row.title || row.name || "Untitled Event",
+    status: row.status || row.type || "upcoming",
+    type: row.type || "workshops",
+    startDate: row.start_date || row.date,
+    endDate: row.end_date || row.date,
+    deadline: row.deadline || "",
+    venue: row.venue || "HITAM",
+    location: row.location || "",
+    fee: row.fee || 0,
+    prizePool: row.prize_pool || "",
+    minTeam: row.min_team || 1,
+    maxTeam: row.max_team || 1,
+    banner: row.banner || row.img || "edc-logo.png",
+    logo: row.logo || row.img || "edc-logo.png",
+    upiId: row.upi_id || "",
+    qrCode: row.qr_code || "",
+    facultyCoordinators: row.faculty_coordinators || row.speaker || "",
+    studentCoordinators: row.student_coordinators || "",
+    sponsors: row.sponsors || "",
+    contactNumbers: row.contact_numbers || "",
+    socialMediaLinks: row.social_media || "",
+    description: row.description || row.outcome || "",
+    about: row.about || row.description || row.outcome || "",
+    rules: row.rules || "",
+    eligibility: row.eligibility || "",
+    schedule: row.schedule || "",
+    faqs: row.faqs || "",
+    subevents: row.subevents || [],
+  }));
+
+  appData.blogs = blogs;
+  appData.team = team;
+  appData.events = events;
+  appData.visitors = visitors;
+  appData.startups = startups;
+  appData.socials = fallback.socials;
+  appData.stats = fallback.stats;
+}
 
       function showToast(message) {
         const toast = document.getElementById("toast");
@@ -3957,12 +3990,17 @@
           const regCount = registrations().filter(
             (r) => r.eventId === event.id,
           ).length;
-          const tracks = (event.subevents || [])
-            .map(
-              (s) =>
-                `<article class="track"><span>${esc(s.prize || "Competition")}</span><h3>${esc(s.name)}</h3><p>${esc(s.description || "")}</p><small>${esc(s.time || "")} · ${esc(s.venue || "")}</small></article>`,
-            )
-            .join("");
+          // 1. Build competition track cards with a safe fallback to the main event outcome/description
+          const tracks = (event.subevents && Array.isArray(event.subevents) && event.subevents.length > 0)
+            ? event.subevents.map(
+                (s) =>
+                  `<article class="track"><span>${esc(s.prize || "Competition")}</span><h3>${esc(s.name)}</h3><p>${esc(s.description || "")}</p><small>${esc(s.time || "")} · ${esc(s.venue || "")}</small></article>`,
+              ).join("")
+            : `<article class="track"><h3>${esc(event.title || event.name || "Main Innovation Track")}</h3><p>${esc(event.outcome || event.description || "Track details and domain breakdown.")}</p></article>`;
+
+          // 2. Fall back cleanly if schedule isn't in Supabase
+          const scheduleDisplay = event.schedule || event.outcome || "Event schedule and session details will be shared with registered participants.";
+
           main.innerHTML = `<section class="portal"><div class="portal-hero" style="--event-banner:url('${image(event.banner)}')"><span class="portal-kicker">EDC HITAM EVENT MANAGEMENT & REGISTRATION PORTAL</span><div class="portal-status">${esc(event.status || "upcoming")}</div><h1>${esc(event.name)}</h1><p>${esc(event.description)}</p><p><strong>${fmt(event.startDate)} – ${fmt(event.endDate)}</strong> · ${esc(event.venue || "HITAM")}</p><div class="hero-actions"><button class="primary-btn" id="openRegistration">Register Now</button><button class="ghost-btn" id="backToMain" onclick="window.location.href='index.html'">Back to EDC</button></div></div><div class="portal-grid"><div class="portal-stat"><b>${countdown(event.startDate)}</b><span>until the event</span></div><div class="portal-stat"><b>${esc(event.prizePool || "—")}</b><span>prize pool</span></div><div class="portal-stat"><b>${regCount || "500+"}</b><span>participants registered</span></div></div><div class="event-select">${all
             .filter((e) => e.status !== "completed")
             .map(
@@ -3971,7 +4009,7 @@
             )
             .join(
               "",
-            )}</div><div class="portal-layout"><div class="portal-card"><span class="portal-kicker">About the event</span><h2>Make your idea count.</h2><p>${esc(event.about || event.description)}</p><h3 style="margin-top:28px">Competition tracks</h3><div class="track-grid">${tracks || "<p>Tracks will be announced shortly.</p>"}</div><h3 style="margin-top:28px">Schedule</h3><p class="portal-list">${esc(event.schedule || "Schedule will be announced shortly.")}</p></div><aside><div class="portal-card"><span class="portal-kicker">Registration</span><h3>${money(event.fee)} ${Number(event.fee) ? "per participant" : ""}</h3><p>Registration closes ${fmt(event.deadline)}. Team size: ${event.minTeam || 1}–${event.maxTeam || 1}.</p><button class="primary-btn" id="openRegistration2">Register for ${esc(event.name)}</button></div><div class="portal-card" style="margin-top:16px"><h3>Eligibility</h3><p>${esc(event.eligibility || "Open to students.")}</p><h3>Contact</h3><p>${esc(event.contactNumbers || "EDC HITAM Desk")}</p><h3>Rules</h3><p>${esc(event.rules || "Rules will be announced shortly.")}</p></div></aside></div></section>`;
+            )}</div><div class="portal-layout"><div class="portal-card"><span class="portal-kicker">About the event</span><h2>Make your idea count.</h2><p>${esc(event.about || event.description)}</p><h3 style="margin-top:28px">Competition tracks</h3><div class="track-grid">${tracks}</div><h3 style="margin-top:28px">Schedule</h3><p class="portal-list">${esc(scheduleDisplay)}</p></div><aside><div class="portal-card"><span class="portal-kicker">Registration</span><h3>${money(event.fee)} ${Number(event.fee) ? "per participant" : ""}</h3><p>Registration closes ${fmt(event.deadline)}. Team size: ${event.minTeam || 1}–${event.maxTeam || 1}.</p><button class="primary-btn" id="openRegistration2">Register for ${esc(event.name)}</button></div><div class="portal-card" style="margin-top:16px"><h3>Eligibility</h3><p>${esc(event.eligibility || "Open to students.")}</p><h3>Contact</h3><p>${esc(event.contactNumbers || "EDC HITAM Desk")}</p><h3>Rules</h3><p>${esc(event.rules || "Rules will be announced shortly.")}</p></div></aside></div></section>`;
           document.querySelectorAll("[data-event-id]").forEach(
             (b) =>
               (b.onclick = () => {

@@ -1050,21 +1050,48 @@
         }
         return [];
       };
-      const portalWrite = async (k, v) => {
+     const portalWrite = async (k, v) => {
   localStorage.setItem(k, JSON.stringify(v));
   if (k === PORTAL_EVENTS && Array.isArray(v)) {
     for (const item of v) {
       const rawDate = item.startDate || item.date || new Date().toISOString().split('T')[0];
       const cleanDate = (rawDate.includes('T') ? rawDate.split('T')[0] : rawDate) || new Date().toISOString().split('T')[0];
 
+      // Build complete 1:1 payload mapping every form input field to Supabase columns
       const payload = {
         title: item.name || item.title || "Untitled Event",
-        type: item.status || item.type || "workshops",
+        type: item.type || "workshops",
+        status: item.status || "upcoming",
         date: cleanDate,
-        speaker: item.facultyCoordinators || item.studentCoordinators || item.speaker || "EDC Desk",
-        outcome: item.description || item.about || item.outcome || "EDC HITAM Innovation Event",
-        img: item.banner || item.logo || item.img || "edc-logo.png",
-        sort_order: parseInt(item.sort_order) || 1
+        start_date: item.startDate || cleanDate,
+        end_date: item.endDate || cleanDate,
+        deadline: item.deadline || "",
+        venue: item.venue || "HITAM",
+        location: item.location || "",
+        fee: parseFloat(item.fee) || 0,
+        prize_pool: item.prizePool || "",
+        min_team: String(item.minTeam || 1),
+        max_team: String(item.maxTeam || 1),
+        banner: item.banner || "",
+        logo: item.logo || "",
+        upi_id: item.upiId || "",
+        qr_code: item.qrCode || "",
+        speaker: item.facultyCoordinators || item.speaker || "EDC Desk",
+        faculty_coordinators: item.facultyCoordinators || "",
+        student_coordinators: item.studentCoordinators || "",
+        sponsors: item.sponsors || "",
+        contact_numbers: item.contactNumbers || "",
+        social_media: item.socialMediaLinks || "",
+        outcome: item.description || item.about || "EDC Event",
+        description: item.description || "",
+        about: item.about || "",
+        rules: item.rules || "",
+        eligibility: item.eligibility || "",
+        schedule: item.schedule || "",
+        faqs: item.faqs || "",
+        img: item.banner || item.logo || "edc-logo.png",
+        sort_order: parseInt(item.sort_order) || 1,
+        subevents: item.subevents || [] // 🌟 Pushes full subevents array as JSON
       };
 
       const isUpdate = Boolean(item.id && !String(item.id).startsWith('event-'));
@@ -1086,9 +1113,9 @@
 
         if (!res.ok) {
           const errData = await res.json();
-          console.error("❌ Supabase Event Sync Error:", errData);
+          console.error("❌ Supabase Full Sync Error:", errData);
         } else {
-          console.log("✅ Event successfully synced to Supabase!");
+          console.log("✅ All form fields & subevents synced to Supabase!");
         }
       } catch (e) {
         console.error("Cloud event portal sync failed:", e);
