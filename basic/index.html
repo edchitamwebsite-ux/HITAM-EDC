@@ -2916,7 +2916,7 @@
         socials: {},
         stats: {},
       };
-
+window.appData = appData;
       let currentTeamIndex = 0;
       let teamAutoTimer = null;
       let ambientAudio = null;
@@ -3096,19 +3096,23 @@
       }
 
       function renderMetrics() {
-        const stats = appData.stats || {};
-        const target = document.getElementById("metricsGrid");
-        target.innerHTML = statsMap
-          .map(
-            ([key, label]) => `
-                <div class="metric">
-                    <strong>${formatNumber(stats[key])}</strong>
-                    <span>${label}</span>
-                </div>
-            `,
-          )
-          .join("");
-      }
+    const target = document.getElementById("metricsGrid");
+
+    // GUARD CLAUSE: Exit early if #metricsGrid is not on the current page
+    if (!target) return;
+
+    const stats = appData.stats || {};
+    target.innerHTML = statsMap
+      .map(
+        ([key, label]) => `
+            <div class="metric">
+                <strong>${formatNumber(stats[key])}</strong>
+                <span>${label}</span>
+            </div>
+        `,
+      )
+      .join("");
+}
 
      function renderAnnouncements() {
   const featured = document.getElementById("featuredAnnouncement");
