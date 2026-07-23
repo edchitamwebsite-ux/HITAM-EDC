@@ -3110,264 +3110,284 @@
           .join("");
       }
 
-      function renderAnnouncements() {
-        const blogs = appData.blogs || [];
-        const featured = document.getElementById("featuredAnnouncement");
-        const list = document.getElementById("announcementList");
+     function renderAnnouncements() {
+  const featured = document.getElementById("featuredAnnouncement");
+  const list = document.getElementById("announcementList");
 
-        if (!blogs.length) {
-          featured.innerHTML = `<div><span class="section-label">No updates yet</span><h3>Announcements will appear here.</h3><p>Add updates from Daily Announcements in the admin panel.</p></div>`;
-          list.innerHTML = "";
-          return;
-        }
+  // SAFEGUARD: Stop if elements are not on this page view
+  if (!featured || !list) return;
 
-        const first = blogs[0];
-        featured.innerHTML = `
-                <div>
-                    <div class="meta"><span>Latest Broadcast</span><span>${first.date || ""}</span></div>
-                    <h3>${first.title || "EDC Announcement"}</h3>
-                    <p>${first.content || ""}</p>
-                </div>
-                <a class="ghost-btn" href="#contact">Ask About This</a>
-            `;
+  const blogs = appData.blogs || [];
 
-        list.innerHTML = blogs
-          .slice(1, 4)
-          .map(
-            (item) => `
-                <article class="card announcement-item">
-                    <div class="meta"><span>${item.date || ""}</span></div>
-                    <h3>${item.title || "EDC Update"}</h3>
-                    <p>${item.content || ""}</p>
-                </article>
-            `,
-          )
-          .join("");
-      }
+  if (!blogs.length) {
+    featured.innerHTML = `<div><span class="section-label">No updates yet</span><h3>Announcements will appear here.</h3><p>Add updates from Daily Announcements in the admin panel.</p></div>`;
+    list.innerHTML = "";
+    return;
+  }
 
-      function imageSource(item, index) {
-        const raw = item && item.img ? String(item.img) : "";
-        if (raw.startsWith("http") || raw.startsWith("pictures/")) return raw;
-        if (raw && !raw.includes("/")) return `pictures/${raw}`;
-        return "edc-logo.png";
-      }
+  const first = blogs[0];
+  featured.innerHTML = `
+          <div>
+              <div class="meta"><span>Latest Broadcast</span><span>${first.date || ""}</span></div>
+              <h3>${first.title || "EDC Announcement"}</h3>
+              <p>${first.content || ""}</p>
+          </div>
+          <a class="ghost-btn" href="#contact">Ask About This</a>
+      `;
 
-      let currentEventIndex = 0;
-      let eventAutoTimer = null;
+  list.innerHTML = blogs
+    .slice(1, 4)
+    .map(
+      (item) => `
+          <article class="card announcement-item">
+              <div class="meta"><span>${item.date || ""}</span></div>
+              <h3>${item.title || "EDC Update"}</h3>
+              <p>${item.content || ""}</p>
+          </article>
+      `,
+    )
+    .join("");
+}
 
-      function renderEvents() {
-        const events = getData(appData.events, []);
-        const target = document.getElementById("eventsGrid");
+function imageSource(item, index) {
+  const raw = item && item.img ? String(item.img) : "";
+  if (raw.startsWith("http") || raw.startsWith("pictures/")) return raw;
+  if (raw && !raw.includes("/")) return `pictures/${raw}`;
+  return "edc-logo.png";
+}
 
-        if (!events.length) {
-          target.innerHTML = `<article class="event-card active"><div class="event-body"><h3>Initiatives coming soon.</h3><p>Add events from the administrative dashboard panel.</p></div></article>`;
-          return;
-        }
+let currentEventIndex = 0;
+let eventAutoTimer = null;
 
-        target.innerHTML = events
-          .map(
-            (event, index) => `
-                <article class="card event-card">
-                    <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
-                    <div class="event-body">
-                        <div class="meta"><span>${event.type || "event"}</span><span>${event.date || ""}</span></div>
-                        <h3>${event.title || "EDC Event"}</h3>
-                        <p>${event.outcome || event.content || "Student-led innovation activity at HITAM EDC."}</p>
-                    </div>
-                </article>
-            `,
-          )
-          .join("");
+function renderEvents() {
+  const target = document.getElementById("eventsGrid");
+  
+  // SAFEGUARD: Stop if eventsGrid isn't on this page
+  if (!target) return;
 
-        currentEventIndex = 0;
-        updateEventsCarousel();
-        startEventsAutoCarousel();
-      }
+  const events = getData(appData.events, []);
 
-      function updateEventsCarousel() {
-        const events = getData(appData.events, []);
-        const track = document.getElementById("eventsGrid");
-        if (!track || !events.length) return;
+  if (!events.length) {
+    target.innerHTML = `<article class="event-card active"><div class="event-body"><h3>Initiatives coming soon.</h3><p>Add events from the administrative dashboard panel.</p></div></article>`;
+    return;
+  }
 
-        currentEventIndex = Math.max(
-          0,
-          Math.min(currentEventIndex, events.length - 1),
-        );
-        const slides = Array.from(track.querySelectorAll(".event-card"));
+  target.innerHTML = events
+    .map(
+      (event, index) => `
+          <article class="card event-card">
+              <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
+              <div class="event-body">
+                  <div class="meta"><span>${event.type || "event"}</span><span>${event.date || ""}</span></div>
+                  <h3>${event.title || "EDC Event"}</h3>
+                  <p>${event.outcome || event.content || "Student-led innovation activity at HITAM EDC."}</p>
+              </div>
+          </article>
+      `,
+    )
+    .join("");
 
-        slides.forEach((slide, index) => {
-          slide.classList.remove("active", "prev", "next");
-          if (index === currentEventIndex) {
-            slide.classList.add("active");
-          } else if (
-            index ===
-            (currentEventIndex - 1 + events.length) % events.length
-          ) {
-            slide.classList.add("prev");
-          } else if (index === (currentEventIndex + 1) % events.length) {
-            slide.classList.add("next");
-          }
-        });
-      }
+  currentEventIndex = 0;
+  updateEventsCarousel();
+  startEventsAutoCarousel();
+}
 
-      function startEventsAutoCarousel() {
-        window.clearInterval(eventAutoTimer);
-        const events = getData(appData.events, []);
-        if (events.length < 2) return;
-        eventAutoTimer = window.setInterval(() => {
-          currentEventIndex = (currentEventIndex + 1) % events.length;
-          updateEventsCarousel();
-        }, 4500); // Transitions automatically every 4.5 seconds
-      }
+function updateEventsCarousel() {
+  const events = getData(appData.events, []);
+  const track = document.getElementById("eventsGrid");
+  if (!track || !events.length) return;
 
-      function renderTeam() {
-        const team = getData(appData.team, []);
-        const target = document.getElementById("teamTrack");
-        target.innerHTML = team
-          .map(
-            (member, index) => `
-                <article class="team-slide">
-                    <div class="team-photo">
-                        <img src="${imageSource(member, index)}" alt="${member.name || "EDC team member"}" onerror="this.src='edc-logo.png'">
-                    </div>
-                    <div class="team-card">
-                        <div class="meta"><span>${member.year || "EDC"}</span><span>Team Member</span></div>
-                        <h3>${member.name || "EDC Member"}</h3>
-                        <span>${member.role || "Student Coordinator"}</span>
-                        <p>${member.achievement || "Supporting EDC programs, outreach, and student innovation."}</p>
-                        ${member.linkedin ? `<a class="ghost-btn" href="${member.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>` : ""}
-                    </div>
-                </article>
-            `,
-          )
-          .join("");
-        currentTeamIndex = 0;
-        updateTeamCarousel();
-        startTeamAutoCarousel();
-      }
+  currentEventIndex = Math.max(
+    0,
+    Math.min(currentEventIndex, events.length - 1),
+  );
+  const slides = Array.from(track.querySelectorAll(".event-card"));
 
-      function updateTeamCarousel() {
-        const team = getData(appData.team, []);
-        const track = document.getElementById("teamTrack");
-        const count = document.getElementById("teamCount");
-        if (!track || !count) return;
-        if (!team.length) {
-          track.innerHTML = `<article class="team-slide"><div class="team-card"><h3>Team updates coming soon.</h3><p>Add board members from the admin panel to show them here.</p></div></article>`;
-          count.textContent = "00 / 00";
-          return;
-        }
-        currentTeamIndex = Math.max(
-          0,
-          Math.min(currentTeamIndex, team.length - 1),
-        );
-        const slides = Array.from(track.querySelectorAll(".team-slide"));
-        slides.forEach((slide, index) => {
-          slide.classList.remove("active", "prev", "next");
-          if (index === currentTeamIndex) {
-            slide.classList.add("active");
-            return;
-          }
-          if (index === (currentTeamIndex - 1 + team.length) % team.length) {
-            slide.classList.add("prev");
-            return;
-          }
-          if (index === (currentTeamIndex + 1) % team.length) {
-            slide.classList.add("next");
-          }
-        });
-        count.textContent = `${String(currentTeamIndex + 1).padStart(2, "0")} / ${String(team.length).padStart(2, "0")}`;
-      }
+  slides.forEach((slide, index) => {
+    slide.classList.remove("active", "prev", "next");
+    if (index === currentEventIndex) {
+      slide.classList.add("active");
+    } else if (
+      index ===
+      (currentEventIndex - 1 + events.length) % events.length
+    ) {
+      slide.classList.add("prev");
+    } else if (index === (currentEventIndex + 1) % events.length) {
+      slide.classList.add("next");
+    }
+  });
+}
 
-      function startTeamAutoCarousel() {
-        window.clearInterval(teamAutoTimer);
-        const team = getData(appData.team, []);
-        if (team.length < 2) return;
-        teamAutoTimer = window.setInterval(() => {
-          currentTeamIndex = (currentTeamIndex + 1) % team.length;
-          updateTeamCarousel();
-        }, 5200);
-      }
+function startEventsAutoCarousel() {
+  window.clearInterval(eventAutoTimer);
+  const events = getData(appData.events, []);
+  if (events.length < 2) return;
+  eventAutoTimer = window.setInterval(() => {
+    currentEventIndex = (currentEventIndex + 1) % events.length;
+    updateEventsCarousel();
+  }, 4500); // Transitions automatically every 4.5 seconds
+}
 
-      function playSoftClick() {
-        try {
-          const audio = new (
-            window.AudioContext || window.webkitAudioContext
-          )();
-          const gain = audio.createGain();
-          const osc = audio.createOscillator();
-          gain.gain.setValueAtTime(0.0001, audio.currentTime);
-          gain.gain.exponentialRampToValueAtTime(
-            0.035,
-            audio.currentTime + 0.02,
-          );
-          gain.gain.exponentialRampToValueAtTime(
-            0.0001,
-            audio.currentTime + 0.34,
-          );
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(420, audio.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(
-            620,
-            audio.currentTime + 0.24,
-          );
-          osc.connect(gain).connect(audio.destination);
-          osc.start();
-          osc.stop(audio.currentTime + 0.36);
-        } catch (error) {
-          return false;
-        }
-        return true;
-      }
+function renderTeam() {
+  const target = document.getElementById("teamTrack");
+  
+  // SAFEGUARD: Stop if teamTrack isn't on this page
+  if (!target) return;
 
-      function renderTestimonials() {
-        const visitors = getData(appData.visitors, []);
-        const target = document.getElementById("testimonialGrid");
-        if (!visitors.length) {
-          target.innerHTML = `<article class="card testimonial-card"><p>Guest testimonials will appear here after they are added in the admin panel.</p></article>`;
-          return;
-        }
-        target.innerHTML = visitors
-          .slice(0, 6)
-          .map(
-            (visitor, index) => `
-                <article class="card testimonial-card">
-                    <p>&ldquo;${sanitizeInputString(visitor.message || "A valuable interaction with the HITAM EDC ecosystem.")}&rdquo;</p>
-                    <div class="testimonial-person">
-                        <img src="${imageSource(visitor, index + 2)}" alt="${sanitizeInputString(visitor.name || "Guest")}" onerror="this.src='edc-logo.png'">
-                        <div>
-                            <b>${sanitizeInputString(visitor.name || "Guest Mentor")}</b>
-                            <span>${sanitizeInputString(visitor.designation || visitor.topic || "EDC Guest")}</span>
-                        </div>
-                    </div>
-                </article>
-            `,
-          )
-          .join("");
-      }
+  const team = getData(appData.team, []);
+  target.innerHTML = team
+    .map(
+      (member, index) => `
+          <article class="team-slide">
+              <div class="team-photo">
+                  <img src="${imageSource(member, index)}" alt="${member.name || "EDC team member"}" onerror="this.src='edc-logo.png'">
+              </div>
+              <div class="team-card">
+                  <div class="meta"><span>${member.year || "EDC"}</span><span>Team Member</span></div>
+                  <h3>${member.name || "EDC Member"}</h3>
+                  <span>${member.role || "Student Coordinator"}</span>
+                  <p>${member.achievement || "Supporting EDC programs, outreach, and student innovation."}</p>
+                  ${member.linkedin ? `<a class="ghost-btn" href="${member.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>` : ""}
+              </div>
+          </article>
+      `,
+    )
+    .join("");
+  currentTeamIndex = 0;
+  updateTeamCarousel();
+  startTeamAutoCarousel();
+}
 
-      function renderStartups() {
-        const startups = getData(appData.startups, []);
-        const target = document.getElementById("startupGrid");
-        if (!startups.length) {
-          target.innerHTML = `<article class="card startup-card"><h3>Startup portfolio coming soon.</h3><p>Add incubated startups from the admin panel to display them here.</p></article>`;
-          return;
-        }
-        target.innerHTML = startups
-          .slice(0, 6)
-          .map(
-            (startup) => `
-                <article class="card startup-card">
-                    <div class="meta"><span>${startup.industry || "Startup"}</span></div>
-                    <h3>${startup.name || "Student Venture"}</h3>
-                    <p><strong>Founder:</strong> ${startup.founder || "EDC Founder"}</p>
-                    <p>${startup.solution || ""}</p>
-                    <p>${startup.metrics || ""}</p>
-                    ${startup.url ? `<a class="ghost-btn" href="${startup.url}" target="_blank" rel="noreferrer" style="margin-top:18px;">Visit Venture</a>` : ""}
-                </article>
-            `,
-          )
-          .join("");
-      }
+function updateTeamCarousel() {
+  const team = getData(appData.team, []);
+  const track = document.getElementById("teamTrack");
+  const count = document.getElementById("teamCount");
+  if (!track || !count) return;
+  if (!team.length) {
+    track.innerHTML = `<article class="team-slide"><div class="team-card"><h3>Team updates coming soon.</h3><p>Add board members from the admin panel to show them here.</p></div></article>`;
+    count.textContent = "00 / 00";
+    return;
+  }
+  currentTeamIndex = Math.max(
+    0,
+    Math.min(currentTeamIndex, team.length - 1),
+  );
+  const slides = Array.from(track.querySelectorAll(".team-slide"));
+  slides.forEach((slide, index) => {
+    slide.classList.remove("active", "prev", "next");
+    if (index === currentTeamIndex) {
+      slide.classList.add("active");
+      return;
+    }
+    if (index === (currentTeamIndex - 1 + team.length) % team.length) {
+      slide.classList.add("prev");
+      return;
+    }
+    if (index === (currentTeamIndex + 1) % team.length) {
+      slide.classList.add("next");
+    }
+  });
+  count.textContent = `${String(currentTeamIndex + 1).padStart(2, "0")} / ${String(team.length).padStart(2, "0")}`;
+}
+
+function startTeamAutoCarousel() {
+  window.clearInterval(teamAutoTimer);
+  const team = getData(appData.team, []);
+  if (team.length < 2) return;
+  teamAutoTimer = window.setInterval(() => {
+    currentTeamIndex = (currentTeamIndex + 1) % team.length;
+    updateTeamCarousel();
+  }, 5200);
+}
+
+function playSoftClick() {
+  try {
+    const audio = new (
+      window.AudioContext || window.webkitAudioContext
+    )();
+    const gain = audio.createGain();
+    const osc = audio.createOscillator();
+    gain.gain.setValueAtTime(0.0001, audio.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      0.035,
+      audio.currentTime + 0.02,
+    );
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      audio.currentTime + 0.34,
+    );
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(420, audio.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(
+      620,
+      audio.currentTime + 0.24,
+    );
+    osc.connect(gain).connect(audio.destination);
+    osc.start();
+    osc.stop(audio.currentTime + 0.36);
+  } catch (error) {
+    return false;
+  }
+  return true;
+}
+
+function renderTestimonials() {
+  const target = document.getElementById("testimonialGrid");
+  
+  // SAFEGUARD: Stop if testimonialGrid isn't on this page
+  if (!target) return;
+
+  const visitors = getData(appData.visitors, []);
+  if (!visitors.length) {
+    target.innerHTML = `<article class="card testimonial-card"><p>Guest testimonials will appear here after they are added in the admin panel.</p></article>`;
+    return;
+  }
+  target.innerHTML = visitors
+    .slice(0, 6)
+    .map(
+      (visitor, index) => `
+          <article class="card testimonial-card">
+              <p>&ldquo;${sanitizeInputString(visitor.message || "A valuable interaction with the HITAM EDC ecosystem.")}&rdquo;</p>
+              <div class="testimonial-person">
+                  <img src="${imageSource(visitor, index + 2)}" alt="${sanitizeInputString(visitor.name || "Guest")}" onerror="this.src='edc-logo.png'">
+                  <div>
+                      <b>${sanitizeInputString(visitor.name || "Guest Mentor")}</b>
+                      <span>${sanitizeInputString(visitor.designation || visitor.topic || "EDC Guest")}</span>
+                  </div>
+              </div>
+          </article>
+      `,
+    )
+    .join("");
+}
+
+function renderStartups() {
+  const target = document.getElementById("startupGrid");
+  
+  // SAFEGUARD: Stop if startupGrid isn't on this page
+  if (!target) return;
+
+  const startups = getData(appData.startups, []);
+  if (!startups.length) {
+    target.innerHTML = `<article class="card startup-card"><h3>Startup portfolio coming soon.</h3><p>Add incubated startups from the admin panel to display them here.</p></article>`;
+    return;
+  }
+  target.innerHTML = startups
+    .slice(0, 6)
+    .map(
+      (startup) => `
+          <article class="card startup-card">
+              <div class="meta"><span>${startup.industry || "Startup"}</span></div>
+              <h3>${startup.name || "Student Venture"}</h3>
+              <p><strong>Founder:</strong> ${startup.founder || "EDC Founder"}</p>
+              <p>${startup.solution || ""}</p>
+              <p>${startup.metrics || ""}</p>
+              ${startup.url ? `<a class="ghost-btn" href="${startup.url}" target="_blank" rel="noreferrer" style="margin-top:18px;">Visit Venture</a>` : ""}
+          </article>
+      `,
+    )
+    .join("");
+}
 
       function renderSocials() {
         const socials = appData.socials || {};
