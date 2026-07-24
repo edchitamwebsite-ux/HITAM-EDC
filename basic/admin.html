@@ -1268,6 +1268,8 @@
       }
       // Full event-detail manager: controls every event-specific element rendered publicly.
       function openEventDetails(id) {
+        // 1. Switch the navbar active state to 'Events'
+    setActiveNav('events');
         const all = portalEvents(),
           event = all.find((e) => e.id === id);
         if (!event) return;

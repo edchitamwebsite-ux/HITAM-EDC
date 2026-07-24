@@ -2211,15 +2211,14 @@
           </span>
         </a>
 
-        <nav class="nav-links" aria-label="Primary navigation">
-          <a href="#announcements">News</a>
-          <a href="#about">About</a>
-          <a href="#programs">Programs</a>
-          <a href="index.html?page=events">Events</a>
-          <a href="#team">Team</a>
-          <a href="#testimonials">Guests</a>
-          <a href="#contact">Contact</a>
-        </nav>
+        <nav class="nav-links">
+  <a href="index.html#about" class="nav-item">About</a>
+  <a href="index.html#programs" class="nav-item">Programs</a>
+  <a href="index.html#events" class="nav-item" id="nav-events-link">Events</a>
+  <a href="index.html#team" class="nav-item">Team</a>
+ <a href="index.html#testimonials" class="nav-item">Guests</a>
+  <a href="index.html#contact" class="nav-item">Contact</a>
+</nav>
 
         <div class="nav-actions">
           <a class="ghost-btn" href="admin.html">Admin</a>
@@ -2280,7 +2279,7 @@
               Apply to Join
             </button>
           </div>
-          <div class="hero-strip" aria-label="EDC quick stats">
+          <!-- <div class="hero-strip" aria-label="EDC quick stats">
             <div class="mini-stat">
               <strong data-stat="initiatives">26+</strong
               ><span>initiatives across innovation and venture building</span>
@@ -2293,7 +2292,7 @@
               <strong data-stat="workshops">45+</strong
               ><span>workshops, talks, tours, and pitch tracks</span>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <div
@@ -2313,26 +2312,6 @@
               programs under one student-first platform.
             </p>
           </div>
-        </div>
-      </section>
-
-      <section class="section" id="announcements">
-        <div class="section-head reveal">
-          <div>
-            <span class="section-label">Announcements</span>
-            <h2>Latest updates from the EDC desk.</h2>
-          </div>
-          <p class="section-note">
-            These updates are pulled from the same Daily Announcements area in
-            your admin panel.
-          </p>
-        </div>
-        <div class="announcement-grid reveal">
-          <article
-            class="card announcement-feature"
-            id="featuredAnnouncement"
-          ></article>
-          <div class="announcement-list" id="announcementList"></div>
         </div>
       </section>
 
@@ -2716,6 +2695,25 @@
         <div class="startup-grid reveal" id="startupGrid"></div>
       </section>
 
+      <section class="section" id="announcements">
+        <div class="section-head reveal">
+          <div>
+            <span class="section-label">Announcements</span>
+            <h2>Latest updates from the EDC desk.</h2>
+          </div>
+          <p class="section-note">
+            These updates are pulled from the same Daily Announcements area in
+            your admin panel.
+          </p>
+        </div>
+        <div class="announcement-grid reveal">
+          <article
+            class="card announcement-feature"
+            id="featuredAnnouncement"
+          ></article>
+          <div class="announcement-list" id="announcementList"></div>
+        </div>
+      </section>
       <section class="section" id="contact">
         <div class="contact-grid">
           <div class="panel reveal">
@@ -5067,7 +5065,30 @@ window.openRegistration = function openRegistration(event) {
           });
         }).observe(document.body, { childList: true, subtree: true });
       })();
+      // Function to update active link state and handle back navigation
+function setActiveNav(target) {
+  // Remove 'active' class from all nav items
+  document.querySelectorAll('.nav-links .nav-item').forEach(el => {
+    el.classList.remove('active');
+  });
 
+  // Highlight target nav item
+  if (target === 'events') {
+    const eventsBtn = document.getElementById('nav-events-link');
+    if (eventsBtn) eventsBtn.classList.add('active');
+  }
+}
+
+// Global click listener for navbar items when on event view
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', function () {
+    // If you have a separate event details view hidden/shown via JS:
+    const eventDetailModal = document.getElementById('event-modal'); // replace with your event detail wrapper ID
+    if (eventDetailModal) {
+      eventDetailModal.style.display = 'none';
+    }
+  });
+});
     </script>
   </body>
 </html>
