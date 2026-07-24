@@ -318,22 +318,25 @@
                 <div><label class="block mb-1">Core Achievement Milestone Summary *</label><input type='text' id='val_achievement' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Photo Filename Asset Key URL *</label><input type='text' id='val_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g. abhijeet.png"></div>` +
             reorderingBlueprintHTML;
-        } else if (currentActiveSubsystemRoute === "edc_events") {
-          wrapper.innerHTML =
-            `<div><label class="block mb-1">Initiative Event Title *</label><input type='text' id='ev_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                <div><label class="block mb-1">Pillar Classification Type *</label>
-                    <select id='ev_type' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold outline-none'>
-                        <option value="tours">Exposure Tours & Site Visits</option>
-                        <option value="workshops">Skills Enhancement Workshops</option>
-                        <option value="pitching">Venture Pitching Events</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1">Execution Calendar Date *</label><input type='date' id='ev_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
-                <div><label class="block mb-1">Guest Expert / Host / Speaker *</label><input type='text' id='ev_speaker' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
-                <div><label class="block mb-1">Key Outcomes Summary *</label><textarea id='ev_outcome' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
-                <div><label class="block mb-1">Cover Image Filename Key *</label><input type='text' id='ev_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g., hitam-logo.png"></div>` +
-            reorderingBlueprintHTML;
-        } else if (currentActiveSubsystemRoute === "edc_startups") {
+        // ✅ Clean, valid template literal syntax
+} else if (currentActiveSubsystemRoute === "edc_events") {
+  wrapper.innerHTML = `
+    <div><label class="block mb-1">Initiative Event Title *</label><input type='text' id='ev_title' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+    <div><label class="block mb-1 text-emerald-400 font-bold">Google Form / Registration URL 🔗</label><input type='url' id='ev_registration_url' class='w-full p-3 bg-slate-800 rounded-xl border border-emerald-500/50 text-white focus:outline-none focus:border-emerald-400' placeholder="https://forms.gle/your-google-form-link"></div>
+    <div><label class="block mb-1">Pillar Classification Type *</label>
+        <select id='ev_type' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-bold outline-none'>
+            <option value="tours">Exposure Tours & Site Visits</option>
+            <option value="workshops">Skills Enhancement Workshops</option>
+            <option value="pitching">Venture Pitching Events</option>
+        </select>
+    </div>
+    <div><label class="block mb-1">Execution Calendar Date *</label><input type='date' id='ev_date' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white font-mono font-bold' required value='2026-06-18'></div>
+    <div><label class="block mb-1">Guest Expert / Host / Speaker *</label><input type='text' id='ev_speaker' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
+    <div><label class="block mb-1">Key Outcomes Summary *</label><textarea id='ev_outcome' rows='2' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></textarea></div>
+    <div><label class="block mb-1">Cover Image Filename Key *</label><input type='text' id='ev_img' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required placeholder="e.g., hitam-logo.png"></div>
+    ${reorderingBlueprintHTML}
+  `;
+} else if (currentActiveSubsystemRoute === "edc_startups") {
           wrapper.innerHTML = `<div><label class="block mb-1">Venture Startup Corporate Name *</label><input type='text' id='st_name' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Founder Executive Full Name *</label><input type='text' id='st_founder' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
                 <div><label class="block mb-1">Sector Domain Classification *</label><input type='text' id='st_ind' class='w-full p-3 bg-slate-800 rounded-xl border border-slate-700 text-white' required></div>
@@ -393,17 +396,17 @@
               parseInt(document.getElementById("val_sort_order").value) || 0,
           };
         } else if (currentActiveSubsystemRoute === "edc_events") {
-          payload = {
-            title: document.getElementById("ev_title").value,
-            type: document.getElementById("ev_type").value,
-            date: document.getElementById("ev_date").value || new Date().toISOString().split('T')[0],
-            speaker: document.getElementById("ev_speaker").value,
-            outcome: document.getElementById("ev_outcome").value,
-            img: document.getElementById("ev_img").value,
-            sort_order:
-              parseInt(document.getElementById("val_sort_order").value) || 0,
-          };
-        } else if (currentActiveSubsystemRoute === "edc_startups") {
+  payload = {
+    title: document.getElementById("ev_title").value,
+    type: document.getElementById("ev_type").value,
+    date: document.getElementById("ev_date").value || new Date().toISOString().split('T')[0],
+    registration_url: document.getElementById("ev_registration_url") ? document.getElementById("ev_registration_url").value : "",
+    speaker: document.getElementById("ev_speaker").value,
+    outcome: document.getElementById("ev_outcome").value,
+    img: document.getElementById("ev_img").value,
+    sort_order: parseInt(document.getElementById("val_sort_order").value) || 0,
+  };
+} else if (currentActiveSubsystemRoute === "edc_startups") {
           payload = {
             name: document.getElementById("st_name").value,
             founder: document.getElementById("st_founder").value,
@@ -570,20 +573,20 @@
             structuralMatchRowTarget.achievement || "";
           document.getElementById("val_img").value =
             structuralMatchRowTarget.img || "";
-        } else if (currentActiveSubsystemRoute === "edc_events") {
-          document.getElementById("ev_title").value =
-            structuralMatchRowTarget.title || "";
-          document.getElementById("ev_type").value =
-            structuralMatchRowTarget.type || "tours";
-          document.getElementById("ev_date").value =
-            structuralMatchRowTarget.date || "";
-          document.getElementById("ev_speaker").value =
-            structuralMatchRowTarget.speaker || "";
-          document.getElementById("ev_outcome").value =
-            structuralMatchRowTarget.outcome || "";
-          document.getElementById("ev_img").value =
-            structuralMatchRowTarget.img || "";
-        } else if (currentActiveSubsystemRoute === "edc_startups") {
+        }else if (currentActiveSubsystemRoute === "edc_events") {
+  document.getElementById("ev_title").value = structuralMatchRowTarget.title || structuralMatchRowTarget.name || "";
+  document.getElementById("ev_type").value = structuralMatchRowTarget.type || "workshops";
+  document.getElementById("ev_date").value = structuralMatchRowTarget.date || "";
+  document.getElementById("ev_speaker").value = structuralMatchRowTarget.speaker || "";
+  document.getElementById("ev_outcome").value = structuralMatchRowTarget.outcome || structuralMatchRowTarget.description || "";
+  document.getElementById("ev_img").value = structuralMatchRowTarget.img || structuralMatchRowTarget.image || "";
+  
+  // Populates the Google Form link
+  if (document.getElementById("ev_registration_url")) {
+    document.getElementById("ev_registration_url").value = 
+      structuralMatchRowTarget.registration_url || structuralMatchRowTarget.registrationUrl || "";
+  }
+} else if (currentActiveSubsystemRoute === "edc_startups") {
           document.getElementById("st_name").value =
             structuralMatchRowTarget.name || "";
           document.getElementById("st_founder").value =
@@ -897,16 +900,18 @@
       img: value("val_img"),
       sort_order: Number(value("val_sort_order")) || 0,
     };
-  else if (currentActiveSubsystemRoute === "edc_events")
-    p = {
-      title: value("ev_title"),
-      type: value("ev_type"),
-      date: value("ev_date") || new Date().toISOString().split('T')[0],
-      speaker: value("ev_speaker"),
-      outcome: value("ev_outcome"),
-      img: value("ev_img"),
-      sort_order: Number(value("val_sort_order")) || 0,
-    };
+  else if (currentActiveSubsystemRoute === "edc_events") {
+  payload = {
+    title: document.getElementById("ev_title").value,
+    type: document.getElementById("ev_type").value,
+    date: document.getElementById("ev_date").value || new Date().toISOString().split('T')[0],
+    registration_url: document.getElementById("ev_registration_url") ? document.getElementById("ev_registration_url").value : "",
+    speaker: document.getElementById("ev_speaker").value,
+    outcome: document.getElementById("ev_outcome").value,
+    img: document.getElementById("ev_img").value,
+    sort_order: parseInt(document.getElementById("val_sort_order") ? document.getElementById("val_sort_order").value : 0) || 0
+  };
+}
   else if (currentActiveSubsystemRoute === "edc_startups")
     p = {
       name: value("st_name"),
@@ -1075,6 +1080,7 @@
         banner: item.banner || "",
         logo: item.logo || "",
         upi_id: item.upiId || "",
+        registration_url: item.registrationUrl || item.registration_url || "",
         qr_code: item.qrCode || "",
         speaker: item.facultyCoordinators || item.speaker || "EDC Desk",
         faculty_coordinators: item.facultyCoordinators || "",
@@ -1206,7 +1212,7 @@
         m.className = "fixed inset-0 z-[30000] bg-black/80 overflow-auto p-4";
         const field = (key, label, type = "text", wide = false) =>
           `<label class="block ${wide ? "md:col-span-2" : ""}"><span class="text-[10px] text-slate-400 font-bold uppercase">${label}</span><input name="${key}" type="${type}" value="${portalEsc(event[key] || "")}" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white"></label>`;
-        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 border border-slate-700 rounded-2xl p-6"><div class="flex justify-between mb-5"><div><p class="text-emerald-400 text-[10px] font-black uppercase">Event builder</p><h2 class="font-extrabold text-xl">${event.name ? "Edit " + portalEsc(event.name) : "Create Event"}</h2></div><button class="text-slate-400 text-xl" data-close>×</button></div><form id="portalEventForm" class="grid md:grid-cols-2 gap-4 text-xs"><input type="hidden" name="id" value="${event.id}">${field("name", "Event name *")}${field("status", "Status (upcoming, live, completed, cancelled)")}${field("startDate", "Event start", "datetime-local")}${field("endDate", "Event end", "datetime-local")}${field("deadline", "Registration deadline", "datetime-local")}${field("venue", "Venue")}${field("location", "Location")}${field("fee", "Registration fee (0 = free)", "number")}${field("prizePool", "Prize pool")}${field("minTeam", "Minimum team size", "number")}${field("maxTeam", "Maximum team size", "number")}${field("banner", "Event banner image filename / URL")}${field("logo", "Logo filename / URL")}${field("upiId", "UPI ID")}${field("qrCode", "QR code image filename / URL")}${field("facultyCoordinators", "Faculty coordinators", "text", true)}${field("studentCoordinators", "Student coordinators", "text", true)}${field("sponsors", "Sponsors", "text", true)}${field("contactNumbers", "Contact numbers", "text", true)}${field("socialLinks", "Social media links", "text", true)}<label class="md:col-span-2"><span class="text-[10px] text-slate-400 font-bold uppercase">Description</span><textarea name="description" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.description || "")}</textarea></label><label class="md:col-span-2"><span class="text-[10px] text-slate-400 font-bold uppercase">About event</span><textarea name="about" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.about || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Rules</span><textarea name="rules" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.rules || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Eligibility</span><textarea name="eligibility" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.eligibility || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Schedule</span><textarea name="schedule" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.schedule || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">FAQs</span><textarea name="faq" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.faq || "")}</textarea></label><div class="md:col-span-2 border-t border-slate-800 pt-4"><div class="flex justify-between"><h3 class="font-bold">Subevents</h3><button type="button" id="addSubevent" class="text-emerald-400 font-bold">+ Add Sub Event</button></div><div id="subeventList" class="space-y-2 mt-3"></div></div><button class="md:col-span-2 bg-emerald-600 py-3 rounded-xl font-black uppercase tracking-wider text-[10px]">Save event to portal</button></form></div>`;
+        m.innerHTML = `<div class="max-w-4xl mx-auto my-6 bg-slate-900 border border-slate-700 rounded-2xl p-6"><div class="flex justify-between mb-5"><div><p class="text-emerald-400 text-[10px] font-black uppercase">Event builder</p><h2 class="font-extrabold text-xl">${event.name ? "Edit " + portalEsc(event.name) : "Create Event"}</h2></div><button class="text-slate-400 text-xl" data-close>×</button></div><form id="portalEventForm" class="grid md:grid-cols-2 gap-4 text-xs"><input type="hidden" name="id" value="${event.id}">${field("name", "Event name *")}${field("status", "Status (upcoming, live, completed, cancelled)")}${field("startDate", "Event start", "datetime-local")}${field("endDate", "Event end", "datetime-local")}${field("deadline", "Registration deadline", "datetime-local")}${field("registrationUrl", "Google Form / Registration URL", "url")}${field("venue", "Venue")}${field("location", "Location")}${field("fee", "Registration fee (0 = free)", "number")}${field("prizePool", "Prize pool")}${field("minTeam", "Minimum team size", "number")}${field("maxTeam", "Maximum team size", "number")}${field("banner", "Event banner image filename / URL")}${field("logo", "Logo filename / URL")}${field("upiId", "UPI ID")}${field("qrCode", "QR code image filename / URL")}${field("facultyCoordinators", "Faculty coordinators", "text", true)}${field("studentCoordinators", "Student coordinators", "text", true)}${field("sponsors", "Sponsors", "text", true)}${field("contactNumbers", "Contact numbers", "text", true)}${field("socialLinks", "Social media links", "text", true)}<label class="md:col-span-2"><span class="text-[10px] text-slate-400 font-bold uppercase">Description</span><textarea name="description" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.description || "")}</textarea></label><label class="md:col-span-2"><span class="text-[10px] text-slate-400 font-bold uppercase">About event</span><textarea name="about" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.about || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Rules</span><textarea name="rules" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.rules || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Eligibility</span><textarea name="eligibility" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.eligibility || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">Schedule</span><textarea name="schedule" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.schedule || "")}</textarea></label><label><span class="text-[10px] text-slate-400 font-bold uppercase">FAQs</span><textarea name="faq" class="mt-1 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white">${portalEsc(event.faq || "")}</textarea></label><div class="md:col-span-2 border-t border-slate-800 pt-4"><div class="flex justify-between"><h3 class="font-bold">Subevents</h3><button type="button" id="addSubevent" class="text-emerald-400 font-bold">+ Add Sub Event</button></div><div id="subeventList" class="space-y-2 mt-3"></div></div><button class="md:col-span-2 bg-emerald-600 py-3 rounded-xl font-black uppercase tracking-wider text-[10px]">Save event to portal</button></form></div>`;
         document.body.append(m);
         let subs = [...(event.subevents || [])];
         const renderSubs = () => {
@@ -1817,6 +1823,7 @@ async function universalSupabaseSave(tableName, rawData, editId = null) {
     cleanData.title = cleanData.title || cleanData.name || "Untitled Event";
     cleanData.date = cleanData.date || cleanData.startDate || new Date().toISOString().split('T')[0];
     cleanData.type = cleanData.type || cleanData.status || "workshops";
+    cleanData.registration_url = cleanData.registration_url || cleanData.registrationUrl || "";
     cleanData.speaker = cleanData.speaker || cleanData.facultyCoordinators || cleanData.studentCoordinators || "EDC Desk";
     cleanData.outcome = cleanData.outcome || cleanData.description || cleanData.about || "EDC HITAM Event";
     cleanData.img = cleanData.img || cleanData.banner || cleanData.logo || "edc-logo.png";
@@ -1826,6 +1833,7 @@ async function universalSupabaseSave(tableName, rawData, editId = null) {
     delete cleanData.name;
     delete cleanData.startDate;
     delete cleanData.status;
+    delete cleanData.registrationUrl;
     delete cleanData.facultyCoordinators;
     delete cleanData.studentCoordinators;
     delete cleanData.description;

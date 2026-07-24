@@ -1401,10 +1401,13 @@
       }
 
       .team-track {
-        position: relative;
-        z-index: 1;
-        min-height: 600px;
-      }
+  position: relative;
+  z-index: 1;
+  min-height: 600px;
+  cursor: grab;
+  touch-action: pan-y; /* Prevents vertical scroll interference while swiping horizontally */
+  user-select: none;   /* Prevents text selection while dragging */
+}
 
       .team-slide {
         position: absolute;
@@ -3189,16 +3192,26 @@ function renderEvents() {
 
   target.innerHTML = events
     .map(
-      (event, index) => `
+      (event, index) => {
+        const regUrl = event.registrationUrl || event.registration_url || "";
+        return `
           <article class="card event-card">
               <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
               <div class="event-body">
                   <div class="meta"><span>${event.type || "event"}</span><span>${event.date || ""}</span></div>
                   <h3>${event.title || "EDC Event"}</h3>
                   <p>${event.outcome || event.content || "Student-led innovation activity at HITAM EDC."}</p>
+                  <button 
+                    type="button" 
+                    class="primary-btn" 
+                    style="margin-top: 12px; padding: 6px 14px; font-size: 0.78rem; align-self: flex-start;" 
+                    onclick="window.handleHomeEventRegister(event, '${esc(event.registrationUrl || event.registration_url || '')}')">
+                    Register Now 
+                  </button>
               </div>
           </article>
-      `,
+        `;
+      }
     )
     .join("");
 
@@ -3242,6 +3255,17 @@ function startEventsAutoCarousel() {
     updateEventsCarousel();
   }, 4500); // Transitions automatically every 4.5 seconds
 }
+window.handleHomeEventRegister = function(e, regUrl) {
+  if (e) e.stopPropagation();
+
+  if (regUrl && regUrl.trim() !== "" && regUrl.startsWith("http")) {
+    // 1. Directly opens the Google Form link if configured
+    window.open(regUrl, "_blank");
+  } else {
+    // 2. Otherwise redirects cleanly to the main events tab/page
+    window.location.href = "index.html?page=events";
+  }
+};
 
 function renderTeam() {
   const target = document.getElementById("teamTrack");
@@ -3636,9 +3660,20 @@ function renderStartups() {
         const successModal = document.getElementById("successModal");
         const ambientToggle = document.getElementById("ambientToggle");
 
-        document.getElementById("menuToggle").addEventListener("click", () => {
-          menu.classList.toggle("open");
-        });
+        const menuToggleBtn = document.getElementById("menuToggle");
+        if (menuToggleBtn) {
+          menuToggleBtn.onclick = (e) => {
+            e.stopPropagation();
+            menu.classList.toggle("open");
+          };
+
+          // Close menu if user taps outside of it
+          document.addEventListener("click", (e) => {
+            if (!menu.contains(e.target) && !menuToggleBtn.contains(e.target)) {
+              menu.classList.remove("open");
+            }
+          });
+        }
 
         if (ambientToggle) {
           ambientToggle.addEventListener("click", toggleAmbientSound);
@@ -3820,28 +3855,90 @@ function renderStartups() {
         // ==========================================================================
         // CAROUSELS AND SCROLL LAYOUT CONTROL LOGIC
         // ==========================================================================
+        const teamTrack = document.getElementById("teamTrack");
+        if (teamTrack) {
+          let startX = 0;
+          let isDragging = false;
+
+          // Touch Event Listeners for Mobile / Fingertip Swiping
+          teamTrack.addEventListener("touchstart", (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+          }, { passive: true });
+
+          teamTrack.addEventListener("touchend", (e) => {
+            if (!isDragging) return;
+            const endX = e.changedTouches[0].clientX;
+            handleSwipe(startX, endX);
+            isDragging = false;
+          }, { passive: true });
+
+          // Mouse Event Listeners for Desktop Dragging
+          teamTrack.addEventListener("mousedown", (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            teamTrack.style.cursor = "grabbing";
+          });
+
+          teamTrack.addEventListener("mouseup", (e) => {
+            if (!isDragging) return;
+            const endX = e.clientX;
+            handleSwipe(startX, endX);
+            isDragging = false;
+            teamTrack.style.cursor = "grab";
+          });
+
+          teamTrack.addEventListener("mouseleave", () => {
+            if (isDragging) {
+              isDragging = false;
+              teamTrack.style.cursor = "grab";
+            }
+          });
+
+          function handleSwipe(start, end) {
+            const diffX = start - end;
+            const threshold = 40; // Minimum drag distance to trigger slide change
+            const total = getData(appData.team, []).length;
+            if (!total) return;
+
+            if (Math.abs(diffX) > threshold) {
+              if (diffX > 0) {
+                // Swiped Left -> Next Card
+                currentTeamIndex = (currentTeamIndex + 1) % total;
+              } else {
+                // Swiped Right -> Previous Card
+                currentTeamIndex = (currentTeamIndex - 1 + total) % total;
+              }
+              updateTeamCarousel();
+              startTeamAutoCarousel();
+              playSoftClick();
+            }
+          }
+        }
+
+        // Keep button clicks functional as fallback
         const teamPrev = document.getElementById("teamPrev");
         if (teamPrev) {
-          teamPrev.addEventListener("click", () => {
+          teamPrev.onclick = () => {
             const total = getData(appData.team, []).length;
             if (!total) return;
             currentTeamIndex = (currentTeamIndex - 1 + total) % total;
             updateTeamCarousel();
             startTeamAutoCarousel();
             playSoftClick();
-          });
+          };
         }
 
         const teamNext = document.getElementById("teamNext");
         if (teamNext) {
-          teamNext.addEventListener("click", () => {
+          teamNext.onclick = () => {
             const total = getData(appData.team, []).length;
             if (!total) return;
             currentTeamIndex = (currentTeamIndex + 1) % total;
             updateTeamCarousel();
             startTeamAutoCarousel();
             playSoftClick();
-          });
+          };
         }
 
         const sections = Array.from(
@@ -4306,8 +4403,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             return false;
           }
         }
-
-        window.openRegistration = function openRegistration(event) {
+// ==========================================
+// DYNAMIC EVENT-SPECIFIC REGISTRATION REDIRECT
+// ==========================================
+window.openRegistration = function openRegistration(event) {
+  // Check if this specific event has a custom Google Form / registration URL
+  if (event && event.registrationUrl) {
+    window.open(event.registrationUrl, "_blank");
+  } else {
+    // Fallback if no link was provided by the admin for this event
+    alert("Registration link for this event is not available yet. Please check back soon!");
+  }
+};
+        /* window.openRegistration = function openRegistration(event) {
           const modal = document.createElement("div");
           modal.className = "registration-modal open";
           const maxTeamMembers = Math.max(0, Number(event.maxTeam || 1) - 1);
@@ -4321,7 +4429,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           modal.onclick = (e) => {
             if (e.target === modal) modal.remove();
           };
-        }
+        }*/
         document.addEventListener("DOMContentLoaded", () => {
           if (new URLSearchParams(location.search).get("page") !== "events")
             return;
@@ -4485,6 +4593,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           modal.onclick = (e) => {
             if (e.target === modal) close();
           };
+
+          // ⚡ CLOSE SEARCH MODAL UPON CLICKING ANY RESULT ITEM
+          modal.addEventListener("click", (e) => {
+            if (e.target.closest(".search-result")) {
+              close();
+            }
+          });
+
           window.addEventListener("keydown", (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
               e.preventDefault();
