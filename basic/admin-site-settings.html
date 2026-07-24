@@ -363,7 +363,7 @@
         }
 
         function getSiteSettingsSnapshot() {
-            const fallbackSocials = { linkedin: "https://linkedin.com", instagram: "https://instagram.com", whatsapp: "https://chat.whatsapp.com/LN0aAxHI5p5IJ4CXzrfUAX", youtube: "https://youtube.com", website: "https://hitam.org" };
+            const fallbackSocials = { linkedin: "https://linkedin.com", instagram: "https://www.instagram.com/edc_hitam/", whatsapp: "https://chat.whatsapp.com/LN0aAxHI5p5IJ4CXzrfUAX", youtube: "https://youtube.com", website: "https://hitam.org" };
             const fallbackStats = { initiatives: 26, mindsets: 1200, workshops: 45, experts: 32, funding: 15, awards: 12 };
             return {
                 socials: { ...fallbackSocials, ...JSON.parse(localStorage.getItem('edc_site_socials') || '{}') },
