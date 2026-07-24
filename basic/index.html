@@ -3028,64 +3028,75 @@ window.appData = appData;
         };
       }
 
-      async function loadAdminDrivenData() {
+      // 1. Immediately hydrate window.appData from local cache if available
+const cachedAppData = localStorage.getItem("appData_cache");
+if (cachedAppData) {
+  try {
+    const parsedCache = JSON.parse(cachedAppData);
+    Object.assign(appData, parsedCache);
+  } catch (e) {
+    console.error("Failed to parse local appData cache", e);
+  }
+}
+
+// 2. Fetch fresh data from Supabase & keep cache in sync across all pages
+async function loadAdminDrivenData() {
   const fallback = localFallbacks();
-  const [blogs, team, rawEvents, visitors, startups] = await Promise.all([
-    fetchTable("edc_blogs", "?order=date.desc,id.desc", fallback.blogs),
-    fetchTable(
-      "edc_team",
-      "?order=sort_order.asc,id.desc",
-      fallback.team,
-    ),
-    fetchTable(
-      "edc_events",
-      "?order=sort_order.asc,id.desc",
-      fallback.events,
-    ),
-    fetchTable("edc_visitors", "?order=id.desc", fallback.visitors),
-    fetchTable("edc_startups", "?order=id.desc", fallback.startups),
-  ]);
+  
+  try {
+    const [blogs, team, rawEvents, visitors, startups] = await Promise.all([
+      fetchTable("edc_blogs", "?order=date.desc,id.desc", fallback.blogs),
+      fetchTable("edc_team", "?order=sort_order.asc,id.desc", fallback.team),
+      fetchTable("edc_events", "?order=sort_order.asc,id.desc", fallback.events),
+      fetchTable("edc_visitors", "?order=id.desc", fallback.visitors),
+      fetchTable("edc_startups", "?order=id.desc", fallback.startups),
+    ]);
 
-  // Map Supabase database columns back to camelCase properties for the UI
-  const events = (rawEvents || []).map((row) => ({
-    id: row.id,
-    name: row.title || row.name || "Untitled Event",
-    status: row.status || row.type || "upcoming",
-    type: row.type || "workshops",
-    startDate: row.start_date || row.date,
-    endDate: row.end_date || row.date,
-    deadline: row.deadline || "",
-    venue: row.venue || "HITAM",
-    location: row.location || "",
-    fee: row.fee || 0,
-    prizePool: row.prize_pool || "",
-    minTeam: row.min_team || 1,
-    maxTeam: row.max_team || 1,
-    banner: row.banner || row.img || "edc-logo.png",
-    logo: row.logo || row.img || "edc-logo.png",
-    upiId: row.upi_id || "",
-    qrCode: row.qr_code || "",
-    facultyCoordinators: row.faculty_coordinators || row.speaker || "",
-    studentCoordinators: row.student_coordinators || "",
-    sponsors: row.sponsors || "",
-    contactNumbers: row.contact_numbers || "",
-    socialMediaLinks: row.social_media || "",
-    description: row.description || row.outcome || "",
-    about: row.about || row.description || row.outcome || "",
-    rules: row.rules || "",
-    eligibility: row.eligibility || "",
-    schedule: row.schedule || "",
-    faqs: row.faqs || "",
-    subevents: row.subevents || [],
-  }));
+    const events = (rawEvents || []).map((row) => ({
+      id: row.id,
+      name: row.title || row.name || "Untitled Event",
+      status: row.status || row.type || "upcoming",
+      type: row.type || "workshops",
+      startDate: row.start_date || row.date,
+      endDate: row.end_date || row.date,
+      deadline: row.deadline || "",
+      venue: row.venue || "HITAM",
+      location: row.location || "",
+      fee: row.fee || 0,
+      prizePool: row.prize_pool || "",
+      minTeam: row.min_team || 1,
+      maxTeam: row.max_team || 1,
+      banner: row.banner || row.img || "edc-logo.png",
+      logo: row.logo || row.img || "edc-logo.png",
+      upiId: row.upi_id || "",
+      qrCode: row.qr_code || "",
+      facultyCoordinators: row.faculty_coordinators || row.speaker || "",
+      studentCoordinators: row.student_coordinators || "",
+      sponsors: row.sponsors || "",
+      contactNumbers: row.contact_numbers || "",
+      socialMediaLinks: row.social_media || "",
+      description: row.description || row.outcome || "",
+      about: row.about || row.description || row.outcome || "",
+      rules: row.rules || "",
+      eligibility: row.eligibility || "",
+      schedule: row.schedule || "",
+      faqs: row.faqs || "",
+      subevents: row.subevents || [],
+    }));
 
-  appData.blogs = blogs;
-  appData.team = team;
-  appData.events = events;
-  appData.visitors = visitors;
-  appData.startups = startups;
-  appData.socials = fallback.socials;
-  appData.stats = fallback.stats;
+    appData.blogs = blogs;
+    appData.team = team;
+    appData.events = events;
+    appData.visitors = visitors;
+    appData.startups = startups;
+    appData.socials = fallback.socials;
+    appData.stats = fallback.stats;
+
+    // Save synced data to localStorage for instant availability across page transitions
+    localStorage.setItem("appData_cache", JSON.stringify(appData));
+  } catch (err) {
+    console.error("Error syncing data with cloud:", err);
+  }
 }
 
       function showToast(message) {
@@ -3945,6 +3956,143 @@ function renderStartups() {
         renderSocials();
         setupInteractions();
       });
+      // 4. Master Safe Component Controller
+function renderCurrentPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const page = urlParams.get("page");
+  const eventId = urlParams.get("id");
+
+  // Check if user is opening the events page or a specific event portal
+  if (page === "events" || page === "event" || eventId) {
+    renderEventPage(eventId);
+    return;
+  }
+
+  // Otherwise render standard homepage sections safely
+  if (typeof renderAnnouncements === "function") renderAnnouncements();
+  if (typeof renderMetrics === "function") renderMetrics();
+  if (typeof renderEvents === "function") renderEvents();
+  if (typeof renderTeam === "function") renderTeam();
+  if (typeof renderStartups === "function") renderStartups();
+}
+// ==========================================
+// SAFE COUNTDOWN TIMER
+// ==========================================
+function countdown(dateString) {
+  if (!dateString) return "Date To Be Announced";
+  
+  const parsedTime = new Date(dateString).getTime();
+  if (isNaN(parsedTime)) return "Date To Be Announced";
+
+  const distance = parsedTime - Date.now();
+  if (distance <= 0) return "Event Completed / Active";
+
+  const totalSeconds = Math.floor(distance / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+
+  return `${days} Days ${hours} Hours ${minutes} Minutes`;
+}
+
+// Helper to safely fetch events from appData
+function events() {
+  return (window.appData && window.appData.events) ? window.appData.events : [];
+}
+
+// Helper to safely escape HTML strings
+function esc(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// ==========================================
+// EVENT PAGE PORTAL RENDERER
+// ==========================================
+// ==========================================
+// EVENT PAGE PORTAL RENDERER (FIXED)
+// ==========================================
+function renderEventPage(id) {
+  const rawList = events();
+  const main = document.querySelector("main");
+  if (!main) return;
+
+  const all = rawList.map((e) => ({
+    ...e,
+    name: e.name || e.title || "EDC Event",
+    startDate: e.startDate || e.start_date || e.date || null,
+    endDate: e.endDate || e.end_date || e.date || null,
+    description: e.description || e.outcome || "EDC Event Details",
+    about: e.about || e.description || e.outcome || "",
+  }));
+
+  if (all.length === 0) {
+    main.innerHTML = `
+      <section class="portal" style="padding: 3rem; text-align: center;">
+        <h1>No current events yet.</h1>
+        <p>Check back soon for the next EDC HITAM experience.</p>
+      </section>`;
+    return;
+  }
+
+  let event =
+    all.find((e) => String(e.id) === String(id)) ||
+    all.find((e) => e.featured) ||
+    all[0];
+
+  const eventName = esc(event.name || "EDC Event");
+  const timeText = countdown(event.startDate);
+
+  main.innerHTML = `
+    <section class="portal-event-container" style="max-width: 900px; margin: 2rem auto; padding: 1.5rem;">
+      <div class="event-header">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">${eventName}</h1>
+        <p class="venue-badge" style="color: #666;">📍 ${esc(event.venue || "HITAM Campus")}</p>
+      </div>
+
+      <div class="countdown-box" style="background: #f4f4f5; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; font-weight: bold;">
+        ⏳ Start Countdown: <span id="event-timer">${timeText}</span>
+      </div>
+
+      <div class="event-description" style="line-height: 1.6; margin-bottom: 2rem;">
+        <h3>About the Event</h3>
+        <p>${esc(event.description || event.about)}</p>
+      </div>
+
+      <button class="primary-btn" id="openRegistrationBtn" style="padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer;">
+        Register for ${eventName}
+      </button>
+    </section>
+  `;
+
+  // 🌟 FIX: Attach click listener right after rendering
+  const btn = document.getElementById("openRegistrationBtn");
+  if (btn) {
+    btn.onclick = () => {
+      if (typeof window.openRegistration === "function") {
+        window.openRegistration(event);
+      } else {
+        console.error("openRegistration function not found!");
+      }
+    };
+  }
+}
+document.addEventListener("DOMContentLoaded", async () => {
+  runIntro();
+  
+  // Render immediately from local cache so the UI loads instantly
+  renderCurrentPage(); 
+
+  // Fetch fresh data from Supabase in the background and re-render
+  await loadAdminDrivenData();
+  renderCurrentPage();
+
+  setupInteractions();
+});
     </script>
     <script>
       /* Single-file Event Management & Registration Portal */
@@ -4159,7 +4307,7 @@ function renderStartups() {
           }
         }
 
-        function openRegistration(event) {
+        window.openRegistration = function openRegistration(event) {
           const modal = document.createElement("div");
           modal.className = "registration-modal open";
           const maxTeamMembers = Math.max(0, Number(event.maxTeam || 1) - 1);
@@ -4803,6 +4951,7 @@ function renderStartups() {
           });
         }).observe(document.body, { childList: true, subtree: true });
       })();
+
     </script>
   </body>
 </html>
