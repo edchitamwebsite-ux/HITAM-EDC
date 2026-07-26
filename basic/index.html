@@ -56,6 +56,7 @@
       rel="stylesheet"
     />
     <style>
+      /* Keep event card height uniform and ensure Register button is always visible */
       :root {
         --ink: #071011;
         --panel: #0d1718;
@@ -2000,6 +2001,7 @@
           flex-direction: column;
         }
       }
+      
     </style>
   </head>
   <body>
@@ -3168,22 +3170,27 @@ async function loadAdminDrivenData() {
 }
 
 function imageSource(item, index) {
-  const raw = item && item.img ? String(item.img) : "";
-  if (raw.startsWith("http") || raw.startsWith("pictures/")) return raw;
-  if (raw && !raw.includes("/")) return `pictures/${raw}`;
-  return "edc-logo.png";
+  // Grab banner, logo, or img field
+  const raw = item && (item.banner || item.logo || item.img) ? String(item.banner || item.logo || item.img).trim() : "";
+  if (!raw) return "edc-logo.png"; // Fallback if no image string exists
+  // If it's already a full URL, relative path, or base64 image, use it directly
+  if (raw.startsWith("http") || raw.includes("/") || raw.startsWith("data:")) {
+    return raw;
+  }
+  // Otherwise return the filename directly from the root folder
+  return raw; 
 }
 
 let currentEventIndex = 0;
 let eventAutoTimer = null;
-
 function renderEvents() {
   const target = document.getElementById("eventsGrid");
-  
-  // SAFEGUARD: Stop if eventsGrid isn't on this page
   if (!target) return;
 
-  const events = getData(appData.events, []);
+  // Pull array from appData.events (or appData.initiatives if present)
+  const events = (appData.events && appData.events.length) 
+    ? appData.events 
+    : (appData.initiatives || []);
 
   if (!events.length) {
     target.innerHTML = `<article class="event-card active"><div class="event-body"><h3>Initiatives coming soon.</h3><p>Add events from the administrative dashboard panel.</p></div></article>`;
@@ -3191,28 +3198,32 @@ function renderEvents() {
   }
 
   target.innerHTML = events
-    .map(
-      (event, index) => {
-        const regUrl = event.registrationUrl || event.registration_url || "";
-        return `
-          <article class="card event-card">
-              <img src="${imageSource(event, index + 3)}" alt="${event.title || "EDC event"}" onerror="this.src='edc-logo.png'">
-              <div class="event-body">
-                  <div class="meta"><span>${event.type || "event"}</span><span>${event.date || ""}</span></div>
-                  <h3>${event.title || "EDC Event"}</h3>
-                  <p>${event.outcome || event.content || "Student-led innovation activity at HITAM EDC."}</p>
-                  <button 
-                    type="button" 
-                    class="primary-btn" 
-                    style="margin-top: 12px; padding: 6px 14px; font-size: 0.78rem; align-self: flex-start;" 
-                    onclick="window.handleHomeEventRegister(event, '${esc(event.registrationUrl || event.registration_url || '')}')">
-                    Register Now 
-                  </button>
-              </div>
-          </article>
-        `;
-      }
-    )
+    .map((event, index) => {
+      // Map exact property keys from your Supabase object
+      const titleText = event.name || event.title || "EDC Event";
+      const descText  = event.about || event.description || "Student-led innovation activity at HITAM EDC.";
+      const regUrl    = event.registrationUrl || event.registration_url || "";
+      const category  = event.type || event.status || "EVENT";
+      const dateText  = event.startDate || event.date || "";
+
+      return `
+        <article class="card event-card">
+            <img src="${imageSource(event, index + 3)}" alt="${esc(titleText)}" onerror="this.src='edc-logo.png'">
+            <div class="event-body">
+                <div class="meta"><span>${esc(category)}</span><span>${esc(dateText)}</span></div>
+                <h3>${esc(titleText)}</h3>
+                <p>${esc(descText)}</p>
+                <button 
+                  type="button" 
+                  class="primary-btn" 
+                  style="margin-top: 12px; padding: 6px 14px; font-size: 0.78rem; align-self: flex-start;" 
+                  onclick="window.handleHomeEventRegister(event, '${esc(regUrl)}')">
+                  Register Now 
+                </button>
+            </div>
+        </article>
+      `;
+    })
     .join("");
 
   currentEventIndex = 0;
