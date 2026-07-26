@@ -3054,36 +3054,38 @@ async function loadAdminDrivenData() {
     ]);
 
     const events = (rawEvents || []).map((row) => ({
-      id: row.id,
-      name: row.title || row.name || "Untitled Event",
-      status: row.status || row.type || "upcoming",
-      type: row.type || "workshops",
-      startDate: row.start_date || row.date,
-      endDate: row.end_date || row.date,
-      deadline: row.deadline || "",
-      venue: row.venue || "HITAM",
-      location: row.location || "",
-      fee: row.fee || 0,
-      prizePool: row.prize_pool || "",
-      minTeam: row.min_team || 1,
-      maxTeam: row.max_team || 1,
-      banner: row.banner || row.img || "edc-logo.png",
-      logo: row.logo || row.img || "edc-logo.png",
-      upiId: row.upi_id || "",
-      qrCode: row.qr_code || "",
-      facultyCoordinators: row.faculty_coordinators || row.speaker || "",
-      studentCoordinators: row.student_coordinators || "",
-      sponsors: row.sponsors || "",
-      contactNumbers: row.contact_numbers || "",
-      socialMediaLinks: row.social_media || "",
-      description: row.description || row.outcome || "",
-      about: row.about || row.description || row.outcome || "",
-      rules: row.rules || "",
-      eligibility: row.eligibility || "",
-      schedule: row.schedule || "",
-      faqs: row.faqs || "",
-      subevents: row.subevents || [],
-    }));
+  id: row.id,
+  name: row.title || row.name || "Untitled Event",
+  // 🔽 ADD THIS LINE TO MAP THE SUPABASE COLUMN 🔽
+  registrationUrl: row.registration_url || row.registrationUrl || "", 
+  status: row.status || row.type || "upcoming",
+  type: row.type || "workshops",
+  startDate: row.start_date || row.date,
+  endDate: row.end_date || row.date,
+  deadline: row.deadline || "",
+  venue: row.venue || "HITAM",
+  location: row.location || "",
+  fee: row.fee || 0,
+  prizePool: row.prize_pool || "",
+  minTeam: row.min_team || 1,
+  maxTeam: row.max_team || 1,
+  banner: row.banner || row.img || "edc-logo.png",
+  logo: row.logo || row.img || "edc-logo.png",
+  upiId: row.upi_id || "",
+  qrCode: row.qr_code || "",
+  facultyCoordinators: row.faculty_coordinators || row.speaker || "",
+  studentCoordinators: row.student_coordinators || "",
+  sponsors: row.sponsors || "",
+  contactNumbers: row.contact_numbers || "",
+  socialMediaLinks: row.social_media || "",
+  description: row.description || row.outcome || "",
+  about: row.about || row.description || row.outcome || "",
+  rules: row.rules || "",
+  eligibility: row.eligibility || "",
+  schedule: row.schedule || "",
+  faqs: row.faqs || "",
+  subevents: row.subevents || [],
+}));
 
     appData.blogs = blogs;
     appData.team = team;
@@ -4168,8 +4170,9 @@ function renderEventPage(id) {
   const btn = document.getElementById("openRegistrationBtn");
   if (btn) {
     btn.onclick = () => {
+      const targetUrl = event?.registration_url || event?.registrationUrl || "";
       if (typeof window.openRegistration === "function") {
-        window.openRegistration(event);
+        window.openRegistration(targetUrl || event);
       } else {
         console.error("openRegistration function not found!");
       }
@@ -4405,11 +4408,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 // DYNAMIC EVENT-SPECIFIC REGISTRATION REDIRECT
 // ==========================================
 window.openRegistration = function openRegistration(event) {
-  // Check if this specific event has a custom Google Form / registration URL
-  if (event && event.registrationUrl) {
-    window.open(event.registrationUrl, "_blank");
+  // Extract URL whether passed as an object or raw string, checking both snake_case and camelCase
+  const rawUrl = typeof event === 'string' 
+    ? event 
+    : (event?.registration_url || event?.registrationUrl || event?.registration || '');
+
+  if (rawUrl && rawUrl.trim() !== "") {
+    let cleanUrl = rawUrl.trim();
+    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+      cleanUrl = "https://" + cleanUrl;
+    }
+    window.open(cleanUrl, "_blank");
   } else {
-    // Fallback if no link was provided by the admin for this event
     alert("Registration link for this event is not available yet. Please check back soon!");
   }
 };
