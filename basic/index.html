@@ -2281,20 +2281,6 @@
               Apply to Join
             </button>
           </div>
-          <!-- <div class="hero-strip" aria-label="EDC quick stats">
-            <div class="mini-stat">
-              <strong data-stat="initiatives">26+</strong
-              ><span>initiatives across innovation and venture building</span>
-            </div>
-            <div class="mini-stat">
-              <strong data-stat="mindsets">1,200+</strong
-              ><span>students reached through EDC activity</span>
-            </div>
-            <div class="mini-stat">
-              <strong data-stat="workshops">45+</strong
-              ><span>workshops, talks, tours, and pitch tracks</span>
-            </div>
-          </div> -->
         </div>
 
         <div
@@ -2636,10 +2622,6 @@
             <span class="section-label">Events</span>
             <h2>Recent activity from the EDC ecosystem.</h2>
           </div>
-          <p class="section-note">
-            The event feed uses your existing local data, so updates made
-            through your content flow can continue appearing here.
-          </p>
         </div>
         <div class="timeline-grid reveal" id="eventsGrid"></div>
       </section>
@@ -2650,10 +2632,6 @@
             <span class="section-label">Team</span>
             <h2>Swipe through the student leaders moving the cell forward.</h2>
           </div>
-          <p class="section-note">
-            A focused team section with clean profile cards, using the local EDC
-            images already present in your project.
-          </p>
         </div>
         <div class="team-carousel reveal">
           <div class="team-track" id="teamTrack"></div>
@@ -2675,10 +2653,6 @@
             <span class="section-label">Guest Testimonials</span>
             <h2>Voices from mentors, dignitaries, and industry guests.</h2>
           </div>
-          <p class="section-note">
-            This section is connected to the Guest Testimonials area in your
-            admin panel.
-          </p>
         </div>
         <div class="testimonial-grid reveal" id="testimonialGrid"></div>
       </section>
@@ -2689,10 +2663,6 @@
             <span class="section-label">Incubated Startups</span>
             <h2>Student ventures and portfolio stories.</h2>
           </div>
-          <p class="section-note">
-            Startup cards are managed from the admin panel’s Incubated Startups
-            tab.
-          </p>
         </div>
         <div class="startup-grid reveal" id="startupGrid"></div>
       </section>
@@ -2703,10 +2673,6 @@
             <span class="section-label">Announcements</span>
             <h2>Latest updates from the EDC desk.</h2>
           </div>
-          <p class="section-note">
-            These updates are pulled from the same Daily Announcements area in
-            your admin panel.
-          </p>
         </div>
         <div class="announcement-grid reveal">
           <article
@@ -3270,10 +3236,10 @@ window.handleHomeEventRegister = function(e, regUrl) {
   if (e) e.stopPropagation();
 
   if (regUrl && regUrl.trim() !== "" && regUrl.startsWith("http")) {
-    // 1. Directly opens the Google Form link if configured
-    window.open(regUrl, "_blank");
+    // Opens the link safely in a new tab
+    window.open(regUrl, "_blank", "noopener,noreferrer");
   } else {
-    // 2. Otherwise redirects cleanly to the main events tab/page
+    // Redirects to the main events page if no URL is provided
     window.location.href = "index.html?page=events";
   }
 };
@@ -4052,18 +4018,6 @@ function renderStartups() {
         }, 2850);
       }
 
-      document.addEventListener("DOMContentLoaded", async () => {
-        runIntro();
-        await loadAdminDrivenData();
-        renderAnnouncements();
-        renderMetrics();
-        renderEvents();
-        renderTeam();
-        renderTestimonials();
-        renderStartups();
-        renderSocials();
-        setupInteractions();
-      });
       // 4. Master Safe Component Controller
 function renderCurrentPage() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -4190,24 +4144,10 @@ function renderEventPage(id) {
     };
   }
 }
-document.addEventListener("DOMContentLoaded", async () => {
-  runIntro();
-  
-  // Render immediately from local cache so the UI loads instantly
-  renderCurrentPage(); 
-
-  // Fetch fresh data from Supabase in the background and re-render
-  await loadAdminDrivenData();
-  renderCurrentPage();
-
-  setupInteractions();
-});
     </script>
     <script>
       /* Single-file Event Management & Registration Portal */
       (() => {
-        const portalKey = "edc_events",
-          registrationKey = "edc_event_registrations";
         const esc = (value) =>
           String(value ?? "").replace(
             /[&<>'"]/g,
@@ -4228,9 +4168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           return JSON.parse(
             localStorage.getItem(portalKey) ||
               JSON.stringify(
-                typeof initialPortalEvents !== "undefined"
-                  ? initialPortalEvents
-                  : [],
+                (window.appData && window.appData.events) ? window.appData.events : []
               ),
           );
         };
@@ -4362,59 +4300,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           typeof crypto !== "undefined" && crypto.randomUUID
             ? crypto.randomUUID()
             : `reg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        async function syncRegistrationToSupabase(registration) {
-          const registrationId =
-            typeof registration.id === "string" && registration.id.includes("-")
-              ? registration.id
-              : createRegistrationId();
-          const payload = {
-            id: registrationId,
-            event_name: registration.eventName || "",
-            student_name: registration.fullName || "",
-            email: registration.email || "",
-            phone: registration.phone || "",
-            college: registration.college || "",
-            department: registration.branch || "",
-            year: registration.year || "",
-            gender: registration.gender || "",
-            roll_number: registration.rollNumber || "",
-            team_name: registration.teamName || "Individual",
-            team_leader: registration.teamLeader || "",
-            member_1: registration.member1 || "",
-            member_2: registration.member2 || "",
-            member_3: registration.member3 || "",
-            emergency_contact: registration.emergencyContact || "",
-            food_preference: registration.foodPreference || "",
-            accommodation: registration.accommodation || "No",
-            transaction_id: registration.transactionId || "",
-            status: registration.status || "pending",
-            payment_screenshot: registration.paymentScreenshot || "",
-          };
-
-          try {
-            const response = await fetch(
-              `${SUPABASE_URL}/rest/v1/edc_event_registrations`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  apikey: SUPABASE_KEY,
-                  Authorization: `Bearer ${SUPABASE_KEY}`,
-                  Prefer: "return=minimal",
-                },
-                body: JSON.stringify(payload),
-              },
-            );
-            if (!response.ok) {
-              const text = await response.text();
-              throw new Error(text || "Supabase insert failed");
-            }
-            return true;
-          } catch (error) {
-            console.error("Registration sync failed:", error);
-            return false;
-          }
-        }
 // ==========================================
 // DYNAMIC EVENT-SPECIFIC REGISTRATION REDIRECT
 // ==========================================
@@ -4434,21 +4319,6 @@ window.openRegistration = function openRegistration(event) {
     alert("Registration link for this event is not available yet. Please check back soon!");
   }
 };
-        /* window.openRegistration = function openRegistration(event) {
-          const modal = document.createElement("div");
-          modal.className = "registration-modal open";
-          const maxTeamMembers = Math.max(0, Number(event.maxTeam || 1) - 1);
-          let members = "";
-          for (let i = 0; i < maxTeamMembers; i++) {
-            members += `<input name="member${i + 1}" placeholder="Member ${i + 1} name">`;
-          }
-          modal.innerHTML = `<div class="registration-box"><button class="icon-btn" style="float:right" aria-label="Close">×</button><span class="portal-kicker">${esc(event.name)}</span><h2>Premium registration</h2><p style="color:var(--muted);margin-bottom:18px">${Number(event.fee) ? `Pay ${money(event.fee)} via ${esc(event.upiId || "the displayed UPI ID")} and upload your proof.` : "This event is free to register."}</p><form id="eventRegistration" class="reg-grid"><input required name="fullName" placeholder="Full name"><input required type="email" name="email" placeholder="Email"><input required minlength="8" type="password" name="participantPassword" placeholder="Create password"><input required type="password" name="participantConfirmPassword" placeholder="Confirm password"><input required name="phone" placeholder="Phone"><input required name="college" placeholder="College"><input required name="branch" placeholder="Branch"><input required name="year" placeholder="Year"><select required name="gender"><option value="">Gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select><input required name="rollNumber" placeholder="Roll number"><input class="reg-wide" name="teamName" placeholder="Team name (optional)"><input class="reg-wide" name="teamLeader" placeholder="Team leader"><div class="reg-wide grid gap-2">${members}</div><input required name="emergencyContact" placeholder="Emergency contact"><select required name="foodPreference"><option value="">Food preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>None</option></select><select required name="accommodation"><option value="No">Accommodation required?</option><option>Yes</option><option>No</option></select><div class="reg-wide"><label style="color:var(--muted); display:block; margin-bottom:4px;">Choose File / Screenshot:</label><input type="file" name="paymentScreenshot" accept="image/*"></div>${Number(event.fee) ? `<input name="transactionId" required placeholder="Transaction ID / UPI reference">` : ""}<label class="reg-wide" style="color:var(--muted)"><input required type="checkbox" name="terms"> I agree to the event rules and terms.</label><button class="primary-btn reg-wide" type="submit">Submit registration</button></form></div>`;
-          document.body.append(modal);
-          modal.querySelector("button").onclick = () => modal.remove();
-          modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-          };
-        }*/
         document.addEventListener("DOMContentLoaded", () => {
           if (new URLSearchParams(location.search).get("page") !== "events")
             return;
@@ -4512,27 +4382,14 @@ window.openRegistration = function openRegistration(event) {
               href: "#announcements",
             }),
           );
-          (data.events || []).forEach((x) =>
+          (data.events || []).forEach((x) => {
             raw.push({
               type: "Event",
-              title: x.title,
-              text: x.outcome,
-              href: "#events",
-            }),
-          );
-          read(
-            "edc_portal_events",
-            typeof initialPortalEvents !== "undefined"
-              ? initialPortalEvents
-              : [],
-          ).forEach((x) =>
-            raw.push({
-              type: "Current Event",
-              title: x.name,
-              text: x.description,
+              title: x.name || x.title || "EDC Event",
+              text: x.description || x.outcome || "",
               href: `index.html?page=events&event=${encodeURIComponent(x.id)}`,
-            }),
-          );
+            });
+          });
           (data.team || []).forEach((x) =>
             raw.push({
               type: "Team",
@@ -5110,6 +4967,97 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     }
   });
 });
+
+let activePopupEventUrl = "";
+
+function closeLiveEventPopup() {
+    const modal = document.getElementById('live-event-popup-modal');
+    if (modal) modal.style.display = 'none';
+    sessionStorage.setItem("live_event_popup_dismissed", "true");
+}
+
+function registerForLivePopupEvent() {
+    if (activePopupEventUrl && activePopupEventUrl.startsWith("http")) {
+        window.open(activePopupEventUrl, "_blank");
+    } else {
+        window.location.href = "index.html?page=events";
+    }
+    closeLiveEventPopup();
+}
+
+async function handleEventsAndPopupFlow() {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/edc_events?order=sort_order.asc,date.desc`, {
+            headers: cloudHeaders
+        });
+
+        if (!res.ok) return;
+        const allEvents = await res.json();
+        if (!Array.isArray(allEvents)) return;
+
+        // 1. FILTER FOR LIVE OR UPCOMING EVENTS (POPUP MODAL ONLY)
+        const popupEvent = allEvents.find(e => e.status === 'live' || e.status === 'upcoming');
+
+        if (popupEvent && sessionStorage.getItem("live_event_popup_dismissed") !== "true") {
+            const isLive = popupEvent.status === 'live';
+            
+            const badgeLabel = isLive ? "LIVE EVENT HAPPENING NOW 🔴" : "UPCOMING EVENT ANNOUNCEMENT 🚀";
+            const badgeColor = isLive ? "#22C55E" : "#60A5FA";
+            
+            const badgeElem = document.getElementById('popup-event-badge');
+            if (badgeElem) {
+                badgeElem.innerText = badgeLabel;
+                badgeElem.style.color = badgeColor;
+            }
+
+            document.getElementById('popup-event-title').innerText = popupEvent.title || popupEvent.name || "EDC Event";
+            document.getElementById('popup-event-desc').innerText = popupEvent.outcome || popupEvent.description || popupEvent.about || "Join our event and connect with mentors and student innovators!";
+            
+            const rawImg = popupEvent.img || popupEvent.banner || popupEvent.logo || "edc-logo.png";
+            document.getElementById('popup-event-img').src = rawImg.startsWith("http") ? rawImg : `pictures/${rawImg}`;
+            
+            activePopupEventUrl = popupEvent.registration_url || popupEvent.registrationUrl || "";
+
+            setTimeout(() => {
+                const modal = document.getElementById('live-event-popup-modal');
+                if (modal) modal.style.display = 'flex';
+                
+            }, 800);
+        }
+
+    } catch (err) {
+        console.warn("Event processing error:", err);
+    }
+}
+
+// Automatically trigger on page load
+document.addEventListener("DOMContentLoaded", () => {
+    handleEventsAndPopupFlow();
+});
     </script>
+<!-- LIVE & UPCOMING POPUP MODAL -->
+<div id="live-event-popup-modal" style="position: fixed; inset: 0; background: rgba(5, 8, 22, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 25000; display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--dark-slate, #0F172A); border: 1px solid var(--emerald, #10B981); max-width: 480px; width: 100%; padding: 32px; border-radius: 16px; position: relative; text-align: center; box-shadow: 0 20px 50px rgba(16, 185, 129, 0.25);">
+        
+        <button onclick="closeLiveEventPopup()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #94A3B8; font-size: 24px; cursor: pointer;">&times;</button>
+        
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px;">
+            <span style="width: 8px; height: 8px; background: #22C55E; border-radius: 50%; box-shadow: 0 0 10px #22C55E;"></span>
+            <span id="popup-event-badge" style="font-size: 10px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 1.5px;">EVENT ANNOUNCEMENT</span>
+        </div>
+
+        <div style="width: 100%; height: 180px; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); background: #050816;">
+            <img id="popup-event-img" src="edc-logo.png" alt="Event" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='edc-logo.png'">
+        </div>
+
+        <h3 id="popup-event-title" style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC; text-transform: uppercase; margin-bottom: 10px; line-height: 1.2;"></h3>
+        <p id="popup-event-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.6; margin-bottom: 24px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;"></p>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="popup-event-register-btn" onclick="registerForLivePopupEvent()" style="flex: 1; background: #10B981; color: #050816; border: none; padding: 14px 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px; cursor: pointer;">Register Now &rarr;</button>
+            <button onclick="closeLiveEventPopup()" style="background: transparent; color: #94A3B8; border: 1px solid #1E293B; padding: 14px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 6px; cursor: pointer;">Dismiss</button>
+        </div>
+    </div>
+</div>
   </body>
 </html>
