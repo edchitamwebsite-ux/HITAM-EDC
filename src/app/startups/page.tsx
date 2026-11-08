@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { INCUBATED_STARTUPS } from '@/lib/data';
-import { Startup, StartupSector } from '@/types';
+import { Startup } from '@/types';
 import { 
   Rocket, 
   Search, 
@@ -65,23 +65,23 @@ export default function StartupsPage() {
   };
 
   return (
-    <div className="bg-slate-950 text-slate-100 min-h-screen">
+    <div className="bg-slate-50 text-slate-800 min-h-screen pb-16">
       
       {/* Header */}
-      <section className="py-20 border-b border-slate-800 bg-grid-pattern">
+      <section className="py-16 md:py-20 border-b border-slate-200 bg-grid-pattern">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Badge variant="hitam" className="mb-4">
+          <Badge variant="teal" className="mb-3">
             Catalyst Cohort Directory
           </Badge>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-navy-900 tracking-tight font-heading">
             HITAM Startup Showcase
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto">
+          <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Discover student-founded companies building hardware, enterprise AI, sustainable materials, and rural technology at the HITAM Green Campus.
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Link href="/startups/submit">
-              <Button size="lg" className="gap-2 shadow-glow-sm">
+              <Button variant="teal" size="lg" className="gap-2 shadow-sm">
                 <Sparkles className="h-4 w-4" />
                 Submit Your Startup Idea
               </Button>
@@ -91,7 +91,7 @@ export default function StartupsPage() {
       </section>
 
       {/* Filter and Search Bar */}
-      <section className="py-6 border-b border-slate-800 bg-slate-900/40">
+      <section className="py-6 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           
           <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
@@ -99,13 +99,13 @@ export default function StartupsPage() {
               <button
                 key={sec}
                 onClick={() => setSelectedSector(sec)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   selectedSector === sec
-                    ? 'bg-hitam-600 text-white shadow-sm border border-hitam-400/40'
-                    : 'bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800'
+                    ? 'bg-navy-900 text-white shadow-sm border border-navy-800'
+                    : 'bg-slate-100 text-slate-600 hover:text-navy-900 hover:bg-slate-200 border border-slate-200'
                 }`}
               >
-                {sec.replace('_', ' ')}
+                {sec.replace(/_/g, ' ')}
               </button>
             ))}
           </div>
@@ -117,7 +117,7 @@ export default function StartupsPage() {
               placeholder="Search by venture name or keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-hitam-400"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all"
             />
           </div>
 
@@ -125,53 +125,53 @@ export default function StartupsPage() {
       </section>
 
       {/* Startups Grid */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredStartups.map((startup) => (
-              <Card key={startup.id} className="border-slate-800 glass-panel-hover flex flex-col justify-between">
+              <Card key={startup.id} className="border-slate-200 bg-white shadow-card hover:shadow-lg transition-all flex flex-col justify-between">
                 <div>
                   <CardHeader>
                     <div className="flex items-center justify-between mb-3">
-                      <Badge variant="hitam">
-                        {startup.sector.replace('_', ' ')}
+                      <Badge variant="teal">
+                        {startup.sector.replace(/_/g, ' ')}
                       </Badge>
-                      <span className="text-xs text-slate-400 font-mono">
-                        {startup.stage.replace('_', ' ')}
+                      <span className="text-xs text-slate-500 font-mono font-semibold">
+                        {startup.stage.replace(/_/g, ' ')}
                       </span>
                     </div>
 
-                    <CardTitle className="text-2xl text-white">
+                    <CardTitle className="text-2xl text-navy-900 font-heading">
                       {startup.name}
                     </CardTitle>
-                    <CardDescription className="text-xs text-hitam-300 font-medium">
+                    <CardDescription className="text-xs text-teal-700 font-medium pt-1">
                       {startup.tagline}
                     </CardDescription>
                   </CardHeader>
 
                   <CardContent className="space-y-4 pt-1">
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {startup.description}
                     </p>
 
                     {startup.traction_metric && (
-                      <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
-                        <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] block">
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+                        <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px] block">
                           Traction Metric:
                         </span>
-                        <span className="text-slate-200 font-semibold">
+                        <span className="text-navy-900 font-bold">
                           {startup.traction_metric}
                         </span>
                       </div>
                     )}
 
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                       <div>
-                        Founders: <span className="text-slate-200 font-medium">{startup.founder_names.join(', ')}</span>
+                        Founders: <span className="text-slate-800 font-semibold">{startup.founder_names.join(', ')}</span>
                       </div>
                       {startup.lab_allocated && (
-                        <div className="text-[11px] text-hitam-400">
+                        <div className="text-[11px] text-teal-700 font-medium">
                           {startup.lab_allocated}
                         </div>
                       )}
@@ -179,17 +179,17 @@ export default function StartupsPage() {
                   </CardContent>
                 </div>
 
-                <CardFooter className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <CardFooter className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex flex-wrap gap-1.5 w-full sm:w-auto">
                     {startup.skills_needed && startup.skills_needed.map((skill, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-slate-300">
+                      <span key={i} className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-700 font-medium">
                         Need: {skill}
                       </span>
                     ))}
                   </div>
 
                   <Button
-                    variant="primary"
+                    variant="navy"
                     size="sm"
                     onClick={() => {
                       setActiveStartup(startup);
@@ -219,12 +219,12 @@ export default function StartupsPage() {
         maxWidth="md"
       >
         {collabSent ? (
-          <div className="text-center py-6 space-y-4 animate-scale-in">
-            <div className="inline-flex p-3 rounded-full bg-hitam-950 border border-hitam-500/40 text-hitam-400">
+          <div className="text-center py-6 space-y-4">
+            <div className="inline-flex p-3 rounded-full bg-teal-50 border border-teal-200 text-teal-600">
               <Check className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold text-white">Collaboration Request Sent!</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-xl font-bold text-navy-900 font-heading">Collaboration Request Sent!</h3>
+            <p className="text-xs text-slate-600 max-w-sm mx-auto">
               Your inquiry has been forwarded to the founders of <strong>{activeStartup?.name}</strong>. They will review your profile and reach out via email.
             </p>
             <Button variant="outline" size="sm" onClick={() => setActiveStartup(null)} className="text-xs">
@@ -234,66 +234,66 @@ export default function StartupsPage() {
         ) : (
           <div>
             <div className="mb-4">
-              <Badge variant="hitam" className="mb-1 text-[10px]">Team Collaboration</Badge>
-              <h3 className="text-xl font-bold text-white">Join {activeStartup?.name}</h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <Badge variant="teal" className="mb-1 text-[10px]">Team Collaboration</Badge>
+              <h3 className="text-xl font-bold text-navy-900 font-heading">Join {activeStartup?.name}</h3>
+              <p className="text-xs text-slate-500 mt-1">
                 Share what skills you bring to this startup venture.
               </p>
             </div>
 
             <form onSubmit={handleSendCollab} className="space-y-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Your Full Name *</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Your Full Name *</label>
                 <input
                   type="text"
                   required
                   value={applicantName}
                   onChange={(e) => setApplicantName(e.target.value)}
                   placeholder="e.g. Rahul Sharma"
-                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Your College Email *</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Your College Email *</label>
                 <input
                   type="email"
                   required
                   value={applicantEmail}
                   onChange={(e) => setApplicantEmail(e.target.value)}
                   placeholder="e.g. rahul@hitam.org"
-                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Role / Skill Set *</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Role / Skill Set *</label>
                 <input
                   type="text"
                   required
                   value={appliedRole}
                   onChange={(e) => setAppliedRole(e.target.value)}
                   placeholder="e.g. Embedded C Developer, UI Designer, Growth"
-                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Message to Founders</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Message to Founders</label>
                 <textarea
                   rows={3}
                   value={collabMessage}
                   onChange={(e) => setCollabMessage(e.target.value)}
                   placeholder="Tell them why you want to build this product..."
-                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-800 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
                 <Button type="button" variant="outline" size="sm" onClick={() => setActiveStartup(null)} className="text-xs">
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="sm" className="text-xs">
+                <Button type="submit" variant="navy" size="sm" className="text-xs">
                   Submit Request
                 </Button>
               </div>

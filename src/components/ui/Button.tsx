@@ -4,22 +4,23 @@ import { Loader2 } from "lucide-react";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "subtle";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "teal" | "navy";
   size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading = false, children, disabled, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hitam-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]";
+    const baseStyles = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-900 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.99]";
 
     const variants = {
-      primary: "bg-hitam-600 hover:bg-hitam-500 text-white shadow-sm hover:shadow-glow-sm border border-hitam-500/30",
-      secondary: "bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700",
-      outline: "bg-transparent hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600",
-      ghost: "bg-transparent hover:bg-slate-850 text-slate-300 hover:text-white",
-      danger: "bg-red-600/90 hover:bg-red-600 text-white shadow-sm border border-red-500/30",
-      subtle: "bg-hitam-950/60 hover:bg-hitam-900/60 text-hitam-300 border border-hitam-700/40",
+      primary: "bg-navy-900 hover:bg-navy-800 text-white shadow-subtle border border-navy-950",
+      navy: "bg-navy-900 hover:bg-navy-800 text-white shadow-subtle border border-navy-950",
+      secondary: "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200",
+      outline: "bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-subtle",
+      ghost: "bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900",
+      danger: "bg-red-600 hover:bg-red-700 text-white shadow-subtle border border-red-700",
+      teal: "bg-teal-600 hover:bg-teal-700 text-white shadow-subtle border border-teal-700",
     };
 
     const sizes = {

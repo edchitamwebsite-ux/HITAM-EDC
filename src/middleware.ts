@@ -54,7 +54,13 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  } catch (err) {
+    // If Supabase is unreachable (e.g. during offline build or test sandbox), proceed safely
+  }
 
   const pathname = request.nextUrl.pathname;
 
@@ -74,11 +80,17 @@ export async function middleware(request: NextRequest) {
     }
 
     // Role check via users table
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single();
+    let profile = null;
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('role')
+        .eq('auth_id', user.id)
+        .single();
+      profile = data;
+    } catch (err) {
+      // Offline fallback
+    }
 
     if (!profile || profile.role !== 'admin') {
       // Unauthorized user attempting admin access - redirect to forbidden or student dashboard

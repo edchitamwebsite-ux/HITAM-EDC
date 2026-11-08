@@ -73,10 +73,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-grid-pattern">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-grid-pattern">
       <div className="sm:mx-auto sm:w-full sm:max-w-lg text-center">
         <Link href="/" className="inline-flex items-center gap-3 group mb-4">
-          <div className="h-12 w-12 rounded-xl bg-hitam-950 border border-hitam-500/40 p-2 flex items-center justify-center group-hover:border-hitam-400">
+          <div className="h-12 w-12 rounded-xl bg-white border border-slate-200 p-2 flex items-center justify-center shadow-subtle group-hover:border-navy-900 transition-all">
             <Image
               src="/images/brand/edc-logo.png"
               alt="EDC HITAM"
@@ -86,28 +86,28 @@ export default function RegisterPage() {
             />
           </div>
         </Link>
-        <h2 className="text-3xl font-extrabold text-white tracking-tight">
+        <h2 className="text-3xl font-extrabold text-navy-900 tracking-tight font-heading">
           Create an EDC Account
         </h2>
-        <p className="mt-2 text-xs text-slate-400">
+        <p className="mt-2 text-xs sm:text-sm text-slate-500">
           Join 18,500+ student innovators across the HITAM entrepreneurial network
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg px-4 sm:px-0">
-        <Card className="border-slate-800 bg-slate-900/90 shadow-2xl p-6 sm:p-8">
+        <Card className="border-slate-200 bg-white shadow-card rounded-2xl p-6 sm:p-8">
           {isSuccess ? (
-            <div className="text-center py-8 space-y-4 animate-scale-in">
-              <div className="inline-flex p-3 rounded-full bg-hitam-950 border border-hitam-500/40 text-hitam-400">
+            <div className="text-center py-8 space-y-4">
+              <div className="inline-flex p-3 rounded-full bg-teal-50 border border-teal-200 text-teal-600">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
-              <h3 className="text-2xl font-bold text-white">Account Created!</h3>
-              <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+              <h3 className="text-2xl font-bold text-navy-900 font-heading">Account Created!</h3>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
                 We have registered your account. If email confirmation was requested, please check your inbox at <strong>{email}</strong>.
               </p>
               <div className="pt-2">
                 <Link href="/auth/login">
-                  <Button variant="primary" size="md" className="text-xs">
+                  <Button variant="navy" size="md" className="text-xs">
                     Sign In Now
                   </Button>
                 </Link>
@@ -116,15 +116,15 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/40 text-xs text-red-200 flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
                   <span>{error}</span>
                 </div>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
                     Full Name *
                   </label>
                   <input
@@ -133,144 +133,122 @@ export default function RegisterPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Candidate full name"
-                    className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    College Email *
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    Email Address *
                   </label>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g. rollno@hitam.org"
-                    className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                    placeholder="rollno@hitam.org"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Create Password *
+                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  Password (min 8 characters) *
                 </label>
                 <input
                   type="password"
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                  placeholder="Create a strong password"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Institution *
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    College / Institute *
                   </label>
                   <input
                     type="text"
                     required
                     value={collegeName}
                     onChange={(e) => setCollegeName(e.target.value)}
-                    placeholder="HITAM"
-                    className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                    placeholder="HITAM / Other Institute"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Department *
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    Branch / Department *
                   </label>
                   <input
                     type="text"
                     required
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    placeholder="CSE, ECE, etc."
-                    className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Graduation Year *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="2024"
-                    max="2032"
-                    value={graduationYear}
-                    onChange={(e) => setGraduationYear(e.target.value)}
-                    placeholder="2026"
-                    className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-hitam-400"
+                    placeholder="e.g. CSE, ECE, MECH"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Primary Profile Track
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setRole('attendee')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium text-center transition-all ${
-                      role === 'attendee'
-                        ? 'bg-hitam-600 text-white shadow-sm'
-                        : 'bg-slate-950 text-slate-400 border border-slate-800'
-                    }`}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    Graduation Year
+                  </label>
+                  <select
+                    value={graduationYear}
+                    onChange={(e) => setGraduationYear(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   >
-                    Student Innovator
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('founder')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium text-center transition-all ${
-                      role === 'founder'
-                        ? 'bg-hitam-600 text-white shadow-sm'
-                        : 'bg-slate-950 text-slate-400 border border-slate-800'
-                    }`}
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    Platform Role
+                  </label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as any)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
                   >
-                    Startup Founder
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('campus_ambassador')}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium text-center transition-all ${
-                      role === 'campus_ambassador'
-                        ? 'bg-hitam-600 text-white shadow-sm'
-                        : 'bg-slate-950 text-slate-400 border border-slate-800'
-                    }`}
-                  >
-                    Ambassador
-                  </button>
+                    <option value="attendee">Student Attendee / Participant</option>
+                    <option value="founder">Student Founder / Builder</option>
+                    <option value="campus_ambassador">Campus Ambassador</option>
+                  </select>
                 </div>
               </div>
 
               <div className="pt-2">
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant="navy"
                   size="md"
                   isLoading={isLoading}
-                  className="w-full justify-center text-xs py-3 shadow-glow-sm"
+                  className="w-full justify-center text-xs py-3 shadow-sm"
                 >
-                  Complete Registration
+                  Create Student Account
                 </Button>
               </div>
             </form>
           )}
 
-          <div className="mt-6 pt-6 border-t border-slate-800 text-center">
-            <p className="text-xs text-slate-400">
+          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-500">
               Already have an account?{' '}
-              <Link href="/auth/login" className="font-semibold text-hitam-400 hover:text-white underline">
+              <Link href="/auth/login" className="font-semibold text-teal-700 hover:text-navy-900 underline">
                 Sign In
               </Link>
             </p>
