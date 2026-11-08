@@ -253,7 +253,14 @@ export default function AdminConsolePage() {
 
             <div className="flex items-center gap-2">
               <Link href="/">
-                <Button variant="outline" size="sm" className="text-xs border-slate-700 text-slate-200 hover:bg-navy-900">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    document.cookie = 'edc_admin_auth=; path=/; max-age=0;';
+                  }}
+                  className="text-xs border-slate-700 text-slate-200 hover:bg-navy-900"
+                >
                   Exit to Website
                 </Button>
               </Link>

@@ -73,6 +73,11 @@ export async function middleware(request: NextRequest) {
 
   // Protect admin routes
   if (pathname.startsWith('/admin')) {
+    const adminSession = request.cookies.get('edc_admin_auth')?.value;
+    if (adminSession === 'true') {
+      return response;
+    }
+
     if (!user) {
       const redirectUrl = new URL('/auth/login', request.url);
       redirectUrl.searchParams.set('next', pathname);

