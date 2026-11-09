@@ -9,12 +9,58 @@ interface AnnouncementBannerProps {
   announcements?: Announcement[];
 }
 
-export function AnnouncementBanner({ announcements = [] }: AnnouncementBannerProps) {
+export function AnnouncementBanner({ announcements }: AnnouncementBannerProps) {
+  const [current, setCurrent] = React.useState<Announcement | null>(announcements?.[0] || null);
   const [isVisible, setIsVisible] = React.useState(true);
 
-  if (!isVisible || announcements.length === 0) return null;
+  const checkAnnouncement = React.useCallback(() => {
+    // 1. Check custom admin override
+    const custom = localStorage.getItem('edc_custom_announcement');
+    if (custom) {
+      try {
+        const parsed = JSON.parse(custom);
+        if (parsed.is_active) {
+          setCurrent(parsed);
+          setIsVisible(true);
+          return;
+        } else {
+          setCurrent(null);
+          return;
+        }
+      } catch {
+        // Fallback
+      }
+    }
 
-  const current = announcements[0];
+    // 2. Fallback to API
+    fetch('/api/announcements/active')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.is_active) {
+          setCurrent(data);
+          setIsVisible(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    checkAnnouncement();
+
+    const handleStorageChange = () => {
+      checkAnnouncement();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('edc_announcement_updated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('edc_announcement_updated', handleStorageChange);
+    };
+  }, [checkAnnouncement]);
+
+  if (!isVisible || !current || !current.is_active) return null;
 
   return (
     <div className={`announcement-banner relative px-4 py-2.5 text-xs text-center border-b transition-all ${
@@ -30,7 +76,7 @@ export function AnnouncementBanner({ announcements = [] }: AnnouncementBannerPro
               ? 'bg-amber-100 text-amber-800 border border-amber-300' 
               : 'bg-navy-900 text-slate-300 border border-navy-700'
           }`}>
-            {current.is_urgent ? 'Urgent Notice' : 'Announcement'}
+            {current.is_urgent ? 'Urgent Notice' : 'Official Notice'}
           </span>
         </span>
 

@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { verifyAdminSessionToken } from '@/lib/auth-security';
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -64,17 +65,23 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Protect student dashboard routes
-  if (pathname.startsWith('/dashboard') && !user) {
-    const redirectUrl = new URL('/auth/login', request.url);
-    redirectUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(redirectUrl);
+  // Check administrative & student cryptographic/session state
+  const adminSession = request.cookies.get('edc_admin_auth')?.value;
+  const isValidAdmin = await verifyAdminSessionToken(adminSession);
+  const studentSession = request.cookies.get('edc_student_auth')?.value;
+
+  // Protect student dashboard routes (allow authenticated Supabase users, verified admins, and session holders)
+  if (pathname.startsWith('/dashboard')) {
+    if (!user && !isValidAdmin && !studentSession) {
+      const redirectUrl = new URL('/auth/login', request.url);
+      redirectUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
-  // Protect admin routes
+  // Protect admin routes with cryptographic signature verification
   if (pathname.startsWith('/admin')) {
-    const adminSession = request.cookies.get('edc_admin_auth')?.value;
-    if (adminSession === 'true') {
+    if (isValidAdmin) {
       return response;
     }
 

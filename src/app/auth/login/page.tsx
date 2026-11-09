@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { createAdminSessionToken } from '@/lib/auth-security';
 import { Lock, Mail, AlertCircle, Sparkles } from 'lucide-react';
 
 function LoginFormContent() {
@@ -32,7 +33,17 @@ function LoginFormContent() {
       (cleanEmail === 'edc.hitam.website@hitam.org' || cleanEmail === 'admin@hitam.org') &&
       password === 'edc.hitam@2026'
     ) {
-      document.cookie = 'edc_admin_auth=true; path=/; max-age=86400; SameSite=Lax';
+      const signedToken = await createAdminSessionToken(cleanEmail);
+      document.cookie = `edc_admin_auth=${signedToken}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `edc_student_auth=1; path=/; max-age=86400; SameSite=Lax`;
+      localStorage.setItem('edc_current_user', JSON.stringify({
+        id: 'master-admin',
+        email: cleanEmail,
+        fullName: 'Super Administrator',
+        role: 'admin',
+        college: 'HITAM Hyderabad',
+        department: 'Innovation & Incubation Cell'
+      }));
       router.push('/admin');
       return;
     }
@@ -48,11 +59,32 @@ function LoginFormContent() {
       }
 
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('role')
-          .eq('auth_id', data.user.id)
-          .single();
+        let profile = null;
+        try {
+          const { data: p } = await supabase
+            .from('users')
+            .select('*')
+            .eq('auth_id', data.user.id)
+            .single();
+          profile = p;
+        } catch {}
+
+        document.cookie = `edc_student_auth=1; path=/; max-age=86400; SameSite=Lax`;
+        if (profile?.role === 'admin') {
+          const signedToken = await createAdminSessionToken(data.user.email || 'admin@hitam.org');
+          document.cookie = `edc_admin_auth=${signedToken}; path=/; max-age=86400; SameSite=Lax`;
+        }
+
+        const userObj = {
+          id: data.user.id,
+          email: data.user.email,
+          fullName: profile?.full_name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0],
+          role: profile?.role || 'student',
+          college: profile?.college_name || 'HITAM',
+          department: profile?.department || 'Engineering',
+          graduationYear: profile?.graduation_year || 2026
+        };
+        localStorage.setItem('edc_current_user', JSON.stringify(userObj));
 
         if (profile?.role === 'admin' && nextUrl.startsWith('/admin')) {
           router.push('/admin');

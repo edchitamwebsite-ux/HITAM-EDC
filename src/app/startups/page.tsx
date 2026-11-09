@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function StartupsPage() {
+  const [startupsList, setStartupsList] = React.useState<Startup[]>(INCUBATED_STARTUPS);
   const [selectedSector, setSelectedSector] = React.useState<string>('All');
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   
@@ -33,9 +34,39 @@ export default function StartupsPage() {
   const [collabMessage, setCollabMessage] = React.useState('');
   const [collabSent, setCollabSent] = React.useState(false);
 
+  React.useEffect(() => {
+    const saved = localStorage.getItem('edc_my_startups');
+    if (saved) {
+      try {
+        const userStartups = JSON.parse(saved);
+        if (userStartups.length > 0) {
+          const mapped: Startup[] = userStartups.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            slug: s.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            tagline: s.tagline,
+            description: s.solution || s.problem,
+            sector: s.sector || 'AgriTech',
+            stage: s.stage || 'Ideation',
+            is_student_venture: true,
+            founder_names: Array.isArray(s.founder_names) ? s.founder_names : [s.founder_names || 'Student Founder'],
+            logo_url: '/images/brand/edc-logo.png',
+            lab_allocated: s.lab_allocated || 'Makerspace Bay 4',
+            skills_needed: Array.isArray(s.skills_needed) ? s.skills_needed : ['Marketing', 'Frontend Dev'],
+            hiring_roles: ['Co-Founder', 'Technical Lead'],
+            metrics: { funding_raised_inr: 0, customers: 12, team_size: 2, patent_filed: false },
+            created_at: s.created_at || new Date().toISOString(),
+            updated_at: s.updated_at || new Date().toISOString()
+          }));
+          setStartupsList([...mapped, ...INCUBATED_STARTUPS]);
+        }
+      } catch {}
+    }
+  }, []);
+
   const sectors = ['All', 'AgriTech', 'CleanTech_Hardware', 'AI_SaaS', 'Consumer_D2C', 'DeepTech', 'EdTech'];
 
-  const filteredStartups = INCUBATED_STARTUPS.filter((startup) => {
+  const filteredStartups = startupsList.filter((startup) => {
     const matchesSector = selectedSector === 'All' || startup.sector === selectedSector;
     const matchesSearch = startup.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           startup.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||

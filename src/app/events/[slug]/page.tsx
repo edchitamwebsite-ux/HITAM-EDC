@@ -26,7 +26,19 @@ export default function EventDetailPage() {
   const router = useRouter();
   const slug = params?.slug as string;
 
-  const event = FEATURED_EVENTS.find((e) => e.slug === slug) || FEATURED_EVENTS[0];
+  const initialEvent = FEATURED_EVENTS.find((e) => e.slug === slug) || FEATURED_EVENTS[0];
+  const [event, setEvent] = React.useState(initialEvent);
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('edc_events_registry');
+    if (saved) {
+      try {
+        const list = JSON.parse(saved);
+        const match = list.find((e: any) => e.slug === slug);
+        if (match) setEvent(match);
+      } catch {}
+    }
+  }, [slug]);
 
   // Dynamic Registration Modal State
   const [isRegisterModalOpen, setIsRegisterModalOpen] = React.useState(false);
@@ -116,8 +128,32 @@ export default function EventDetailPage() {
         return;
       }
 
-      existing.push(payload);
+      existing.unshift(payload);
       localStorage.setItem('edc_my_registrations', JSON.stringify(existing));
+
+      // Also synchronize master administrative roster
+      try {
+        const allRegs = JSON.parse(localStorage.getItem('edc_all_registrations') || '[]');
+        allRegs.unshift({
+          id: `reg-${Date.now()}`,
+          reg_code: regCode,
+          event_id: event.id,
+          lead: payload.lead,
+          team_name: payload.team_name,
+          reg_type: payload.reg_type,
+          status: 'Confirmed',
+          attended: false,
+          timestamp: payload.timestamp
+        });
+        localStorage.setItem('edc_all_registrations', JSON.stringify(allRegs));
+
+        // Update live capacity counter in registry
+        const eventsRegistry = JSON.parse(localStorage.getItem('edc_events_registry') || '[]');
+        const updatedEvents = (eventsRegistry.length > 0 ? eventsRegistry : FEATURED_EVENTS).map((e: any) =>
+          e.id === event.id ? { ...e, current_registrations: Math.min(e.max_registrations, e.current_registrations + 1) } : e
+        );
+        localStorage.setItem('edc_events_registry', JSON.stringify(updatedEvents));
+      } catch {}
 
       fetch('/api/events/register', {
         method: 'POST',

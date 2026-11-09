@@ -14,8 +14,10 @@ import {
   Users, 
   Compass, 
   ShieldCheck, 
-  UserCircle 
+  UserCircle,
+  LogOut
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface NavbarProps {
   userRole?: string | null;
@@ -24,7 +26,53 @@ interface NavbarProps {
 
 export function Navbar({ userRole, userEmail }: NavbarProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = React.useState(false);
+  const [isStudentLoggedIn, setIsStudentLoggedIn] = React.useState(false);
+  const [currentUserName, setCurrentUserName] = React.useState<string | null>(null);
   const pathname = usePathname();
+
+  React.useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const hasAdminCookie = document.cookie.includes('edc_admin_auth=') && !document.cookie.includes('edc_admin_auth=;');
+      const hasStudentCookie = document.cookie.includes('edc_student_auth=') && !document.cookie.includes('edc_student_auth=;');
+      const savedUserStr = localStorage.getItem('edc_current_user');
+      let parsedUser = null;
+      if (savedUserStr) {
+        try {
+          parsedUser = JSON.parse(savedUserStr);
+        } catch {}
+      }
+
+      const adminActive = hasAdminCookie || userRole === 'admin' || parsedUser?.role === 'admin';
+      const studentActive = hasStudentCookie || Boolean(userEmail) || Boolean(parsedUser);
+
+      setIsAdminLoggedIn(adminActive);
+      setIsStudentLoggedIn(studentActive || adminActive);
+
+      if (parsedUser?.fullName) {
+        setCurrentUserName(parsedUser.fullName);
+      } else if (userEmail) {
+        setCurrentUserName(userEmail.split('@')[0]);
+      }
+    }
+  }, [pathname, userRole, userEmail]);
+
+  const handleSignOut = async () => {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'edc_admin_auth=; path=/; max-age=0;';
+      document.cookie = 'edc_student_auth=; path=/; max-age=0;';
+      localStorage.removeItem('edc_current_user');
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {}
+      setIsAdminLoggedIn(false);
+      setIsStudentLoggedIn(false);
+      setCurrentUserName(null);
+      setIsOpen(false);
+      window.location.href = '/';
+    }
+  };
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -92,16 +140,14 @@ export function Navbar({ userRole, userEmail }: NavbarProps) {
 
           {/* Desktop Right Actions */}
           <div className="hidden lg:flex items-center gap-2.5">
-            {userEmail ? (
+            {isAdminLoggedIn ? (
               <div className="flex items-center gap-2">
-                {userRole === 'admin' && (
-                  <Link href="/admin">
-                    <Button variant="secondary" size="sm" className="gap-1.5 text-xs text-amber-900 bg-amber-50 border-amber-200 hover:bg-amber-100">
-                      <ShieldCheck className="h-4 w-4 text-amber-700" />
-                      Admin Console
-                    </Button>
-                  </Link>
-                )}
+                <Link href="/admin">
+                  <Button variant="secondary" size="sm" className="gap-1.5 text-xs text-amber-900 bg-amber-50 border-amber-200 hover:bg-amber-100 font-bold shadow-sm">
+                    <ShieldCheck className="h-4 w-4 text-amber-700" />
+                    Admin Console
+                  </Button>
+                </Link>
                 <Link href="/dashboard">
                   <Button variant="outline" size="sm" className="gap-1.5 text-xs bg-navy-800 text-white border-navy-700 hover:bg-navy-700">
                     <UserCircle className="h-4 w-4 text-teal-400" />
@@ -114,6 +160,39 @@ export function Navbar({ userRole, userEmail }: NavbarProps) {
                     Submit Idea
                   </Button>
                 </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSignOut}
+                  title="Sign Out"
+                  className="px-2 text-xs text-slate-300 hover:text-white hover:bg-red-950/40 border-navy-700"
+                >
+                  <LogOut className="h-3.5 w-3.5 text-red-400" />
+                </Button>
+              </div>
+            ) : isStudentLoggedIn ? (
+              <div className="flex items-center gap-2">
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="gap-1.5 text-xs bg-navy-800 text-white border-navy-700 hover:bg-navy-700">
+                    <UserCircle className="h-4 w-4 text-teal-400" />
+                    {currentUserName ? currentUserName.split(' ')[0] : 'Dashboard'}
+                  </Button>
+                </Link>
+                <Link href="/startups/submit">
+                  <Button variant="teal" size="sm" className="gap-1.5 text-xs">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Submit Idea
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSignOut}
+                  title="Sign Out"
+                  className="px-2 text-xs text-slate-300 hover:text-white hover:bg-red-950/40 border-navy-700"
+                >
+                  <LogOut className="h-3.5 w-3.5 text-red-400" />
+                </Button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -175,22 +254,45 @@ export function Navbar({ userRole, userEmail }: NavbarProps) {
           </div>
 
           <div className="pt-4 border-t border-navy-800 flex flex-col gap-2.5">
-            {userEmail ? (
+            {isAdminLoggedIn ? (
               <>
-                {userRole === 'admin' && (
-                  <Link href="/admin" onClick={() => setIsOpen(false)}>
-                    <Button variant="secondary" className="w-full justify-center bg-amber-50 text-amber-900 border-amber-200 gap-2">
-                      <ShieldCheck className="h-4 w-4 text-amber-700" />
-                      Admin Console
-                    </Button>
-                  </Link>
-                )}
+                <Link href="/admin" onClick={() => setIsOpen(false)}>
+                  <Button variant="secondary" className="w-full justify-center bg-amber-50 text-amber-900 border-amber-200 gap-2 font-bold">
+                    <ShieldCheck className="h-4 w-4 text-amber-700" />
+                    Admin Console
+                  </Button>
+                </Link>
                 <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full justify-center bg-navy-800 text-white border-navy-700 gap-2">
                     <UserCircle className="h-4 w-4 text-teal-400" />
                     Student Dashboard
                   </Button>
                 </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={handleSignOut} 
+                  className="w-full justify-center border-red-900/60 bg-red-950/20 text-red-300 gap-2 text-xs"
+                >
+                  <LogOut className="h-3.5 w-3.5 text-red-400" />
+                  Sign Out
+                </Button>
+              </>
+            ) : isStudentLoggedIn ? (
+              <>
+                <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full justify-center bg-navy-800 text-white border-navy-700 gap-2">
+                    <UserCircle className="h-4 w-4 text-teal-400" />
+                    Student Dashboard
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  onClick={handleSignOut} 
+                  className="w-full justify-center border-red-900/60 bg-red-950/20 text-red-300 gap-2 text-xs"
+                >
+                  <LogOut className="h-3.5 w-3.5 text-red-400" />
+                  Sign Out
+                </Button>
               </>
             ) : (
               <div className="grid grid-cols-2 gap-2">

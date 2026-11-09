@@ -26,11 +26,30 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name || !email || !message) return;
+
     setIsSubmitting(true);
+
+    const inquiryPayload = {
+      id: `inq-${Date.now()}`,
+      name: name.trim(),
+      email: email.trim(),
+      subject,
+      message: message.trim(),
+      status: 'New',
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('edc_inquiries') || '[]');
+      existing.unshift(inquiryPayload);
+      localStorage.setItem('edc_inquiries', JSON.stringify(existing));
+    } catch {}
+
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
-    }, 600);
+    }, 400);
   };
 
   return (

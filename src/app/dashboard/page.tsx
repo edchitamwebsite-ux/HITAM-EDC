@@ -29,11 +29,47 @@ export default function StudentDashboardPage() {
   // Loaded user state
   const [registrations, setRegistrations] = React.useState<any[]>([]);
   const [startups, setStartups] = React.useState<any[]>([]);
+  const [userProfile, setUserProfile] = React.useState({
+    fullName: 'Shaik Rehan',
+    role: 'Student Innovator',
+    college: 'HITAM Hyderabad',
+    department: 'Computer Science Engineering (2026)',
+    email: 'shaik.rehan@hitam.org',
+    initials: 'SR'
+  });
 
   React.useEffect(() => {
-    // Load local storage registrations
+    // 1. Synchronize Profile
+    const savedUser = localStorage.getItem('edc_current_user');
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        const name = u.fullName || u.name || 'Shaik Rehan';
+        const parts = name.split(' ').filter(Boolean);
+        const initials = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
+        setUserProfile({
+          fullName: name,
+          role: u.role === 'admin' ? 'Super Administrator' : 'Student Innovator',
+          college: u.college || 'HITAM Hyderabad',
+          department: u.department ? `${u.department} (${u.graduationYear || 2026})` : 'Computer Science Engineering (2026)',
+          email: u.email || 'student@hitam.org',
+          initials: initials
+        });
+      } catch {}
+    }
+
+    // 2. Load local storage registrations synchronized with admin master status
     const savedRegs = JSON.parse(localStorage.getItem('edc_my_registrations') || '[]');
-    setRegistrations(savedRegs);
+    const allRegs = JSON.parse(localStorage.getItem('edc_all_registrations') || '[]');
+    
+    const synced = savedRegs.map((reg: any) => {
+      const adminMatch = allRegs.find((ar: any) => ar.reg_code === reg.reg_code);
+      if (adminMatch) {
+        return { ...reg, status: adminMatch.status, attended: adminMatch.attended };
+      }
+      return reg;
+    });
+    setRegistrations(synced);
 
     const savedStartups = JSON.parse(localStorage.getItem('edc_my_startups') || '[]');
     setStartups(savedStartups);
@@ -44,6 +80,13 @@ export default function StudentDashboardPage() {
     const updated = registrations.filter(r => r.reg_code !== regCode);
     setRegistrations(updated);
     localStorage.setItem('edc_my_registrations', JSON.stringify(updated));
+
+    // Update master admin roster
+    try {
+      const allRegs = JSON.parse(localStorage.getItem('edc_all_registrations') || '[]');
+      const updatedAll = allRegs.map((r: any) => r.reg_code === regCode ? { ...r, status: 'Cancelled' } : r);
+      localStorage.setItem('edc_all_registrations', JSON.stringify(updatedAll));
+    } catch {}
   };
 
   return (
@@ -56,15 +99,17 @@ export default function StudentDashboardPage() {
             
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-2xl bg-navy-900 border border-navy-800 flex items-center justify-center text-white font-bold text-2xl shadow-sm">
-                SR
+                {userProfile.initials}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-navy-900 font-heading">Shaik Rehan</h1>
-                  <Badge variant="teal" className="text-[10px]">Student Innovator</Badge>
+                  <h1 className="text-2xl font-bold text-navy-900 font-heading">{userProfile.fullName}</h1>
+                  <Badge variant={userProfile.role === 'Super Administrator' ? 'amber' : 'teal'} className="text-[10px]">
+                    {userProfile.role}
+                  </Badge>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  HITAM Hyderabad • Computer Science Engineering (2026)
+                  {userProfile.college} • {userProfile.department}
                 </p>
               </div>
             </div>
@@ -171,8 +216,11 @@ export default function StudentDashboardPage() {
                       />
 
                       <div className="relative z-10 flex items-center justify-between">
-                        <Badge variant="teal" className="text-[10px]">
-                          Confirmed Entry Pass
+                        <Badge 
+                          variant={reg.status === 'Cancelled' ? 'outline' : reg.status === 'Waitlisted' ? 'amber' : 'teal'} 
+                          className="text-[10px]"
+                        >
+                          {reg.status ? `${reg.status} Entry Pass` : 'Confirmed Entry Pass'}
                         </Badge>
                         <span className="text-xs font-mono font-bold text-navy-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                           {reg.reg_code}
@@ -208,20 +256,28 @@ export default function StudentDashboardPage() {
                       </div>
 
                       <div className="relative z-10 pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] text-teal-700 font-medium flex items-center gap-1">
+                        <span className={`text-[11px] font-medium flex items-center gap-1 ${
+                          reg.status === 'Cancelled' ? 'text-slate-400' : 'text-teal-700'
+                        }`}>
                           <ShieldCheck className="h-3.5 w-3.5" />
-                          Pass Active for Check-In
+                          {reg.status === 'Cancelled' 
+                            ? 'Pass Cancelled' 
+                            : reg.attended 
+                            ? 'Attendance Recorded' 
+                            : 'Pass Active for Check-In'}
                         </span>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="danger" 
-                            size="sm" 
-                            onClick={() => handleCancelRegistration(reg.reg_code)}
-                            className="text-[11px] py-1 px-2.5 h-auto"
-                          >
-                            Cancel Pass
-                          </Button>
-                        </div>
+                        {reg.status !== 'Cancelled' && (
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="danger" 
+                              size="sm" 
+                              onClick={() => handleCancelRegistration(reg.reg_code)}
+                              className="text-[11px] py-1 px-2.5 h-auto"
+                            >
+                              Cancel Pass
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
                     </Card>

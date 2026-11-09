@@ -16,9 +16,19 @@ import {
 } from 'lucide-react';
 
 export default function EventsDirectoryPage() {
+  const [eventsList, setEventsList] = React.useState(FEATURED_EVENTS);
   const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
   const [selectedStatus, setSelectedStatus] = React.useState<string>('All');
   const [searchQuery, setSearchQuery] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('edc_events_registry');
+    if (saved) {
+      try {
+        setEventsList(JSON.parse(saved));
+      } catch {}
+    }
+  }, []);
 
   const categories: Array<string> = [
     'All',
@@ -29,7 +39,7 @@ export default function EventsDirectoryPage() {
     'Ideathon'
   ];
 
-  const filteredEvents = FEATURED_EVENTS.filter((event) => {
+  const filteredEvents = eventsList.filter((event) => {
     const matchesCat = selectedCategory === 'All' || event.category === selectedCategory;
     const matchesStatus = selectedStatus === 'All' || 
       (selectedStatus === 'Open' && event.registration_open) ||

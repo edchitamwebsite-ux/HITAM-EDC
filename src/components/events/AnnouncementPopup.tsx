@@ -42,6 +42,25 @@ export function AnnouncementPopup({ initialAnnouncement, userId }: AnnouncementP
 
   const loadActiveAnnouncement = React.useCallback(async () => {
     try {
+      // 1. Check custom admin configuration first
+      const custom = localStorage.getItem('edc_custom_announcement');
+      if (custom) {
+        try {
+          const parsed = JSON.parse(custom);
+          if (parsed && parsed.is_active) {
+            setAnnouncement(parsed);
+            checkDismissal(parsed);
+            return;
+          } else {
+            // Explicitly disabled by admin
+            setAnnouncement(null);
+            return;
+          }
+        } catch {
+          // Fall through to API
+        }
+      }
+
       const res = await fetch('/api/announcements/active');
       if (res.ok) {
         const data = await res.json();
@@ -61,6 +80,18 @@ export function AnnouncementPopup({ initialAnnouncement, userId }: AnnouncementP
     } else {
       checkDismissal(announcement);
     }
+
+    const handleUpdate = () => {
+      loadActiveAnnouncement();
+    };
+
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('edc_announcement_updated', handleUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('edc_announcement_updated', handleUpdate);
+    };
   }, [announcement, loadActiveAnnouncement, checkDismissal]);
 
   const handleDismiss = (remindLater: boolean = false) => {

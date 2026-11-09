@@ -27,13 +27,16 @@ import {
   ToggleLeft,
   ToggleRight,
   ExternalLink,
-  QrCode
+  QrCode,
+  Mail,
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminConsolePage() {
-  const [activeTab, setActiveTab] = React.useState<'events' | 'participants' | 'announcements' | 'startups'>('events');
+  const [activeTab, setActiveTab] = React.useState<'events' | 'participants' | 'announcements' | 'startups' | 'inquiries'>('events');
 
-  // Event State
+  // Event State (with persistent overrides)
   const [eventsList, setEventsList] = React.useState<EventItem[]>(FEATURED_EVENTS);
   const [selectedEventId, setSelectedEventId] = React.useState<string>(FEATURED_EVENTS[0].id);
 
@@ -98,6 +101,12 @@ export default function AdminConsolePage() {
   const [popupIsUrgent, setPopupIsUrgent] = React.useState(false);
   const [isSavedNotice, setIsSavedNotice] = React.useState(false);
 
+  // Startups & Moderation State
+  const [startupsList, setStartupsList] = React.useState<any[]>(INCUBATED_STARTUPS);
+
+  // Inquiries State
+  const [inquiries, setInquiries] = React.useState<any[]>([]);
+
   // New Event Modal
   const [isCreateEventOpen, setIsCreateEventOpen] = React.useState(false);
   const [newEventTitle, setNewEventTitle] = React.useState('');
@@ -108,23 +117,65 @@ export default function AdminConsolePage() {
   const [newEventCapacity, setNewEventCapacity] = React.useState(300);
   const [newEventPrize, setNewEventPrize] = React.useState(100000);
 
-  // Load custom registrations from localStorage
+  // Load and synchronize all persistent registries on mount
   React.useEffect(() => {
-    const localRegs = JSON.parse(localStorage.getItem('edc_my_registrations') || '[]');
-    if (localRegs.length > 0) {
-      const mapped = localRegs.map((r: any, idx: number) => ({
-        id: `local-${idx}`,
-        reg_code: r.reg_code,
-        event_id: r.event_id,
-        lead: r.lead,
-        team_name: r.team_name,
-        reg_type: r.reg_type,
-        status: 'Confirmed',
-        attended: false,
-        timestamp: r.timestamp
-      }));
-      setRegistrations(prev => [...mapped, ...prev]);
+    // 1. Events persistent state
+    const savedEvents = localStorage.getItem('edc_events_registry');
+    if (savedEvents) {
+      try {
+        setEventsList(JSON.parse(savedEvents));
+      } catch {}
     }
+
+    // 2. Registrations persistent state
+    const savedAllRegs = localStorage.getItem('edc_all_registrations');
+    if (savedAllRegs) {
+      try {
+        setRegistrations(JSON.parse(savedAllRegs));
+      } catch {}
+    } else {
+      // Merge user local registrations if present
+      const localRegs = JSON.parse(localStorage.getItem('edc_my_registrations') || '[]');
+      if (localRegs.length > 0) {
+        const mapped = localRegs.map((r: any, idx: number) => ({
+          id: `local-${idx}`,
+          reg_code: r.reg_code,
+          event_id: r.event_id,
+          lead: r.lead,
+          team_name: r.team_name,
+          reg_type: r.reg_type,
+          status: 'Confirmed',
+          attended: false,
+          timestamp: r.timestamp
+        }));
+        setRegistrations(prev => [...mapped, ...prev]);
+      }
+    }
+
+    // 3. Custom announcement state
+    const customAnn = localStorage.getItem('edc_custom_announcement');
+    if (customAnn) {
+      try {
+        const parsed = JSON.parse(customAnn);
+        setPopupTitle(parsed.title || popupTitle);
+        setPopupMessage(parsed.message || popupMessage);
+        setPopupCtaLabel(parsed.cta_label || popupCtaLabel);
+        setPopupCtaUrl(parsed.cta_url || popupCtaUrl);
+        setPopupRepeatPolicy(parsed.repeat_policy || 'once_ever');
+        setAnnouncementActive(parsed.is_active ?? true);
+        setPopupIsUrgent(parsed.is_urgent ?? false);
+      } catch {}
+    }
+
+    // 4. Startups pipeline state (merge user submitted blueprints)
+    const userBlueprints = JSON.parse(localStorage.getItem('edc_my_startups') || '[]');
+    if (userBlueprints.length > 0) {
+      setStartupsList(prev => [...userBlueprints, ...prev]);
+    }
+
+    // 5. Contact Inquiries state
+    const savedInquiries = JSON.parse(localStorage.getItem('edc_inquiries') || '[]');
+    setInquiries(savedInquiries);
   }, []);
 
   // Filtered Participants
@@ -138,19 +189,36 @@ export default function AdminConsolePage() {
     return matchesEvent && matchesStatus && matchesSearch;
   });
 
-  // Toggle Event Registration Status (Open / Closed)
+  // Toggle Event Registration Status (Open / Closed) with persistent memory
   const handleToggleRegistration = (id: string) => {
-    setEventsList(eventsList.map(e => e.id === id ? { ...e, registration_open: !e.registration_open } : e));
+    const updated = eventsList.map(e => e.id === id ? { ...e, registration_open: !e.registration_open } : e);
+    setEventsList(updated);
+    localStorage.setItem('edc_events_registry', JSON.stringify(updated));
   };
 
-  // Toggle Participant Attendance
+  // Toggle Participant Attendance with persistence
   const handleToggleAttendance = (id: string) => {
-    setRegistrations(registrations.map(r => r.id === id ? { ...r, attended: !r.attended } : r));
+    const updated = registrations.map(r => r.id === id ? { ...r, attended: !r.attended } : r);
+    setRegistrations(updated);
+    localStorage.setItem('edc_all_registrations', JSON.stringify(updated));
   };
 
-  // Status Change for Participant
+  // Status Change for Participant with persistence
   const handleUpdateParticipantStatus = (id: string, newStatus: string) => {
-    setRegistrations(registrations.map(r => r.id === id ? { ...r, status: newStatus } : r));
+    const updated = registrations.map(r => r.id === id ? { ...r, status: newStatus } : r);
+    setRegistrations(updated);
+    localStorage.setItem('edc_all_registrations', JSON.stringify(updated));
+  };
+
+  // CSV Cell Sanitization preventing CSV Injection (OWASP Formula Injection defense)
+  const sanitizeCsvCell = (val: any): string => {
+    if (val === null || val === undefined) return '""';
+    let str = String(val).replace(/"/g, '""');
+    // If the cell begins with formula characters, prefix with single quote
+    if (/^[=\+\-@\t\r]/.test(str)) {
+      str = `'${str}`;
+    }
+    return `"${str}"`;
   };
 
   // CSV Export Function
@@ -159,17 +227,17 @@ export default function AdminConsolePage() {
     const headers = ['Registration Code', 'Full Name', 'Email', 'Phone', 'College', 'Department', 'Team Name', 'Type', 'Status', 'Attended', 'Registered At'];
     
     const rows = filteredParticipants.map(r => [
-      r.reg_code,
-      `"${r.lead.name}"`,
-      r.lead.email,
-      r.lead.phone,
-      `"${r.lead.college}"`,
-      `"${r.lead.department}"`,
-      `"${r.team_name || 'N/A'}"`,
-      r.reg_type,
-      r.status,
-      r.attended ? 'Yes' : 'No',
-      new Date(r.timestamp).toISOString()
+      sanitizeCsvCell(r.reg_code),
+      sanitizeCsvCell(r.lead.name),
+      sanitizeCsvCell(r.lead.email),
+      sanitizeCsvCell(r.lead.phone),
+      sanitizeCsvCell(r.lead.college),
+      sanitizeCsvCell(r.lead.department),
+      sanitizeCsvCell(r.team_name || 'N/A'),
+      sanitizeCsvCell(r.reg_type),
+      sanitizeCsvCell(r.status),
+      sanitizeCsvCell(r.attended ? 'Yes' : 'No'),
+      sanitizeCsvCell(new Date(r.timestamp).toISOString())
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
@@ -182,11 +250,56 @@ export default function AdminConsolePage() {
     document.body.removeChild(link);
   };
 
-  // Save Announcement Settings
+  // Save Announcement Settings with persistence across public site
   const handleSaveAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
+    const noticeConfig = {
+      id: 'ann-broadcast-' + Date.now(),
+      title: popupTitle,
+      message: popupMessage,
+      cta_label: popupCtaLabel,
+      cta_url: popupCtaUrl,
+      repeat_policy: popupRepeatPolicy,
+      is_active: announcementActive,
+      is_urgent: popupIsUrgent,
+      version: Date.now(),
+      updated_at: new Date().toISOString()
+    };
+    localStorage.setItem('edc_custom_announcement', JSON.stringify(noticeConfig));
+    try {
+      window.dispatchEvent(new CustomEvent('edc_announcement_updated'));
+    } catch {}
     setIsSavedNotice(true);
     setTimeout(() => setIsSavedNotice(false), 3000);
+  };
+
+  // Allocate Bay Space for Startup
+  const handleAllocateBay = (startupId: string) => {
+    const bayNumber = prompt('Enter Makerspace Bay Number to Allocate (e.g. Bay 4 IoT Telemetry Lab):', 'Makerspace Bay 3');
+    if (!bayNumber) return;
+
+    const updated = startupsList.map(s => s.id === startupId ? { ...s, lab_allocated: bayNumber, status: 'Incubated' } : s);
+    setStartupsList(updated);
+    localStorage.setItem('edc_my_startups', JSON.stringify(updated));
+    alert(`Makerspace bay "${bayNumber}" successfully allocated to venture.`);
+  };
+
+  // Assign Mentor for Startup
+  const handleAssignMentor = (startupId: string) => {
+    const mentorName = prompt('Enter Faculty / Industry Mentor Name:', 'Dr. Sheela Singh (Dean Incubation)');
+    if (!mentorName) return;
+
+    const updated = startupsList.map(s => s.id === startupId ? { ...s, assigned_mentor: mentorName } : s);
+    setStartupsList(updated);
+    localStorage.setItem('edc_my_startups', JSON.stringify(updated));
+    alert(`Mentor "${mentorName}" assigned to venture.`);
+  };
+
+  // Mark Inquiry as Responded
+  const handleToggleInquiryStatus = (inquiryId: string) => {
+    const updated = inquiries.map(inq => inq.id === inquiryId ? { ...inq, status: inq.status === 'Responded' ? 'New' : 'Responded' } : inq);
+    setInquiries(updated);
+    localStorage.setItem('edc_inquiries', JSON.stringify(updated));
   };
 
   // Create Event Handler
@@ -221,7 +334,9 @@ export default function AdminConsolePage() {
       updated_at: new Date().toISOString(),
     };
 
-    setEventsList([newEvent, ...eventsList]);
+    const updated = [newEvent, ...eventsList];
+    setEventsList(updated);
+    localStorage.setItem('edc_events_registry', JSON.stringify(updated));
     setIsCreateEventOpen(false);
     setNewEventTitle('');
     setNewEventSlug('');
@@ -256,14 +371,24 @@ export default function AdminConsolePage() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => {
-                    document.cookie = 'edc_admin_auth=; path=/; max-age=0;';
-                  }}
                   className="text-xs border-slate-700 text-slate-200 hover:bg-navy-900"
                 >
-                  Exit to Website
+                  View Website
                 </Button>
               </Link>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  document.cookie = 'edc_admin_auth=; path=/; max-age=0;';
+                  document.cookie = 'edc_student_auth=; path=/; max-age=0;';
+                  localStorage.removeItem('edc_current_user');
+                  window.location.href = '/auth/login';
+                }}
+                className="text-xs border-red-900/50 bg-red-950/30 text-red-300 hover:bg-red-900/40"
+              >
+                Sign Out
+              </Button>
             </div>
 
           </div>
@@ -282,7 +407,7 @@ export default function AdminConsolePage() {
             }`}
           >
             <Calendar className="h-4 w-4" />
-            Event Studio & Controls
+            Event Studio & Controls ({eventsList.length})
           </button>
 
           <button
@@ -294,7 +419,7 @@ export default function AdminConsolePage() {
             }`}
           >
             <Users className="h-4 w-4" />
-            Participant Management & CSV
+            Participant Management & CSV ({registrations.length})
           </button>
 
           <button
@@ -318,7 +443,19 @@ export default function AdminConsolePage() {
             }`}
           >
             <Rocket className="h-4 w-4" />
-            Incubation Pipeline Moderation
+            Incubation Pipeline Moderation ({startupsList.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('inquiries')}
+            className={`py-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'inquiries'
+                ? 'border-navy-900 text-navy-900'
+                : 'border-transparent text-slate-500 hover:text-navy-900'
+            }`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Secretariat & Inquiries ({inquiries.length})
           </button>
         </div>
       </section>
@@ -591,7 +728,7 @@ export default function AdminConsolePage() {
               {isSavedNotice && (
                 <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-600" />
-                  <span>Announcement configuration saved and published live!</span>
+                  <span>Announcement configuration saved and published live across website!</span>
                 </div>
               )}
 
@@ -601,7 +738,7 @@ export default function AdminConsolePage() {
                   {/* Master Enable Toggle */}
                   <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <div>
-                      <span className="font-bold text-navy-900 text-sm block">Enable Announcement Popup</span>
+                      <span className="font-bold text-navy-900 text-sm block">Enable Announcement Popup & Banner</span>
                       <span className="text-xs text-slate-500">Controls whether students receive this alert upon visiting</span>
                     </div>
                     <button
@@ -709,36 +846,106 @@ export default function AdminConsolePage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-bold text-navy-900 font-heading">Incubation Pipeline & Idea Submissions</h2>
-                <p className="text-xs text-slate-500">Review student blueprints submitted via the Venture Foundry</p>
+                <p className="text-xs text-slate-500">Review student blueprints submitted via the Venture Foundry, assign mentors, and allocate labs</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {INCUBATED_STARTUPS.map((st) => (
+                {startupsList.map((st) => (
                   <Card key={st.id} className="border-slate-200 bg-white shadow-card p-6 space-y-3">
                     <div className="flex items-center justify-between">
-                      <Badge variant="teal" className="text-[10px]">{st.sector.replace(/_/g, ' ')}</Badge>
-                      <span className="text-xs text-navy-900 font-bold">{st.stage.replace(/_/g, ' ')}</span>
+                      <Badge variant="teal" className="text-[10px]">{st.sector ? st.sector.replace(/_/g, ' ') : 'General'}</Badge>
+                      <span className="text-xs text-navy-900 font-bold">{st.stage ? st.stage.replace(/_/g, ' ') : 'Ideation'}</span>
                     </div>
 
                     <h3 className="text-lg font-bold text-navy-900 font-heading">{st.name}</h3>
-                    <p className="text-xs text-slate-600 line-clamp-2">{st.tagline}</p>
+                    <p className="text-xs text-slate-600 line-clamp-2">{st.tagline || st.problem}</p>
                     
-                    <div className="text-xs text-slate-500 pt-2 border-t border-slate-100">
-                      <div>Founders: <span className="text-slate-900 font-medium">{st.founder_names.join(', ')}</span></div>
-                      <div>Cohort: <span className="text-teal-700 font-medium">{st.incubation_cohort || 'General Incubation'}</span></div>
+                    <div className="text-xs text-slate-500 pt-2 border-t border-slate-100 space-y-1">
+                      <div>Founders: <span className="text-slate-900 font-medium">{Array.isArray(st.founder_names) ? st.founder_names.join(', ') : st.founder_names || 'Student Team'}</span></div>
+                      {st.lab_allocated && (
+                        <div className="text-teal-700 font-medium">Allocated: {st.lab_allocated}</div>
+                      )}
+                      {st.assigned_mentor && (
+                        <div className="text-amber-700 font-medium">Mentor: {st.assigned_mentor}</div>
+                      )}
                     </div>
 
                     <div className="pt-2 flex justify-end gap-2">
-                      <Button variant="outline" size="sm" className="text-xs">
+                      <Button variant="outline" size="sm" onClick={() => handleAssignMentor(st.id)} className="text-xs">
                         Assign Mentor
                       </Button>
-                      <Button variant="navy" size="sm" className="text-xs">
+                      <Button variant="navy" size="sm" onClick={() => handleAllocateBay(st.id)} className="text-xs">
                         Allocate Bay Space
                       </Button>
                     </div>
                   </Card>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* =====================================================================
+              TAB 5: SECRETARIAT & INCOMING INQUIRIES
+          ===================================================================== */}
+          {activeTab === 'inquiries' && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-bold text-navy-900 font-heading">Secretariat & Student Inquiries</h2>
+                <p className="text-xs text-slate-500">Real-time incoming inquiries submitted from the official Contact desk</p>
+              </div>
+
+              {inquiries.length === 0 ? (
+                <Card className="border-slate-200 bg-white p-12 text-center max-w-md mx-auto shadow-card">
+                  <Mail className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                  <h3 className="text-base font-bold text-navy-900 font-heading">No New Inquiries</h3>
+                  <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                    Direct inquiries submitted via the Contact page will appear here immediately for response.
+                  </p>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {inquiries.map((inq) => (
+                    <Card key={inq.id} className="border-slate-200 bg-white p-5 shadow-card hover:shadow-lg transition-all space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-navy-900 text-sm">{inq.name}</span>
+                          <span className="text-xs text-slate-500">&lt;{inq.email}&gt;</span>
+                          <Badge variant={inq.status === 'Responded' ? 'outline' : 'teal'} className="text-[10px]">
+                            {inq.status || 'New'}
+                          </Badge>
+                        </div>
+                        <span className="text-[11px] text-slate-400">
+                          {new Date(inq.created_at).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-semibold text-teal-700 block">Topic: {inq.subject}</span>
+                        <p className="text-xs text-slate-700 mt-1 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          {inq.message}
+                        </p>
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-1">
+                        <a href={`mailto:${inq.email}?subject=Re: ${encodeURIComponent(inq.subject)} — EDC HITAM`}>
+                          <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                            <Mail className="h-3.5 w-3.5" />
+                            Email Applicant
+                          </Button>
+                        </a>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          onClick={() => handleToggleInquiryStatus(inq.id)}
+                          className="text-xs"
+                        >
+                          {inq.status === 'Responded' ? 'Mark as New' : 'Mark as Responded'}
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
