@@ -1,9 +1,8 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-const DEFAULT_SUPABASE_URL = 'https://kxsinhfsjmqrfkmoqelw.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w';
+const DEFAULT_SUPABASE_URL = 'https://zuqysklqojrsnfumxhrc.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_FgDfguhlWbYEN_n5LWixTA_A7cyns1b';
 
 export function createClient() {
   const cookieStore = cookies();
@@ -43,7 +42,6 @@ export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
 
   if (!serviceRoleKey) {
-    // Fallback to anon client if service role key is not configured in local environment
     return createClient();
   }
 

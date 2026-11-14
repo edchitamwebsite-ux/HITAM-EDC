@@ -2,9 +2,8 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAdminSessionToken } from '@/lib/auth-security';
 
-const DEFAULT_SUPABASE_URL = 'https://kxsinhfsjmqrfkmoqelw.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4c2luaGZzam1xcmZrbW9xZWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODEzNDksImV4cCI6MjA5NzI1NzM0OX0.sRiimBO19iO6kNdcxy2d5SmMkiZS4jsUDDtUWj3rp3w';
+const DEFAULT_SUPABASE_URL = 'https://zuqysklqojrsnfumxhrc.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_FgDfguhlWbYEN_n5LWixTA_A7cyns1b';
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -54,7 +53,7 @@ export async function middleware(request: NextRequest) {
           });
           response.cookies.set({
             name,
-            value: '',
+            value,
             ...options,
           });
         },
