@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Building
 } from 'lucide-react';
-import { FEATURED_EVENTS, INCUBATED_STARTUPS, OPPORTUNITIES } from '@/lib/data';
+import { FEATURED_EVENTS, INCUBATED_STARTUPS, OPPORTUNITIES_LIST, TEAM_MEMBERS } from '@/lib/data';
 
 interface SearchItem {
   id: string;
@@ -84,15 +84,23 @@ export function CommandPalette() {
       url: '/startups',
     }));
 
-    const opps: SearchItem[] = OPPORTUNITIES.map((o) => ({
+    const opps: SearchItem[] = OPPORTUNITIES_LIST.map((o) => ({
       id: `op-${o.id}`,
       title: o.title,
-      subtitle: `${o.type} • ${o.provider}`,
+      subtitle: `${o.category} • ${o.organization}`,
       category: 'Opportunities',
       url: '/opportunities',
     }));
 
-    return [...pages, ...events, ...startups, ...opps];
+    const team: SearchItem[] = TEAM_MEMBERS.map((t) => ({
+      id: `tm-${t.id}`,
+      title: t.name,
+      subtitle: `${t.role} (${t.category})`,
+      category: 'Pages',
+      url: '/team',
+    }));
+
+    return [...pages, ...events, ...startups, ...opps, ...team];
   }, []);
 
   const filteredItems = React.useMemo(() => {
