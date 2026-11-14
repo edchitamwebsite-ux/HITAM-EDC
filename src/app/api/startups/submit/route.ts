@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const StartupSubmitSchema = z.object({
   name: z.string().min(2, 'Startup or project name is required (min 2 chars)'),
   tagline: z.string().min(5, 'Elevator tagline is required (min 5 chars)'),

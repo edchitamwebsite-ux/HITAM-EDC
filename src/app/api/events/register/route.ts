@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FEATURED_EVENTS } from '@/lib/data';
 
+export const dynamic = 'force-dynamic';
+
 const RegisterSchema = z.object({
   event_id: z.string().min(1, 'Event ID is required'),
   reg_type: z.enum(['individual', 'team']),

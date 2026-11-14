@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { FEATURED_EVENTS } from '@/lib/data';
 import { Announcement } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const flagship = FEATURED_EVENTS[0]; // Concept Fusion 2026
 
