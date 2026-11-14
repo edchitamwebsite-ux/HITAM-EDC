@@ -20,15 +20,22 @@ import {
   Plus,
   Trash2,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Printer,
+  Copy,
+  Check,
+  FileText,
+  Users
 } from 'lucide-react';
 
 export default function StudentDashboardPage() {
-  const [activeTab, setActiveTab] = React.useState<'events' | 'startups' | 'notifications'>('events');
+  const [activeTab, setActiveTab] = React.useState<'events' | 'startups' | 'collabs' | 'notifications'>('events');
   
   // Loaded user state
   const [registrations, setRegistrations] = React.useState<any[]>([]);
   const [startups, setStartups] = React.useState<any[]>([]);
+  const [collabRequests, setCollabRequests] = React.useState<any[]>([]);
+  const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
   const [userProfile, setUserProfile] = React.useState({
     fullName: 'Shaik Rehan',
     role: 'Student Innovator',
@@ -73,7 +80,24 @@ export default function StudentDashboardPage() {
 
     const savedStartups = JSON.parse(localStorage.getItem('edc_my_startups') || '[]');
     setStartups(savedStartups);
+
+    const savedCollabs = JSON.parse(localStorage.getItem('edc_collab_requests') || '[]');
+    setCollabRequests(savedCollabs);
   }, []);
+
+  const handleCopyCode = (code: string) => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2500);
+    }
+  };
+
+  const handlePrintPass = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
 
   const handleCancelRegistration = (regCode: string) => {
     if (!confirm('Are you sure you want to cancel this event registration?')) return;
@@ -159,6 +183,18 @@ export default function StudentDashboardPage() {
             >
               <Rocket className="h-4 w-4" />
               My Startup Ideas ({startups.length})
+            </button>
+
+            <button
+              onClick={() => setActiveTab('collabs')}
+              className={`py-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+                activeTab === 'collabs'
+                  ? 'border-navy-900 text-navy-900'
+                  : 'border-transparent text-slate-500 hover:text-navy-900'
+              }`}
+            >
+              <Users className="h-4 w-4" />
+              Co-Founder / Team Matches ({collabRequests.length})
             </button>
 
             <button
@@ -255,6 +291,48 @@ export default function StudentDashboardPage() {
                         )}
                       </div>
 
+                      {/* Digital Barcode / QR Scan verification box */}
+                      <div className="relative z-10 p-2.5 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-white rounded-lg border border-slate-200">
+                            <QrCode className="h-5 w-5 text-navy-900" />
+                          </div>
+                          <div>
+                            <span className="text-[11px] font-bold text-navy-900 block leading-tight">Digital Access Pass</span>
+                            <span className="text-[10px] text-slate-500">Scan at Campus Gate 1 / Innovation Lab</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(reg.reg_code)}
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                            title="Copy registration identifier"
+                          >
+                            {copiedCode === reg.reg_code ? (
+                              <>
+                                <Check className="h-3.5 w-3.5 text-teal-600" />
+                                <span className="text-[10px] text-teal-700">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3.5 w-3.5 text-slate-500" />
+                                <span className="text-[10px]">Copy</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handlePrintPass}
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                            title="Print verification pass"
+                          >
+                            <Printer className="h-3.5 w-3.5 text-slate-500" />
+                            <span className="text-[10px]">Print</span>
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="relative z-10 pt-3 border-t border-slate-100 flex items-center justify-between">
                         <span className={`text-[11px] font-medium flex items-center gap-1 ${
                           reg.status === 'Cancelled' ? 'text-slate-400' : 'text-teal-700'
@@ -344,7 +422,71 @@ export default function StudentDashboardPage() {
             </div>
           )}
 
-          {/* TAB 3: NOTIFICATIONS FEED */}
+          {/* TAB 3: CO-FOUNDER & TEAM APPLICATIONS */}
+          {activeTab === 'collabs' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-navy-900 font-heading">Co-Founder & Team Collaboration Applications</h2>
+                  <p className="text-xs text-slate-500">Applications submitted to join incubated HITAM student startups</p>
+                </div>
+                <Link href="/startups">
+                  <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                    <Rocket className="h-3.5 w-3.5 text-teal-600" />
+                    Browse All Startups
+                  </Button>
+                </Link>
+              </div>
+
+              {collabRequests.length === 0 ? (
+                <Card className="border-slate-200 bg-white p-12 text-center max-w-md mx-auto shadow-card">
+                  <Users className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                  <h3 className="text-base font-bold text-navy-900 font-heading">No Collaboration Applications</h3>
+                  <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                    You haven&apos;t applied to join any student venture yet. Explore our incubated hardware and software startups looking for co-founders.
+                  </p>
+                  <Link href="/startups" className="mt-5 inline-block">
+                    <Button variant="teal" size="sm" className="text-xs">
+                      Find Startups Looking for Talent
+                    </Button>
+                  </Link>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {collabRequests.map((req, idx) => (
+                    <Card key={idx} className="border-slate-200 bg-white p-6 shadow-card space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="teal" className="text-[10px]">
+                          Role: {req.applied_role || 'Co-Founder'}
+                        </Badge>
+                        <span className="text-[11px] text-teal-700 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Application Received
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-navy-900 font-heading">
+                        {req.startup_name || 'Incubated Venture'}
+                      </h3>
+                      
+                      {req.message && (
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 italic">
+                          &ldquo;{req.message}&rdquo;
+                        </div>
+                      )}
+
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span>Applicant: {req.applicant_name} ({req.applicant_email})</span>
+                        <span>{new Date(req.timestamp || Date.now()).toLocaleDateString()}</span>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: NOTIFICATIONS FEED */}
           {activeTab === 'notifications' && (
             <div className="space-y-4 max-w-3xl">
               <h2 className="text-xl font-bold text-navy-900 font-heading mb-4">Official Notices & Conclave Announcements</h2>

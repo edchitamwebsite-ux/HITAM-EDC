@@ -15,7 +15,8 @@ import {
   Compass, 
   ShieldCheck, 
   UserCircle,
-  LogOut
+  LogOut,
+  Search
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -140,6 +141,21 @@ export function Navbar({ userRole, userEmail }: NavbarProps) {
 
           {/* Desktop Right Actions */}
           <div className="hidden lg:flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('open_command_palette'));
+                }
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-navy-800/80 hover:bg-navy-800 text-slate-300 hover:text-white border border-navy-700/80 text-xs transition-colors shadow-sm"
+              title="Global search (Ctrl+K)"
+            >
+              <Search className="h-3.5 w-3.5 text-teal-400" />
+              <span className="text-[11px] text-slate-400">Search</span>
+              <kbd className="text-[9px] px-1.5 py-0.5 bg-navy-900 border border-navy-700 rounded text-slate-400 font-mono">⌘K</kbd>
+            </button>
+
             {isAdminLoggedIn ? (
               <div className="flex items-center gap-2">
                 <Link href="/admin">
@@ -217,8 +233,19 @@ export function Navbar({ userRole, userEmail }: NavbarProps) {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex items-center lg:hidden">
+          {/* Mobile Menu & Search Button */}
+          <div className="flex items-center gap-1.5 lg:hidden">
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('open_command_palette'));
+                }
+              }}
+              className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800 transition-colors"
+              aria-label="Search site"
+            >
+              <Search className="h-5 w-5 text-teal-400" />
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400"

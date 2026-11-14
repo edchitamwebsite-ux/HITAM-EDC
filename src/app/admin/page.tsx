@@ -103,6 +103,7 @@ export default function AdminConsolePage() {
 
   // Startups & Moderation State
   const [startupsList, setStartupsList] = React.useState<any[]>(INCUBATED_STARTUPS);
+  const [collabRequests, setCollabRequests] = React.useState<any[]>([]);
 
   // Inquiries State
   const [inquiries, setInquiries] = React.useState<any[]>([]);
@@ -176,6 +177,10 @@ export default function AdminConsolePage() {
     // 5. Contact Inquiries state
     const savedInquiries = JSON.parse(localStorage.getItem('edc_inquiries') || '[]');
     setInquiries(savedInquiries);
+
+    // 6. Collab / Co-Founder match requests
+    const savedCollabs = JSON.parse(localStorage.getItem('edc_collab_requests') || '[]');
+    setCollabRequests(savedCollabs);
   }, []);
 
   // Filtered Participants
@@ -880,6 +885,41 @@ export default function AdminConsolePage() {
                     </div>
                   </Card>
                 ))}
+              </div>
+
+              {/* Co-Founder & Talent Matching Desk */}
+              <div className="pt-6 border-t border-slate-200">
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-navy-900 font-heading">Co-Founder & Talent Applications ({collabRequests.length})</h3>
+                  <p className="text-xs text-slate-500">Student applications to join venture teams submitted via the public Startup Hub</p>
+                </div>
+
+                {collabRequests.length === 0 ? (
+                  <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-500">
+                    No co-founder applications received yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {collabRequests.map((collab, cIdx) => (
+                      <Card key={cIdx} className="border-slate-200 bg-white p-5 shadow-card space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="teal" className="text-[10px]">Applied Role: {collab.applied_role || 'General'}</Badge>
+                          <span className="text-[11px] text-slate-400">{new Date(collab.timestamp || Date.now()).toLocaleDateString()}</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-navy-900 font-heading">Target Venture: {collab.startup_name}</h4>
+                        <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 italic">
+                          &ldquo;{collab.message}&rdquo;
+                        </p>
+                        <div className="text-xs text-slate-700 flex items-center justify-between pt-1">
+                          <span className="font-semibold">{collab.applicant_name}</span>
+                          <a href={`mailto:${collab.applicant_email}?subject=Regarding Your Application for ${encodeURIComponent(collab.startup_name || '')}`} className="text-teal-700 hover:underline font-medium">
+                            {collab.applicant_email}
+                          </a>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

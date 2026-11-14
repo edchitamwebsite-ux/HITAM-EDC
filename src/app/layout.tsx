@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { AnnouncementPopup } from '@/components/events/AnnouncementPopup';
 import { AnnouncementBanner } from '@/components/events/AnnouncementBanner';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 export const metadata: Metadata = {
   title: {
@@ -70,6 +71,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <AnnouncementPopup />
+        <CommandPalette />
       </body>
     </html>
   );

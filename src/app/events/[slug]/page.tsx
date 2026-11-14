@@ -18,7 +18,10 @@ import {
   AlertCircle, 
   HelpCircle, 
   ArrowLeft,
-  Check
+  Check,
+  QrCode,
+  Printer,
+  Copy
 } from 'lucide-react';
 
 export default function EventDetailPage() {
@@ -44,6 +47,21 @@ export default function EventDetailPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [registrationSuccess, setRegistrationSuccess] = React.useState<any | null>(null);
+  const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
+
+  const handleCopyCode = (code: string) => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2500);
+    }
+  };
+
+  const handlePrintTicket = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
 
   // Form Fields
   const [regType, setRegType] = React.useState<'individual' | 'team'>('individual');
@@ -485,6 +503,48 @@ export default function EventDetailPage() {
               <div className="flex justify-between relative z-20">
                 <span className="text-slate-500 font-sans">Timestamp:</span>
                 <span className="text-slate-500">{new Date(registrationSuccess.timestamp).toLocaleString('en-IN')}</span>
+              </div>
+
+              {/* Digital Access Verification Barcode Box */}
+              <div className="mt-3 p-2.5 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-between relative z-20">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-white rounded-lg border border-slate-200">
+                    <QrCode className="h-5 w-5 text-navy-900" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-navy-900 block leading-tight font-sans">Digital Entry Pass</span>
+                    <span className="text-[10px] text-slate-500 font-sans">Campus Security & Gate Check-in</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCode(registrationSuccess.reg_code)}
+                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-colors font-sans"
+                    title="Copy registration code"
+                  >
+                    {copiedCode === registrationSuccess.reg_code ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-teal-600" />
+                        <span className="text-[10px] text-teal-700">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5 text-slate-500" />
+                        <span className="text-[10px]">Copy ID</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrintTicket}
+                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-colors font-sans"
+                    title="Print confirmation ticket"
+                  >
+                    <Printer className="h-3.5 w-3.5 text-slate-500" />
+                    <span className="text-[10px]">Print</span>
+                  </button>
+                </div>
               </div>
             </div>
 
